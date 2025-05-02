@@ -1,0 +1,307 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Watch Tower - Onboarding</title>
+    <link href="index.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
+    <script src="https://unpkg.com/i18next@22.4.7/i18next.min.js"></script>
+</head>
+<body>
+    <!-- Loader -->
+    <div class="app-loader">
+        <div class="loader-lines"></div>
+        <img src="assets/logo.png" class="loader-logo" alt="Watch Tower Logo">
+    </div>
+
+    <!-- App Container -->
+    <div class="app-container">
+        <!-- Scan line effect -->
+        <div class="scan-line"></div>
+        
+        <!-- Grid overlay -->
+        <div class="grid-overlay"></div>
+        
+        <!-- Main Content Area -->
+        <div class="content-area">
+            <!-- Halftone overlay for entire app -->
+            <div class="halftone-overlay"></div>
+            
+            <!-- Onboarding screens container -->
+            <div class="onboarding-container" id="onboardingContainer">
+                <!-- Onboarding screen 1 -->
+                <div class="onboarding screen1" id="screen1">
+                    <!-- Geometric Pattern Background -->
+                    <div class="geometric-background">
+                        <div class="geometric-shape geo-shape-1"></div>
+                        <div class="geometric-shape geo-shape-2"></div>
+                        <div class="geometric-shape geo-shape-3"></div>
+                        <div class="geometric-shape geo-shape-4"></div>
+                        <div class="geometric-shape geo-shape-5"></div>
+                    </div>
+                    
+                    <div class="onboarding-content">
+                        <div class="exact-layout-container">
+                            <div class="character-exact-layout">
+                                <div class="character olive top-triangle"></div>
+                                <div class="middle-row">
+                                    <div class="character boxo left-square"></div>
+                                    <div class="character trigo right-triangle"></div>
+                                </div>
+                                <div class="character pinky bottom-circle"></div>
+                            </div>
+                            
+                            <div class="logo-container">
+                                <div class="watch-tower-logo">
+                                    <img src="assets/watchtowerlogo.png" alt="Watch Tower Logo">
+                                </div>
+                                
+                                <div class="description">
+                                    <span class="highlight">Your essential companion</span><br>
+                                    during power and water outages.<br>
+                                    <span class="highlight">Stay connected with your</span><br>
+                                    community when it matters most.
+                                </div>
+
+                                <button class="btn-next">
+                                    <span class="btn-text">NEXT</span>
+                                    <span class="btn-icon"><i class="fas fa-arrow-right"></i></span>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Onboarding screen 2 -->
+                <div class="onboarding screen2 hidden" id="screen2">
+                    <!-- Geometric Pattern Background -->
+                    <div class="geometric-background">
+                        <div class="geometric-shape geo-shape-1"></div>
+                        <div class="geometric-shape geo-shape-2"></div>
+                        <div class="geometric-shape geo-shape-3"></div>
+                    </div>
+                    
+                    <div class="onboarding-content">
+                        <h1>HOW IT WORKS</h1>
+                        <div class="orbital-graphic">
+                            <div class="orbital-center">
+                                <div class="center-icon"><i class="fas fa-broadcast-tower"></i></div>
+                            </div>
+                            <div class="orbital-path">
+                                <div class="orbital-item" data-delay="0">
+                                    <div class="orbital-icon"><i class="fas fa-exclamation-circle"></i></div>
+                                </div>
+                                <div class="orbital-item" data-delay="0.25">
+                                    <div class="orbital-icon"><i class="fas fa-check-circle"></i></div>
+                                </div>
+                                <div class="orbital-item" data-delay="0.5">
+                                    <div class="orbital-icon"><i class="fas fa-users"></i></div>
+                                </div>
+                                <div class="orbital-item" data-delay="0.75">
+                                    <div class="orbital-icon"><i class="fas fa-map-marked-alt"></i></div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="features-list">
+                            <div class="feature-item">
+                                <i class="fas fa-exclamation-circle"></i>
+                                <span>Report outages and restorations with one tap.</span>
+                                <div class="feature-glow"></div>
+                            </div>
+                            <div class="feature-item">
+                                <i class="fas fa-check-circle"></i>
+                                <span>Receive verified updates from utility providers.</span>
+                                <div class="feature-glow"></div>
+                            </div>
+                            <div class="feature-item">
+                                <i class="fas fa-users"></i>
+                                <span>Connect with your community through the chat center.</span>
+                                <div class="feature-glow"></div>
+                            </div>
+                            <div class="feature-item">
+                                <i class="fas fa-map-marked-alt"></i>
+                                <span>See real-time status of utilities in your area.</span>
+                                <div class="feature-glow"></div>
+                            </div>
+                        </div>
+                        
+                        <button class="btn-next">
+                            <span class="btn-text">NEXT</span>
+                            <span class="btn-icon"><i class="fas fa-arrow-right"></i></span>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Onboarding screen 3 -->
+                <div class="onboarding screen3 hidden" id="screen3">
+                    <!-- Geometric Pattern Background -->
+                    <div class="geometric-background">
+                        <div class="geometric-shape geo-shape-1"></div>
+                        <div class="geometric-shape geo-shape-2"></div>
+                        <div class="geometric-shape geo-shape-3"></div>
+                    </div>
+                    
+                    <div class="onboarding-content">
+                        <h1>CREATE YOUR PROFILE</h1>
+                        <p>Help us provide you with relevant information during outages.</p>
+                        
+                        <form class="profile-form">
+                            <div class="form-group">
+                                <label for="userZipcode">ZIPCODE</label>
+                                <div class="input-container">
+                                    <input type="text" id="userZipcode" placeholder="Enter your zipcode" required>
+                                    <div class="input-icon">
+                                        <i class="fas fa-map-marker-alt"></i>
+                                    </div>
+                                    <div class="input-highlight"></div>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label for="userEmail">EMAIL</label>
+                                <div class="input-container">
+                                    <input type="email" id="userEmail" placeholder="Enter your email" required>
+                                    <div class="input-icon">
+                                        <i class="fas fa-envelope"></i>
+                                    </div>
+                                    <div class="input-highlight"></div>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label for="userName">NAME (OPTIONAL)</label>
+                                <div class="input-container">
+                                    <input type="text" id="userName" placeholder="Enter your name">
+                                    <div class="input-icon">
+                                        <i class="fas fa-user"></i>
+                                    </div>
+                                    <div class="input-highlight"></div>
+                                </div>
+                            </div>
+                            <div class="form-checkbox">
+                                <input type="checkbox" id="notificationConsent">
+                                <div class="custom-checkbox">
+                                    <i class="fas fa-check"></i>
+                                </div>
+                                <label for="notificationConsent">I want to receive notifications about outages in my area.</label>
+                            </div>
+                        </form>
+                        
+                        <button id="createProfileBtn" class="btn-next">
+                            <span class="btn-text">NEXT</span>
+                            <span class="btn-icon"><i class="fas fa-arrow-right"></i></span>
+                        </button>
+                    </div>
+                </div>
+                
+                <!-- Character Selection Screen -->
+ <!-- Character Selection Screen -->
+<div class="onboarding screen4 hidden" id="screen4">
+    <!-- Geometric Pattern Background -->
+    <div class="geometric-background">
+        <div class="geometric-shape geo-shape-1"></div>
+        <div class="geometric-shape geo-shape-2"></div>
+        <div class="geometric-shape geo-shape-3"></div>
+    </div>
+    
+    <div class="onboarding-content">
+        <h1>CHOOSE YOUR GUIDE</h1>
+        <p>Select a Watch Tower buddy who will assist you during outages and provide important updates.</p>
+        
+        <div class="character-gallery">
+            <!-- Olive -->
+            <div class="character-card" data-character="olive">
+              <div class="selection-indicator"><i class="fas fa-check"></i></div>
+              <div class="character-image-container">
+                <div class="character-bg-glow olive-glow"></div>
+                <div class="character olive"></div>
+              </div>
+              <div class="character-info">
+                <div class="character-name">OLIVE</div>
+                <div class="character-trait">The Optimistic Triangle</div>
+              </div>
+            </div>
+          
+            <!-- Pinky -->
+            <div class="character-card" data-character="pinky">
+              <div class="selection-indicator"><i class="fas fa-check"></i></div>
+              <div class="character-image-container">
+                <div class="character-bg-glow pinky-glow"></div>
+                <div class="character pinky"></div>
+              </div>
+              <div class="character-info">
+                <div class="character-name">PINKY</div>
+                <div class="character-trait">The Cheerful Circle</div>
+              </div>
+            </div>
+          
+            <!-- Boxo -->
+            <div class="character-card" data-character="boxo">
+              <div class="selection-indicator"><i class="fas fa-check"></i></div>
+              <div class="character-image-container">
+                <div class="character-bg-glow boxo-glow"></div>
+                <div class="character boxo"></div>
+              </div>
+              <div class="character-info">
+                <div class="character-name">BOXO</div>
+                <div class="character-trait">The Reliable Square</div>
+              </div>
+            </div>
+          
+            <!-- Ghost -->
+            <div class="character-card" data-character="ghost">
+              <div class="selection-indicator"><i class="fas fa-check"></i></div>
+              <div class="character-image-container">
+                <div class="character-bg-glow ghost-glow"></div>
+                <div class="character ghost"></div>
+              </div>
+              <div class="character-info">
+                <div class="character-name">GHOST</div>
+                <div class="character-trait">The Mysterious Helper</div>
+              </div>
+            </div>
+          
+            <!-- Trigo -->
+            <div class="character-card" data-character="trigo">
+              <div class="selection-indicator"><i class="fas fa-check"></i></div>
+              <div class="character-image-container">
+                <div class="character-bg-glow trigo-glow"></div>
+                <div class="character trigo"></div>
+              </div>
+              <div class="character-info">
+                <div class="character-name">TRIGO</div>
+                <div class="character-trait">The Technical Genius</div>
+              </div>
+            </div>
+          </div>
+          
+        
+        <button id="finalizeProfileBtn" class="btn-next pulse-btn">
+            <span class="btn-text">GET STARTED!</span>
+        </button>
+        
+        <!-- Progress Indicator -->
+        <div class="progress-indicator">
+            <div class="progress-dot"></div>
+            <div class="progress-dot"></div>
+            <div class="progress-dot"></div>
+            <div class="progress-dot active"></div>
+        </div>
+    </div>
+</div>
+
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Toast Notification -->
+    <div class="toast" id="toast">
+        <i class="toast-icon"></i>
+        <span class="toast-message"></span>
+    </div>
+
+    <script src="index.js"></script>
+</body>
+</html>
