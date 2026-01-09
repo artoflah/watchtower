@@ -2,11 +2,11 @@
 
 @font-face {
     font-family: "Resot";
-    src: url("assets/ResotYgPERSONALUSE.ttf") format("truetype");
+    src: url("ResotYgPERSONALUSE.ttf") format("truetype");
 }
 @font-face {
     font-family: "GTVCS";
-    src: url("assets/GTVCS-Medium.otf") format("truetype");
+    src: url("GTVCS-Medium.otf") format("truetype");
 }
 
 * {
@@ -323,27 +323,27 @@ p, .character-trait, .character-info, .form-checkbox, h2, input, textarea, selec
 
 /* Character designs with enhanced glowing effect */
 .character.olive {
-    background-image: url('assets/olive.png');
+    background-image: url('olive.png');
     filter: drop-shadow(0 0 15px rgba(102, 255, 153, 0.8));
 }
 
 .character.pinky {
-    background-image: url('assets/pinky.png');
+    background-image: url('pinky.png');
     filter: drop-shadow(0 0 15px rgba(255, 102, 204, 0.8));
 }
 
 .character.boxo {
-    background-image: url('assets/boxo.png');
+    background-image: url('boxo.png');
     filter: drop-shadow(0 0 15px rgba(153, 102, 255, 0.8));
 }
 
 .character.trigo {
-    background-image: url('assets/trigo.png');
+    background-image: url('trigo.png');
     filter: drop-shadow(0 0 15px rgba(255, 153, 102, 0.8));
 }
 
 .character.ghost {
-    background-image: url('assets/ghost.png');
+    background-image: url('ghost.png');
     filter: drop-shadow(0 0 15px rgba(255, 255, 255, 0.8));
 }
 
@@ -1353,11 +1353,11 @@ p, .character-trait, .character-info, .form-checkbox, h2, input, textarea, selec
   opacity: 1;
 }
 
-.character.olive { background-image: url('assets/olive.png'); }
-.character.pinky { background-image: url('assets/pinky.png'); }
-.character.boxo  { background-image: url('assets/boxo.png'); }
-.character.ghost { background-image: url('assets/ghost.png'); }
-.character.trigo { background-image: url('assets/trigo.png'); }
+.character.olive { background-image: url('olive.png'); }
+.character.pinky { background-image: url('pinky.png'); }
+.character.boxo  { background-image: url('boxo.png'); }
+.character.ghost { background-image: url('ghost.png'); }
+.character.trigo { background-image: url('trigo.png'); }
 
 #screen4 .character {
     width: 100px;
