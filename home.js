@@ -425,19 +425,19 @@ function updateProfileInfo() {
                     background-repeat: no-repeat;
                 }
                 .character-avatar.olive {
-                    background-image: url('assets/olive.png');
+                    background-image: url('olive.png');
                 }
                 .character-avatar.pinky {
-                    background-image: url('assets/pinky.png');
+                    background-image: url('pinky.png');
                 }
                 .character-avatar.boxo {
-                    background-image: url('assets/boxo.png');
+                    background-image: url('boxo.png');
                 }
                 .character-avatar.trigo {
-                    background-image: url('assets/trigo.png');
+                    background-image: url('trigo.png');
                 }
                 .character-avatar.ghost {
-                    background-image: url('assets/ghost.png');
+                    background-image: url('ghost.png');
                 }
             `;
             document.head.appendChild(style);
@@ -1407,19 +1407,19 @@ function loadCommunityPosts() {
                 background-repeat: no-repeat;
             }
             .post-avatar-character.olive {
-                background-image: url('assets/olive.png');
+                background-image: url('olive.png');
             }
             .post-avatar-character.pinky {
-                background-image: url('assets/pinky.png');
+                background-image: url('pinky.png');
             }
             .post-avatar-character.boxo {
-                background-image: url('assets/boxo.png');
+                background-image: url('boxo.png');
             }
             .post-avatar-character.trigo {
-                background-image: url('assets/trigo.png');
+                background-image: url('trigo.png');
             }
             .post-avatar-character.ghost {
-                background-image: url('assets/ghost.png');
+                background-image: url('ghost.png');
             }
         `;
         document.head.appendChild(style);
@@ -1718,11 +1718,11 @@ function loadCommunityPosts() {
                 background-position: center;
                 background-repeat: no-repeat;
             }
-            .post-avatar-character.olive { background-image: url('assets/olive.png'); }
-            .post-avatar-character.pinky { background-image: url('assets/pinky.png'); }
-            .post-avatar-character.boxo { background-image: url('assets/boxo.png'); }
-            .post-avatar-character.trigo { background-image: url('assets/trigo.png'); }
-            .post-avatar-character.ghost { background-image: url('assets/ghost.png'); }
+            .post-avatar-character.olive { background-image: url('olive.png'); }
+            .post-avatar-character.pinky { background-image: url('pinky.png'); }
+            .post-avatar-character.boxo { background-image: url('boxo.png'); }
+            .post-avatar-character.trigo { background-image: url('trigo.png'); }
+            .post-avatar-character.ghost { background-image: url('ghost.png'); }
             .comment-input {
                 margin-top: 10px;
                 display: flex;
