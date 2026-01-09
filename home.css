@@ -1,10 +1,10 @@
 @font-face {
   font-family: "Resot";
-  src: url("assets/ResotYgPERSONALUSE.ttf") format("truetype");
+  src: url("ResotYgPERSONALUSE.ttf") format("truetype");
 }
 @font-face {
   font-family: "GTVCS";
-  src: url("assets/GTVCS-Medium.otf") format("truetype");
+  src: url("GTVCS-Medium.otf") format("truetype");
 }
 
 body {
