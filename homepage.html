@@ -1,0 +1,1270 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>WATCHTOWER — NYC Utility Grid</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Mono:ital,wght@0,300;0,400;0,500;1,400&family=Barlow+Condensed:wght@200;300;400;600;700;900&display=swap" rel="stylesheet">
+<style>
+:root {
+  --ink: #080808;
+  --paper: #ede9e0;
+  --red: #d42b20;
+  --red2: #ff3b2f;
+  --mid: #555;
+  --faint: rgba(237,233,224,0.05);
+  --rule: 1px solid rgba(237,233,224,0.1);
+  --rule-bright: 1px solid rgba(237,233,224,0.22);
+}
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+html { scroll-behavior: smooth; }
+
+body {
+  background: var(--ink);
+  color: var(--paper);
+  font-family: 'DM Mono', monospace;
+  overflow-x: hidden;
+  cursor: crosshair;
+}
+
+/* grain */
+body::before {
+  content: '';
+  position: fixed; inset: 0; z-index: 9000; pointer-events: none;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 512 512' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='f'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.75' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23f)'/%3E%3C/svg%3E");
+  opacity: 0.055; mix-blend-mode: overlay;
+}
+
+/* grid */
+body::after {
+  content: '';
+  position: fixed; inset: 0; z-index: 0; pointer-events: none;
+  background-image:
+    linear-gradient(rgba(237,233,224,0.025) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(237,233,224,0.025) 1px, transparent 1px);
+  background-size: 52px 52px;
+}
+
+@keyframes blink  { 0%,100%{opacity:1} 50%{opacity:0.2} }
+@keyframes ticker { 0%{transform:translateX(0)} 100%{transform:translateX(-50%)} }
+@keyframes fadeUp { from{opacity:0;transform:translateY(20px)} to{opacity:1;transform:none} }
+@keyframes flicker{ 0%,97%{opacity:1} 98%{opacity:0.75} 100%{opacity:1} }
+@keyframes glitch { 0%,100%{clip-path:inset(0 0 100% 0)} 8%{clip-path:inset(25% 0 65% 0)} 18%{clip-path:inset(75% 0 10% 0)} 28%{clip-path:inset(5% 0 88% 0)} 38%{clip-path:inset(55% 0 38% 0)} 48%{clip-path:inset(0 0 100% 0)} }
+@keyframes pulse  { 0%,100%{box-shadow:0 0 0 0 rgba(212,43,32,0.4)} 50%{box-shadow:0 0 0 6px rgba(212,43,32,0)} }
+
+/* ── NAV ── */
+nav {
+  position: fixed; top: 0; left: 0; right: 0; z-index: 500;
+  display: flex; align-items: stretch; height: 56px;
+  border-bottom: var(--rule);
+  background: rgba(8,8,8,0.97);
+  backdrop-filter: blur(12px);
+}
+
+.nav-logo {
+  display: flex; align-items: center;
+  padding: 0 20px 0 20px;
+  border-right: var(--rule);
+  gap: 12px; text-decoration: none; flex-shrink: 0;
+}
+
+/* YOUR LOGO */
+.nav-logo-img {
+  width: 34px; height: 34px;
+  object-fit: contain;
+  filter: brightness(1);
+  display: block;
+}
+
+.nav-logo-type {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 18px; letter-spacing: 0.2em;
+  color: var(--paper);
+  display: flex; align-items: baseline; gap: 4px;
+}
+
+.nav-logo-type sup {
+  font-family: 'DM Mono', monospace;
+  font-size: 7px; color: var(--mid);
+  position: relative; top: -3px; letter-spacing: 0.08em;
+}
+
+.nav-links {
+  display: flex; align-items: center;
+  list-style: none; flex: 1; padding: 0 16px; gap: 2px;
+}
+
+.nav-links a {
+  font-size: 9px; letter-spacing: 0.2em; text-transform: uppercase;
+  color: var(--mid); text-decoration: none; padding: 6px 13px;
+  transition: color 0.15s, background 0.15s;
+}
+
+.nav-links a:hover { color: var(--paper); background: var(--faint); }
+
+.nav-right { display: flex; align-items: stretch; border-left: var(--rule); }
+
+.nav-status {
+  display: flex; align-items: center; gap: 8px;
+  padding: 0 20px; border-right: var(--rule);
+  font-size: 9px; letter-spacing: 0.16em; text-transform: uppercase;
+  color: var(--red2);
+}
+
+.nav-status::before {
+  content: ''; width: 6px; height: 6px;
+  background: var(--red2); border-radius: 50%;
+  animation: blink 1.4s ease-in-out infinite;
+}
+
+.nav-cta {
+  display: flex; align-items: center; padding: 0 24px;
+  font-size: 9px; letter-spacing: 0.2em; text-transform: uppercase;
+  color: var(--ink); background: var(--paper); text-decoration: none;
+  transition: background 0.15s, color 0.15s;
+}
+
+.nav-cta:hover { background: var(--red); color: var(--paper); }
+
+/* ── TICKER ── */
+.ticker-wrap {
+  position: fixed; top: 56px; left: 0; right: 0; z-index: 499;
+  background: var(--red); height: 26px;
+  display: flex; align-items: center; overflow: hidden;
+}
+
+.ticker-track {
+  display: flex; white-space: nowrap;
+  animation: ticker 30s linear infinite;
+}
+
+.t-item {
+  font-size: 9px; letter-spacing: 0.2em; text-transform: uppercase;
+  padding: 0 52px; color: var(--paper);
+}
+
+/* ── HERO ── */
+.hero {
+  min-height: 100vh; padding-top: 82px;
+  display: grid; grid-template-rows: 36px 1fr;
+  position: relative; z-index: 1;
+  border-bottom: var(--rule-bright);
+}
+
+.hero-strip {
+  display: grid; grid-template-columns: 1fr auto;
+  border-bottom: var(--rule);
+}
+
+.hero-coords {
+  display: flex; align-items: center;
+  padding: 0 32px; gap: 0;
+  border-right: var(--rule);
+}
+
+.coord {
+  font-size: 9px; letter-spacing: 0.16em;
+  color: rgba(237,233,224,0.28); padding: 0 16px;
+  border-right: var(--rule);
+}
+
+.coord:first-child { padding-left: 0; }
+
+.hero-strip-right {
+  padding: 0 24px; display: flex; align-items: center;
+  font-size: 9px; letter-spacing: 0.14em; color: rgba(237,233,224,0.2);
+}
+
+.hero-body {
+  display: grid; grid-template-columns: 1fr 380px;
+}
+
+/* HERO LEFT */
+.hero-left {
+  padding: 52px 44px 52px 44px;
+  border-right: var(--rule);
+  display: flex; flex-direction: column;
+  justify-content: space-between;
+  position: relative; overflow: hidden;
+}
+
+.hero-glitch {
+  position: absolute; top: 52px; left: 44px;
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: clamp(120px, 18vw, 240px); line-height: 0.82;
+  color: var(--red); opacity: 0; pointer-events: none; z-index: 3;
+  animation: glitch 14s steps(1) infinite; transform: translateX(3px);
+}
+
+.hero-wordmark {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: clamp(120px, 18vw, 240px); line-height: 0.82;
+  color: var(--paper); position: relative; z-index: 2;
+  animation: flicker 9s ease-in-out infinite;
+}
+
+.hero-wordmark .wm2 {
+  display: block;
+  color: transparent;
+  -webkit-text-stroke: 1px var(--paper);
+  opacity: 0.85;
+}
+
+.hero-wordmark .wm2 em {
+  color: var(--red); -webkit-text-stroke: 0; font-style: normal;
+}
+
+/* logo lockup inside hero — large display */
+.hero-logo-lockup {
+  display: flex; align-items: center; gap: 24px; margin-bottom: 16px;
+}
+
+.hero-logo-large {
+  width: 72px; height: 72px;
+  object-fit: contain;
+  filter: brightness(1);
+}
+
+.hero-eyebrow {
+  font-size: 9px; letter-spacing: 0.26em; text-transform: uppercase;
+  color: var(--mid); display: flex; align-items: center; gap: 12px;
+  margin-bottom: 20px;
+}
+
+.hero-eyebrow::before {
+  content: ''; width: 20px; height: 1px;
+  background: var(--red); display: inline-block; flex-shrink: 0;
+}
+
+.hero-bottom {
+  display: grid; grid-template-columns: 1fr 1fr;
+  border-top: var(--rule); margin-top: 40px;
+}
+
+.hero-stat {
+  padding: 22px 0; border-right: var(--rule); padding-right: 24px;
+}
+
+.hero-stat:last-child { border-right: none; padding-left: 24px; padding-right: 0; }
+
+.stat-big {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 52px; line-height: 1; color: var(--paper);
+}
+
+.stat-big em { color: var(--red); font-style: normal; }
+
+.stat-label {
+  font-size: 8px; letter-spacing: 0.2em; text-transform: uppercase;
+  color: var(--mid); margin-top: 2px;
+}
+
+.hero-desc {
+  font-family: 'Barlow Condensed', sans-serif;
+  font-weight: 300; font-size: 17px; line-height: 1.55;
+  color: rgba(237,233,224,0.45); max-width: 400px;
+  margin: 20px 0 32px;
+}
+
+.hero-ctas { display: flex; gap: 20px; align-items: center; }
+
+.btn-fill {
+  font-size: 9px; letter-spacing: 0.22em; text-transform: uppercase;
+  color: var(--ink); background: var(--paper);
+  padding: 13px 26px; text-decoration: none;
+  border: none; cursor: crosshair; display: inline-block;
+  transition: background 0.15s, color 0.15s;
+}
+
+.btn-fill:hover { background: var(--red); color: var(--paper); }
+
+.btn-ghost {
+  font-size: 9px; letter-spacing: 0.18em; text-transform: uppercase;
+  color: var(--mid); text-decoration: none; transition: color 0.15s;
+}
+
+.btn-ghost:hover { color: var(--paper); }
+
+/* HERO RIGHT — feed */
+.hero-right { display: flex; flex-direction: column; }
+
+.feed-head {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 14px 24px; border-bottom: var(--rule); flex-shrink: 0;
+}
+
+.feed-lbl { font-size: 8px; letter-spacing: 0.22em; text-transform: uppercase; color: var(--mid); }
+
+.feed-live {
+  display: flex; align-items: center; gap: 7px;
+  font-size: 8px; letter-spacing: 0.16em; text-transform: uppercase;
+  color: var(--red2);
+}
+
+.feed-live::before {
+  content: ''; width: 5px; height: 5px;
+  background: var(--red2); border-radius: 50%;
+  animation: blink 1.4s ease-in-out infinite;
+}
+
+.feed-rows { flex: 1; overflow-y: auto; }
+.feed-rows::-webkit-scrollbar { width: 2px; }
+.feed-rows::-webkit-scrollbar-thumb { background: #1e1e1e; }
+
+.f-row {
+  display: grid; grid-template-columns: 1fr 48px 54px;
+  align-items: center; gap: 8px;
+  padding: 11px 24px; border-bottom: var(--rule);
+  cursor: crosshair; transition: background 0.12s;
+}
+
+.f-row:hover { background: rgba(237,233,224,0.02); }
+
+.f-zone { font-size: 10px; color: rgba(237,233,224,0.62); letter-spacing: 0.03em; line-height: 1.3; }
+.f-zone small { display: block; font-size: 8px; color: var(--mid); letter-spacing: 0.1em; margin-top: 1px; }
+.f-type { font-size: 8px; letter-spacing: 0.1em; text-transform: uppercase; color: var(--mid); text-align: right; }
+
+.f-badge {
+  font-size: 8px; letter-spacing: 0.1em; text-transform: uppercase;
+  padding: 3px 7px; text-align: center;
+}
+
+.bOUT  { background: var(--red); color: var(--paper); }
+.bON   { border: 1px solid rgba(237,233,224,0.12); color: rgba(237,233,224,0.35); }
+.bPART { background: rgba(160,120,10,0.18); color: #c8a020; border: 1px solid rgba(160,120,10,0.3); }
+
+.feed-foot {
+  padding: 12px 24px; border-top: var(--rule);
+  display: flex; justify-content: space-between; flex-shrink: 0;
+}
+
+.feed-foot a {
+  font-size: 9px; letter-spacing: 0.16em; text-transform: uppercase;
+  color: var(--mid); text-decoration: none; transition: color 0.15s;
+}
+
+.feed-foot a:hover { color: var(--paper); }
+
+/* ── MANIFESTO ── */
+.manifesto {
+  border-bottom: var(--rule-bright);
+  display: grid; grid-template-columns: 160px 1fr 180px;
+  position: relative; z-index: 1;
+}
+
+.man-num {
+  font-size: 9px; letter-spacing: 0.2em; color: var(--mid);
+  padding: 32px; border-right: var(--rule); display: flex; align-items: center;
+}
+
+.man-text {
+  padding: 32px 52px;
+  font-family: 'Barlow Condensed', sans-serif;
+  font-size: clamp(20px, 2.8vw, 36px); font-weight: 300; line-height: 1.3;
+  color: rgba(237,233,224,0.6); letter-spacing: 0.02em;
+}
+
+.man-text strong { color: var(--paper); font-weight: 600; }
+.man-text em { color: var(--red); font-style: normal; font-weight: 600; }
+
+.man-aside {
+  padding: 32px; border-left: var(--rule);
+  display: flex; flex-direction: column; justify-content: flex-end;
+}
+
+.man-aside p {
+  font-size: 8px; letter-spacing: 0.12em;
+  color: rgba(237,233,224,0.18); line-height: 1.8;
+}
+
+/* ── SECTION HEADER ── */
+.sec-head {
+  display: grid; grid-template-columns: 80px 1fr auto;
+  border-bottom: var(--rule); border-top: var(--rule);
+  position: relative; z-index: 1;
+}
+
+.sec-n {
+  font-size: 9px; letter-spacing: 0.2em; color: var(--mid);
+  padding: 16px 24px; border-right: var(--rule); display: flex; align-items: center;
+}
+
+.sec-title {
+  font-size: 9px; letter-spacing: 0.22em; text-transform: uppercase;
+  color: var(--mid); padding: 16px 28px; display: flex; align-items: center;
+}
+
+.sec-right {
+  padding: 16px 28px; border-left: var(--rule);
+  font-size: 9px; letter-spacing: 0.14em;
+  color: rgba(237,233,224,0.18); display: flex; align-items: center;
+}
+
+/* ── HOW ── */
+.how-grid {
+  display: grid; grid-template-columns: repeat(4,1fr);
+  position: relative; z-index: 1; border-bottom: var(--rule-bright);
+}
+
+.how-cell {
+  padding: 48px 32px; border-right: var(--rule);
+  position: relative; overflow: hidden; transition: background 0.2s;
+}
+
+.how-cell:last-child { border-right: none; }
+.how-cell:hover { background: rgba(237,233,224,0.018); }
+
+.how-ghost {
+  font-family: 'Bebas Neue', sans-serif; font-size: 130px; line-height: 1;
+  color: rgba(237,233,224,0.04); position: absolute; top: 0; right: 8px;
+  pointer-events: none; user-select: none; transition: color 0.2s;
+}
+
+.how-cell:hover .how-ghost { color: rgba(212,43,32,0.06); }
+
+.how-icon {
+  width: 32px; height: 32px; margin-bottom: 24px;
+  border: 1px solid rgba(237,233,224,0.13);
+  display: flex; align-items: center; justify-content: center;
+}
+
+.how-title {
+  font-family: 'Barlow Condensed', sans-serif;
+  font-size: 20px; font-weight: 700; text-transform: uppercase;
+  letter-spacing: 0.05em; color: var(--paper); margin-bottom: 12px; line-height: 1.05;
+}
+
+.how-body { font-size: 10px; line-height: 1.85; color: rgba(237,233,224,0.36); }
+
+/* ── TYPE BREAK ── */
+.type-break {
+  padding: 0 44px; border-bottom: var(--rule-bright);
+  position: relative; z-index: 1; overflow: hidden;
+}
+
+.type-break-inner {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: clamp(56px, 9vw, 130px); line-height: 0.88;
+  color: transparent; -webkit-text-stroke: 1px rgba(237,233,224,0.13);
+  white-space: nowrap; padding: 24px 0; letter-spacing: 0.04em;
+  transition: -webkit-text-stroke-color 0.4s;
+}
+
+.type-break:hover .type-break-inner { -webkit-text-stroke-color: rgba(237,233,224,0.28); }
+.type-break-inner span { color: var(--red); -webkit-text-stroke: 0; }
+
+/* ── FEATURES ── */
+.feat-grid {
+  display: grid; grid-template-columns: 1fr 1fr;
+  position: relative; z-index: 1; border-bottom: var(--rule-bright);
+}
+
+.feat-cell {
+  padding: 56px 52px; border-right: var(--rule); border-bottom: var(--rule);
+  position: relative; overflow: hidden; transition: background 0.2s;
+}
+
+.feat-cell:nth-child(even) { border-right: none; }
+.feat-cell:nth-child(n+3) { border-bottom: none; }
+.feat-cell:hover { background: rgba(237,233,224,0.015); }
+
+.feat-tag {
+  font-size: 8px; letter-spacing: 0.28em; text-transform: uppercase;
+  color: var(--red); margin-bottom: 18px;
+  display: flex; align-items: center; gap: 10px;
+}
+
+.feat-tag::before {
+  content: ''; width: 14px; height: 1px;
+  background: var(--red); display: inline-block; flex-shrink: 0;
+}
+
+.feat-title {
+  font-family: 'Bebas Neue', sans-serif; font-size: 52px;
+  color: var(--paper); margin-bottom: 16px; line-height: 0.92;
+}
+
+.feat-body { font-size: 10px; line-height: 1.85; color: rgba(237,233,224,0.36); max-width: 320px; }
+
+.feat-ghost {
+  font-family: 'Bebas Neue', sans-serif; font-size: 200px;
+  color: rgba(237,233,224,0.022); position: absolute; bottom: -36px; right: -12px;
+  line-height: 1; pointer-events: none; user-select: none;
+}
+
+/* ── MAP SECTION ── */
+.map-section {
+  display: grid; grid-template-columns: 320px 1fr;
+  position: relative; z-index: 1; border-bottom: var(--rule-bright);
+}
+
+.map-copy {
+  padding: 60px 40px; border-right: var(--rule);
+  display: flex; flex-direction: column; justify-content: space-between;
+}
+
+.map-copy h2 {
+  font-family: 'Bebas Neue', sans-serif; font-size: 80px; line-height: 0.88;
+  color: var(--paper); margin-bottom: 20px;
+}
+
+.map-copy p {
+  font-size: 10px; line-height: 1.85; color: rgba(237,233,224,0.36);
+  margin-bottom: 32px; max-width: 250px;
+}
+
+.legend { display: flex; flex-direction: column; gap: 10px; margin-bottom: 44px; }
+
+.leg-row {
+  display: flex; align-items: center; gap: 10px;
+  font-size: 9px; letter-spacing: 0.1em; color: rgba(237,233,224,0.38);
+}
+
+.leg-sq { width: 9px; height: 9px; flex-shrink: 0; }
+.lg { background: #1a6e2e; }
+.lr { background: var(--red); }
+.ly { background: #8a6e10; }
+
+/* ── GOOGLE MAP ── */
+.map-wrap {
+  position: relative; overflow: hidden; min-height: 540px;
+  display: flex; flex-direction: column;
+}
+
+/* dark overlay + mix-blend to desaturate google map */
+.map-tint {
+  position: absolute; inset: 0; z-index: 2; pointer-events: none;
+  background: rgba(8,8,8,0.35);
+  mix-blend-mode: multiply;
+}
+
+/* red crosshair overlay */
+.map-crosshair {
+  position: absolute; top: 50%; left: 50%; z-index: 3;
+  transform: translate(-50%, -50%);
+  pointer-events: none;
+  width: 24px; height: 24px;
+}
+
+.map-crosshair::before,
+.map-crosshair::after {
+  content: ''; position: absolute; background: var(--red);
+}
+
+.map-crosshair::before { width: 1px; height: 100%; left: 50%; top: 0; }
+.map-crosshair::after  { height: 1px; width: 100%; top: 50%; left: 0; }
+
+.map-crosshair-dot {
+  position: absolute; top: 50%; left: 50%;
+  transform: translate(-50%, -50%);
+  width: 6px; height: 6px; background: var(--red); border-radius: 50%;
+  animation: pulse 2s ease-in-out infinite;
+}
+
+/* neighborhood pins */
+.map-pins {
+  position: absolute; inset: 0; z-index: 4; pointer-events: none;
+}
+
+.pin {
+  position: absolute;
+  display: flex; align-items: center; gap: 6px;
+  pointer-events: all; cursor: crosshair;
+  transition: opacity 0.2s;
+}
+
+.pin:hover { opacity: 0.8; }
+
+.pin-dot {
+  width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0;
+  border: 1px solid rgba(8,8,8,0.5);
+}
+
+.p-out { background: var(--red2); }
+.p-on  { background: #2a9944; }
+.p-par { background: #c8a020; }
+
+.pin-label {
+  font-family: 'DM Mono', monospace;
+  font-size: 8px; letter-spacing: 0.1em; text-transform: uppercase;
+  color: var(--paper); white-space: nowrap;
+  background: rgba(8,8,8,0.75); padding: 3px 7px;
+  border: 1px solid rgba(237,233,224,0.12);
+}
+
+.map-timestamp {
+  position: absolute; bottom: 14px; right: 16px; z-index: 5;
+  font-size: 7px; letter-spacing: 0.16em; text-transform: uppercase;
+  color: rgba(237,233,224,0.3); font-family: 'DM Mono', monospace;
+  background: rgba(8,8,8,0.6); padding: 4px 10px;
+}
+
+/* neighborhood selector above map */
+.map-controls {
+  display: flex; align-items: center; gap: 0;
+  border-bottom: var(--rule); flex-shrink: 0; z-index: 6;
+  background: rgba(8,8,8,0.9);
+}
+
+.map-ctrl-label {
+  font-size: 8px; letter-spacing: 0.2em; text-transform: uppercase;
+  color: var(--mid); padding: 10px 18px; border-right: var(--rule);
+  white-space: nowrap; flex-shrink: 0;
+}
+
+.hood-tabs {
+  display: flex; overflow-x: auto; flex: 1;
+}
+
+.hood-tabs::-webkit-scrollbar { height: 2px; }
+.hood-tabs::-webkit-scrollbar-thumb { background: #222; }
+
+.hood-tab {
+  font-size: 8px; letter-spacing: 0.16em; text-transform: uppercase;
+  color: var(--mid); padding: 10px 18px; border-right: var(--rule);
+  cursor: crosshair; white-space: nowrap; flex-shrink: 0;
+  transition: color 0.15s, background 0.15s;
+  background: none; border-top: none; border-bottom: none; border-left: none;
+  font-family: 'DM Mono', monospace;
+}
+
+.hood-tab:hover { color: var(--paper); background: rgba(237,233,224,0.03); }
+.hood-tab.active { color: var(--paper); border-bottom: 2px solid var(--red); }
+
+/* actual map iframe */
+.gmap-iframe {
+  width: 100%; flex: 1; border: none; min-height: 480px;
+  filter: grayscale(100%) invert(92%) contrast(90%);
+  opacity: 0.85;
+}
+
+/* ── REPORT ── */
+.report-section {
+  display: grid; grid-template-columns: 1fr 340px;
+  position: relative; z-index: 1; border-bottom: var(--rule-bright);
+}
+
+.report-left { padding: 64px 52px; border-right: var(--rule); }
+
+.report-left h2 {
+  font-family: 'Bebas Neue', sans-serif; font-size: 88px; line-height: 0.88;
+  color: var(--paper); margin-bottom: 8px;
+}
+
+.report-sub {
+  font-size: 9px; letter-spacing: 0.16em; font-style: italic;
+  color: var(--mid); margin-bottom: 40px;
+}
+
+.form-row { display: grid; gap: 12px; margin-bottom: 12px; }
+.c2 { grid-template-columns: 1fr 1fr; }
+
+.field { display: flex; flex-direction: column; gap: 7px; }
+
+.field label {
+  font-size: 8px; letter-spacing: 0.24em; text-transform: uppercase; color: var(--mid);
+}
+
+.f-in {
+  background: transparent; border: 1px solid rgba(237,233,224,0.1);
+  color: var(--paper); padding: 11px 14px;
+  font-family: 'DM Mono', monospace; font-size: 11px;
+  outline: none; appearance: none; width: 100%;
+  transition: border-color 0.15s, background 0.15s; cursor: crosshair;
+}
+
+.f-in:focus { border-color: rgba(237,233,224,0.36); background: rgba(237,233,224,0.015); }
+.f-in::placeholder { color: #2a2a2a; }
+
+.tog-row { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin: 20px 0; }
+
+.tog {
+  padding: 12px; border: 1px solid rgba(237,233,224,0.1);
+  background: transparent; color: rgba(237,233,224,0.3);
+  font-family: 'DM Mono', monospace; font-size: 9px;
+  letter-spacing: 0.14em; text-transform: uppercase;
+  cursor: crosshair; transition: all 0.15s;
+}
+
+.tog:hover, .tog.on {
+  border-color: var(--red); color: var(--paper); background: rgba(212,43,32,0.07);
+}
+
+.submit {
+  width: 100%; padding: 14px; background: var(--red); color: var(--paper); border: none;
+  font-family: 'DM Mono', monospace; font-size: 10px; letter-spacing: 0.22em;
+  text-transform: uppercase; cursor: crosshair; transition: background 0.15s; margin-top: 4px;
+}
+
+.submit:hover { background: #a82018; }
+
+/* stats */
+.report-right { padding: 64px 40px; }
+
+.stat-b { padding: 28px 0; border-bottom: var(--rule); }
+.stat-b:first-child { padding-top: 0; }
+.stat-b:last-child { border-bottom: none; }
+
+.stat-n { font-family: 'Bebas Neue', sans-serif; font-size: 72px; line-height: 1; color: var(--paper); }
+.stat-n em { color: var(--red); font-style: normal; }
+.stat-l { font-size: 8px; letter-spacing: 0.22em; text-transform: uppercase; color: var(--mid); margin-top: 2px; }
+.stat-d { font-size: 9px; color: rgba(237,233,224,0.2); margin-top: 6px; line-height: 1.6; }
+
+/* ── ACCESS STRIP ── */
+.access-strip {
+  display: grid; grid-template-columns: repeat(3,1fr);
+  border-bottom: var(--rule-bright); position: relative; z-index: 1;
+}
+
+.access-cell {
+  padding: 40px; border-right: var(--rule);
+  display: flex; gap: 22px; align-items: flex-start;
+  transition: background 0.2s;
+}
+
+.access-cell:last-child { border-right: none; }
+.access-cell:hover { background: rgba(237,233,224,0.018); }
+
+.ac-icon {
+  width: 36px; height: 36px; flex-shrink: 0;
+  border: 1px solid rgba(237,233,224,0.13);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 16px; margin-top: 2px;
+}
+
+.ac-title {
+  font-family: 'Barlow Condensed', sans-serif;
+  font-size: 17px; font-weight: 700; text-transform: uppercase;
+  letter-spacing: 0.05em; color: var(--paper); margin-bottom: 5px; line-height: 1;
+}
+
+.ac-val { font-size: 10px; letter-spacing: 0.08em; color: var(--red); margin-bottom: 5px; }
+.ac-desc { font-size: 9px; line-height: 1.7; color: rgba(237,233,224,0.28); }
+
+/* ── FOOTER ── */
+footer {
+  padding: 52px 40px 32px;
+  display: grid; grid-template-columns: 1fr 1fr 1fr auto;
+  gap: 40px; align-items: end;
+  position: relative; z-index: 1; border-top: var(--rule-bright);
+}
+
+.ft-brand {
+  font-family: 'Bebas Neue', sans-serif; font-size: 52px; line-height: 0.92;
+  color: rgba(237,233,224,0.08); letter-spacing: 0.06em;
+}
+
+.ft-col h4 {
+  font-size: 8px; letter-spacing: 0.26em; text-transform: uppercase;
+  color: var(--mid); margin-bottom: 14px;
+}
+
+.ft-col ul { list-style: none; display: flex; flex-direction: column; gap: 9px; }
+.ft-col ul a { font-size: 10px; color: rgba(237,233,224,0.26); text-decoration: none; transition: color 0.15s; }
+.ft-col ul a:hover { color: var(--paper); }
+
+.ft-bottom {
+  border-top: var(--rule); padding: 18px 40px;
+  display: flex; justify-content: space-between;
+  position: relative; z-index: 1;
+}
+
+.ft-bottom p { font-size: 8px; letter-spacing: 0.14em; text-transform: uppercase; color: rgba(237,233,224,0.15); }
+
+/* scroll reveal */
+.reveal { opacity: 0; transform: translateY(14px); transition: opacity 0.6s ease, transform 0.6s ease; }
+.reveal.vis { opacity: 1; transform: none; }
+
+::-webkit-scrollbar { width: 3px; }
+::-webkit-scrollbar-thumb { background: #1a1a1a; }
+</style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav>
+  <a href="#" class="nav-logo">
+    <img src="Untitled-2.png" alt="WatchTower" class="nav-logo-img">
+    <div class="nav-logo-type">WATCHTOWER<sup>™</sup></div>
+  </a>
+  <ul class="nav-links">
+    <li><a href="#how">How It Works</a></li>
+    <li><a href="#features">Features</a></li>
+    <li><a href="#map">Map</a></li>
+    <li><a href="#report">Report</a></li>
+    <li><a href="app.html">Open App →</a></li>
+  </ul>
+  <div class="nav-right">
+    <span class="nav-status">4 Active Outages</span>
+    <a href="app.html" class="nav-cta">Open App →</a>
+  </div>
+</nav>
+
+<!-- TICKER -->
+<div class="ticker-wrap">
+  <div class="ticker-track">
+    <span class="t-item">⚡ OUT — Bronx, 138th &amp; Willis · 4 min ago</span>
+    <span class="t-item"> &nbsp;·&nbsp; </span>
+    <span class="t-item">💧 RESTORED — Crown Heights · 12 min ago</span>
+    <span class="t-item"> &nbsp;·&nbsp; </span>
+    <span class="t-item">⚡ PARTIAL — East Flatbush, Ave D · 31 min ago</span>
+    <span class="t-item"> &nbsp;·&nbsp; </span>
+    <span class="t-item">💧 OUT — Bushwick, Knickerbocker · 1 hr ago</span>
+    <span class="t-item"> &nbsp;·&nbsp; </span>
+    <span class="t-item">⚡ RESTORED — Harlem, W 125th · 2 hr ago</span>
+    <span class="t-item"> &nbsp;·&nbsp; </span>
+    <span class="t-item">💧 OUT — Washington Hts, 181st · 3 hr ago</span>
+    <span class="t-item"> &nbsp;·&nbsp; </span>
+    <!-- duplicate -->
+    <span class="t-item">⚡ OUT — Bronx, 138th &amp; Willis · 4 min ago</span>
+    <span class="t-item"> &nbsp;·&nbsp; </span>
+    <span class="t-item">💧 RESTORED — Crown Heights · 12 min ago</span>
+    <span class="t-item"> &nbsp;·&nbsp; </span>
+    <span class="t-item">⚡ PARTIAL — East Flatbush, Ave D · 31 min ago</span>
+    <span class="t-item"> &nbsp;·&nbsp; </span>
+    <span class="t-item">💧 OUT — Bushwick, Knickerbocker · 1 hr ago</span>
+    <span class="t-item"> &nbsp;·&nbsp; </span>
+    <span class="t-item">⚡ RESTORED — Harlem, W 125th · 2 hr ago</span>
+    <span class="t-item"> &nbsp;·&nbsp; </span>
+    <span class="t-item">💧 OUT — Washington Hts, 181st · 3 hr ago</span>
+    <span class="t-item"> &nbsp;·&nbsp; </span>
+  </div>
+</div>
+
+<!-- HERO -->
+<section class="hero" id="home">
+  <div class="hero-strip">
+    <div class="hero-coords">
+      <span class="coord">40.7128° N</span>
+      <span class="coord">74.0060° W</span>
+      <span class="coord">NYC — All 5 Boroughs</span>
+    </div>
+    <div class="hero-strip-right">UTC−05:00 · EST</div>
+  </div>
+
+  <div class="hero-body">
+    <div class="hero-left">
+      <div class="hero-glitch" aria-hidden="true">WATCH<br>TOWER</div>
+
+      <div>
+        <div class="hero-logo-lockup">
+          <img src="Untitled-2.png" alt="" class="hero-logo-large" aria-hidden="true">
+          <p class="hero-eyebrow" style="margin-bottom:0">Community Utility Network — NYC</p>
+        </div>
+        <div class="hero-wordmark">
+          WATCH<br>
+          <span class="wm2">T<em>OW</em>ER</span>
+        </div>
+        <p class="hero-desc">Know when your power and water go out — before your phone does. Community-verified, real-time utility status for every NYC neighborhood.</p>
+        <div class="hero-ctas">
+          <a href="#report" class="btn-fill">Report an Outage</a>
+          <a href="app.html" class="btn-ghost">→ View Live Map</a>
+        </div>
+      </div>
+
+      <div class="hero-bottom">
+        <div class="hero-stat">
+          <div class="stat-big">3<em>,</em>241</div>
+          <div class="stat-label">Reports this week</div>
+        </div>
+        <div class="hero-stat">
+          <div class="stat-big"><em>4</em>min</div>
+          <div class="stat-label">Avg. update interval</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- LIVE FEED -->
+    <div class="hero-right">
+      <div class="feed-head">
+        <span class="feed-lbl">Live Status Feed — NYC</span>
+        <span class="feed-live">Live</span>
+      </div>
+      <div class="feed-rows">
+        <div class="f-row"><div class="f-zone">Bronx — 138th / Willis<small>4 min ago</small></div><span class="f-type">Power</span><span class="f-badge bOUT">Out</span></div>
+        <div class="f-row"><div class="f-zone">Crown Heights — Nostrand<small>12 min ago</small></div><span class="f-type">Water</span><span class="f-badge bON">On</span></div>
+        <div class="f-row"><div class="f-zone">East Flatbush — Ave D<small>31 min ago</small></div><span class="f-type">Power</span><span class="f-badge bPART">Partial</span></div>
+        <div class="f-row"><div class="f-zone">Bushwick — Knickerbocker<small>1 hr ago</small></div><span class="f-type">Water</span><span class="f-badge bOUT">Out</span></div>
+        <div class="f-row"><div class="f-zone">Harlem — W 125th St<small>2 hr ago</small></div><span class="f-type">Power</span><span class="f-badge bON">On</span></div>
+        <div class="f-row"><div class="f-zone">Bed-Stuy — Malcolm X Blvd<small>2 hr ago</small></div><span class="f-type">Power</span><span class="f-badge bON">On</span></div>
+        <div class="f-row"><div class="f-zone">S. Bronx — Grand Concourse<small>3 hr ago</small></div><span class="f-type">Water</span><span class="f-badge bPART">Partial</span></div>
+        <div class="f-row"><div class="f-zone">Washington Hts — 181st St<small>3 hr ago</small></div><span class="f-type">Power</span><span class="f-badge bOUT">Out</span></div>
+        <div class="f-row"><div class="f-zone">Jamaica, Queens — Sutphin<small>4 hr ago</small></div><span class="f-type">Water</span><span class="f-badge bON">On</span></div>
+        <div class="f-row"><div class="f-zone">Mott Haven — 3rd Ave<small>5 hr ago</small></div><span class="f-type">Power</span><span class="f-badge bOUT">Out</span></div>
+      </div>
+      <div class="feed-foot">
+        <a href="#map">View full map →</a>
+        <a href="#report">Add report +</a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- MANIFESTO -->
+<div class="manifesto reveal">
+  <div class="man-num">// 001</div>
+  <p class="man-text">
+    When the lights go out, <strong>you shouldn't be in the dark</strong> about it.<br>
+    WatchTower is a <em>community-powered</em> utility grid for NYC —<br>
+    built for the moments when everything else stops working.
+  </p>
+  <div class="man-aside">
+    <p>App · SMS · Call-In<br>Works on 2% battery<br>No account required</p>
+  </div>
+</div>
+
+<!-- HOW IT WORKS -->
+<section id="how">
+  <div class="sec-head">
+    <span class="sec-n">01</span>
+    <span class="sec-title">How It Works</span>
+    <span class="sec-right">Four steps. Fifteen seconds.</span>
+  </div>
+  <div class="how-grid">
+    <div class="how-cell reveal">
+      <span class="how-ghost">1</span>
+      <div class="how-icon">
+        <svg width="18" height="18" viewBox="0 0 18 18" fill="none">
+          <circle cx="9" cy="9" r="3" fill="#d42b20"/>
+          <circle cx="9" cy="9" r="6.5" stroke="#d42b20" stroke-width="0.6" stroke-dasharray="2 2"/>
+          <circle cx="9" cy="9" r="8.5" stroke="rgba(237,233,224,0.18)" stroke-width="0.5"/>
+        </svg>
+      </div>
+      <p class="how-title">Open &<br>Scan</p>
+      <p class="how-body">Color-coded map loads instantly. Green means on. Red means out. No guesswork.</p>
+    </div>
+    <div class="how-cell reveal" style="transition-delay:.07s">
+      <span class="how-ghost">2</span>
+      <div class="how-icon">
+        <svg width="18" height="18" viewBox="0 0 18 18" fill="none">
+          <path d="M3 9L7 13L15 5" stroke="#d42b20" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+      </div>
+      <p class="how-title">Tap to<br>Report</p>
+      <p class="how-body">One tap to log an outage or restoration. Works offline. Works at 2% battery.</p>
+    </div>
+    <div class="how-cell reveal" style="transition-delay:.14s">
+      <span class="how-ghost">3</span>
+      <div class="how-icon">
+        <svg width="18" height="18" viewBox="0 0 18 18" fill="none">
+          <path d="M2 16L9 3L16 16Z" stroke="rgba(237,233,224,0.28)" stroke-width="0.75" fill="none"/>
+          <line x1="9" y1="7.5" x2="9" y2="12" stroke="#d42b20" stroke-width="1.5"/>
+          <circle cx="9" cy="13.5" r="0.9" fill="#d42b20"/>
+        </svg>
+      </div>
+      <p class="how-title">Get<br>Verified</p>
+      <p class="how-body">Cross-referenced with neighbors and utility data. Every report is timestamped.</p>
+    </div>
+    <div class="how-cell reveal" style="transition-delay:.21s">
+      <span class="how-ghost">4</span>
+      <div class="how-icon">
+        <svg width="18" height="18" viewBox="0 0 18 18" fill="none">
+          <line x1="9" y1="2" x2="9" y2="16" stroke="#d42b20" stroke-width="1.5" stroke-linecap="round"/>
+          <path d="M2 16Q9 2 16 16" stroke="rgba(237,233,224,0.18)" stroke-width="0.75" fill="none"/>
+          <circle cx="9" cy="2" r="1.5" fill="#d42b20"/>
+        </svg>
+      </div>
+      <p class="how-title">Stay<br>Informed</p>
+      <p class="how-body">Texts when utilities are restored. App, SMS, or call-in — your choice.</p>
+    </div>
+  </div>
+</section>
+
+<!-- TYPE BREAK -->
+<div class="type-break">
+  <p class="type-break-inner">WHEN THE<span>&nbsp;GRID FAILS</span>&nbsp;— WE DON'T.</p>
+</div>
+
+<!-- FEATURES -->
+<section id="features">
+  <div class="sec-head">
+    <span class="sec-n">02</span>
+    <span class="sec-title">Built for When Things Break Down</span>
+    <span class="sec-right">Six core features</span>
+  </div>
+  <div class="feat-grid">
+    <div class="feat-cell reveal">
+      <p class="feat-tag">Communication</p>
+      <h3 class="feat-title">APP.<br>TEXT.<br>CALL.</h3>
+      <p class="feat-body">No data? No problem. Report or check status by SMS or call-in hotline. WatchTower reaches you however it can.</p>
+      <span class="feat-ghost">01</span>
+    </div>
+    <div class="feat-cell reveal" style="transition-delay:.08s">
+      <p class="feat-tag">Battery</p>
+      <h3 class="feat-title">SAVER<br>MODE<br>ON.</h3>
+      <p class="feat-body">Ultra-low power mode drops background activity to near zero. We won't drain the battery you need most.</p>
+      <span class="feat-ghost">02</span>
+    </div>
+    <div class="feat-cell reveal">
+      <p class="feat-tag">Verification</p>
+      <h3 class="feat-title">KNOW<br>IT'S<br>REAL.</h3>
+      <p class="feat-body">Reports are cross-referenced and timestamped. "Updated 4 min ago" means exactly that — no stale data.</p>
+      <span class="feat-ghost">03</span>
+    </div>
+    <div class="feat-cell reveal" style="transition-delay:.08s">
+      <p class="feat-tag">Community</p>
+      <h3 class="feat-title">MUTUAL<br>AID<br>GRID.</h3>
+      <p class="feat-body">Ice. Generator. Childcare. Plumber. Share and request resources in your building — before and after an outage.</p>
+      <span class="feat-ghost">04</span>
+    </div>
+  </div>
+</section>
+
+<!-- MAP SECTION -->
+<section id="map">
+  <div class="sec-head">
+    <span class="sec-n">03</span>
+    <span class="sec-title">Status Map — NYC</span>
+    <span class="sec-right">Updated continuously</span>
+  </div>
+  <div class="map-section">
+    <div class="map-copy reveal">
+      <div>
+        <h2>SEE<br>WHAT'S<br>ON OR<br>OUT.</h2>
+        <p>Block-by-block status. No guesswork. No hold music with ConEd. What's actually happening right now.</p>
+        <div class="legend">
+          <div class="leg-row"><div class="leg-sq lg"></div>All utilities on</div>
+          <div class="leg-row"><div class="leg-sq lr"></div>Power or water out</div>
+          <div class="leg-row"><div class="leg-sq ly"></div>Partial outage</div>
+        </div>
+        <a href="#report" class="btn-fill">Add Your Status →</a>
+      </div>
+    </div>
+
+    <!-- LIVE GOOGLE MAP -->
+    <div class="map-wrap reveal" style="transition-delay:.1s">
+
+      <!-- neighborhood tab bar -->
+      <div class="map-controls">
+        <span class="map-ctrl-label">Jump to</span>
+        <div class="hood-tabs">
+          <button class="hood-tab active" onclick="jumpMap(40.8448,-73.8648,this)">South Bronx</button>
+          <button class="hood-tab" onclick="jumpMap(40.6782,-73.9442,this)">Bed-Stuy</button>
+          <button class="hood-tab" onclick="jumpMap(40.6501,-73.9496,this)">Crown Heights</button>
+          <button class="hood-tab" onclick="jumpMap(40.6944,-73.9213,this)">Bushwick</button>
+          <button class="hood-tab" onclick="jumpMap(40.8116,-73.9465,this)">Harlem</button>
+          <button class="hood-tab" onclick="jumpMap(40.8448,-73.9329,this)">Washington Hts</button>
+          <button class="hood-tab" onclick="jumpMap(40.6928,-73.7871,this)">Jamaica</button>
+          <button class="hood-tab" onclick="jumpMap(40.6892,-74.0445,this)">Red Hook</button>
+        </div>
+      </div>
+
+      <!-- google maps iframe — NYC default view -->
+      <iframe
+        id="gmap"
+        class="gmap-iframe"
+        loading="lazy"
+        allowfullscreen
+        referrerpolicy="no-referrer-when-downgrade"
+        src="https://maps.google.com/maps?q=South+Bronx,+New+York,+NY&t=m&z=14&output=embed&iwloc=near"
+      ></iframe>
+
+      <!-- dark tint overlay -->
+      <div class="map-tint"></div>
+
+      <!-- red crosshair -->
+      <div class="map-crosshair">
+        <div class="map-crosshair-dot"></div>
+      </div>
+
+      <!-- status pins -->
+      <div class="map-pins">
+        <div class="pin" style="top:28%;left:38%">
+          <div class="pin-dot p-out"></div>
+          <span class="pin-label">⚡ OUT · 138th</span>
+        </div>
+        <div class="pin" style="top:44%;left:55%">
+          <div class="pin-dot p-par"></div>
+          <span class="pin-label">~ PARTIAL</span>
+        </div>
+        <div class="pin" style="top:60%;left:30%">
+          <div class="pin-dot p-on"></div>
+          <span class="pin-label">✓ ON</span>
+        </div>
+        <div class="pin" style="top:72%;left:62%">
+          <div class="pin-dot p-out"></div>
+          <span class="pin-label">💧 OUT</span>
+        </div>
+      </div>
+
+      <div class="map-timestamp" id="map-ts">Last updated 2 min ago</div>
+    </div>
+  </div>
+</section>
+
+<!-- REPORT -->
+<section id="report">
+  <div class="sec-head">
+    <span class="sec-n">04</span>
+    <span class="sec-title">Report Your Status</span>
+    <span class="sec-right">No account needed · 15 seconds</span>
+  </div>
+  <div class="report-section">
+    <div class="report-left reveal">
+      <h2>IS YOUR<br>POWER<br>ON?</h2>
+      <p class="report-sub">// anonymous by default. no sign-in required.</p>
+
+      <div class="form-row c2">
+        <div class="field">
+          <label>Zip Code</label>
+          <input class="f-in" type="text" placeholder="e.g. 10451" maxlength="5">
+        </div>
+        <div class="field">
+          <label>Cross Street (optional)</label>
+          <input class="f-in" type="text" placeholder="e.g. 138th &amp; Willis">
+        </div>
+      </div>
+      <div class="form-row c2">
+        <div class="field">
+          <label>Utility</label>
+          <select class="f-in">
+            <option>⚡ Power</option>
+            <option>💧 Water</option>
+            <option>Both</option>
+          </select>
+        </div>
+        <div class="field">
+          <label>How long ago?</label>
+          <input class="f-in" type="text" placeholder="e.g. 2 hrs ago">
+        </div>
+      </div>
+
+      <div class="tog-row">
+        <button class="tog on">⚡ Out — Not working</button>
+        <button class="tog">✓ Back — Restored</button>
+      </div>
+
+      <button class="submit">Submit Report →</button>
+    </div>
+
+    <div class="report-right reveal" style="transition-delay:.1s">
+      <div class="stat-b">
+        <div class="stat-n">3<em>,</em>241</div>
+        <div class="stat-l">Reports this week</div>
+        <div class="stat-d">Across 47 NYC zip codes</div>
+      </div>
+      <div class="stat-b">
+        <div class="stat-n">~94<em>%</em></div>
+        <div class="stat-l">Verification accuracy</div>
+        <div class="stat-d">Cross-checked with utility provider data</div>
+      </div>
+      <div class="stat-b">
+        <div class="stat-n">4<em>min</em></div>
+        <div class="stat-l">Avg. update interval</div>
+        <div class="stat-d">Continuously timestamped and verified</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ACCESS -->
+<div class="access-strip">
+  <div class="access-cell reveal">
+    <div class="ac-icon">📱</div>
+    <div>
+      <p class="ac-title">Via App</p>
+      <p class="ac-val">watchtower-nyc.app</p>
+      <p class="ac-desc">Full map, report flow, mutual aid grid, battery saver. iOS + Android.</p>
+    </div>
+  </div>
+  <div class="access-cell reveal" style="transition-delay:.07s">
+    <div class="ac-icon">💬</div>
+    <div>
+      <p class="ac-title">Via SMS</p>
+      <p class="ac-val">Text START to 917-WT-NOW1</p>
+      <p class="ac-desc">Text OUT or BACK with your zip. No data or smartphone required.</p>
+    </div>
+  </div>
+  <div class="access-cell reveal" style="transition-delay:.14s">
+    <div class="ac-icon">📞</div>
+    <div>
+      <p class="ac-title">Via Phone</p>
+      <p class="ac-val">1-800-WATCH-TWR</p>
+      <p class="ac-desc">Multilingual operators. Available 24/7 during active outages.</p>
+    </div>
+  </div>
+</div>
+
+<!-- FOOTER -->
+<footer>
+  <div class="ft-brand">WATCH<br>TOWER</div>
+  <div class="ft-col">
+    <h4>Product</h4>
+    <ul>
+      <li><a href="#">How It Works</a></li>
+      <li><a href="#">Status Map</a></li>
+      <li><a href="#">Report Outage</a></li>
+      <li><a href="#">Mutual Aid Grid</a></li>
+    </ul>
+  </div>
+  <div class="ft-col">
+    <h4>Access</h4>
+    <ul>
+      <li><a href="#">SMS Hotline</a></li>
+      <li><a href="#">Call-In Number</a></li>
+      <li><a href="#">Language Options</a></li>
+      <li><a href="#">Accessibility</a></li>
+    </ul>
+  </div>
+  <a href="#report" class="btn-fill" style="align-self:flex-end;font-size:9px">Report Now →</a>
+</footer>
+<div class="ft-bottom">
+  <p>WatchTower™ — NYC Community Utility Network</p>
+  <p>Community-powered. Verification-verified. Always on.</p>
+</div>
+
+<script>
+// toggle report buttons
+document.querySelectorAll('.tog').forEach(btn => {
+  btn.addEventListener('click', () => {
+    document.querySelectorAll('.tog').forEach(b => b.classList.remove('on'));
+    btn.classList.add('on');
+  });
+});
+
+// scroll reveals
+const obs = new IntersectionObserver(entries => {
+  entries.forEach(e => { if (e.isIntersecting) e.target.classList.add('vis'); });
+}, { threshold: 0.06 });
+document.querySelectorAll('.reveal').forEach(el => obs.observe(el));
+
+// jump map to neighborhood
+function jumpMap(lat, lng, btn) {
+  document.querySelectorAll('.hood-tab').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+
+  const neighborhoods = {
+    'South Bronx': 'South+Bronx,+New+York,+NY',
+    'Bed-Stuy': 'Bedford-Stuyvesant,+Brooklyn,+New+York,+NY',
+    'Crown Heights': 'Crown+Heights,+Brooklyn,+New+York,+NY',
+    'Bushwick': 'Bushwick,+Brooklyn,+New+York,+NY',
+    'Harlem': 'Harlem,+Manhattan,+New+York,+NY',
+    'Washington Hts': 'Washington+Heights,+Manhattan,+New+York,+NY',
+    'Jamaica': 'Jamaica,+Queens,+New+York,+NY',
+    'Red Hook': 'Red+Hook,+Brooklyn,+New+York,+NY'
+  };
+
+  const label = btn.textContent.trim();
+  const q = neighborhoods[label] || label.replace(/\s+/g,'+') + ',+New+York,+NY';
+  const iframe = document.getElementById('gmap');
+  iframe.src = `https://maps.google.com/maps?q=${q}&t=m&z=14&output=embed&iwloc=near`;
+
+  // update timestamp
+  document.getElementById('map-ts').textContent = 'Navigating...';
+  iframe.onload = () => {
+    document.getElementById('map-ts').textContent = 'Last updated just now';
+  };
+}
+
+// live pulse on out badges
+setInterval(() => {
+  document.querySelectorAll('.bOUT').forEach(b => {
+    b.style.opacity = '0.5';
+    setTimeout(() => b.style.opacity = '1', 500);
+  });
+}, 7000);
+</script>
+</body>
+</html>
