@@ -1,0 +1,1005 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>WATCHTOWER</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Mono:ital,wght@0,300;0,400;0,500&family=Barlow+Condensed:wght@300;400;600;700&display=swap');
+
+/* ── RESET + BASE ── */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+  --ink:   #080808;
+  --paper: #ede9e0;
+  --red:   #d42b20;
+  --mid:   rgba(237,233,224,0.45);
+  --dim:   rgba(237,233,224,0.2);
+  --rule:  1px solid rgba(237,233,224,0.12);
+}
+
+html, body {
+  height: 100%; width: 100%;
+  background: var(--ink);
+  color: var(--paper);
+  font-family: 'DM Mono', monospace;
+  overflow: hidden;
+  cursor: crosshair;
+}
+
+/* grain */
+body::before {
+  content: '';
+  position: fixed; inset: 0; z-index: 9000; pointer-events: none;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 512 512' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='f'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.75' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23f)'/%3E%3C/svg%3E");
+  opacity: 0.05; mix-blend-mode: overlay;
+}
+
+/* grid */
+body::after {
+  content: '';
+  position: fixed; inset: 0; z-index: 0; pointer-events: none;
+  background-image:
+    linear-gradient(rgba(237,233,224,0.025) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(237,233,224,0.025) 1px, transparent 1px);
+  background-size: 52px 52px;
+}
+
+@keyframes fadeUp  { from { opacity:0; transform:translateY(20px); } to { opacity:1; transform:none; } }
+@keyframes fadeIn  { from { opacity:0; } to { opacity:1; } }
+@keyframes blink   { 0%,100%{opacity:1} 50%{opacity:0.25} }
+@keyframes pulse   { 0%,100%{transform:scale(1);opacity:1} 50%{transform:scale(1.15);opacity:0.6} }
+@keyframes spin    { from{transform:rotate(0deg)} to{transform:rotate(360deg)} }
+@keyframes growW   { from{width:0} to{width:var(--target)} }
+
+/* ── SHELL ── */
+.shell {
+  position: fixed; inset: 0; z-index: 1;
+  display: flex; flex-direction: column;
+}
+
+/* ── TOP BAR ── */
+.topbar {
+  height: 52px; flex-shrink: 0;
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 0 28px;
+  border-bottom: var(--rule);
+  background: rgba(8,8,8,0.95);
+}
+
+.tb-logo {
+  display: flex; align-items: center; gap: 10px;
+  text-decoration: none;
+}
+
+.tb-logo-img { width: 28px; height: 28px; object-fit: contain; display: block; }
+
+.tb-logo-text {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 17px; letter-spacing: 0.2em; color: var(--paper);
+}
+
+.tb-logo-text sup {
+  font-family: 'DM Mono', monospace;
+  font-size: 7px; color: var(--dim); position: relative; top: -3px;
+}
+
+.tb-back {
+  font-size: 12px; letter-spacing: 0.16em; text-transform: uppercase;
+  color: var(--dim); text-decoration: none; transition: color 0.15s;
+}
+
+.tb-back:hover { color: var(--paper); }
+
+/* ── PROGRESS BAR ── */
+.progress-bar {
+  height: 2px; background: rgba(237,233,224,0.07); flex-shrink: 0; position: relative;
+}
+
+.progress-fill {
+  position: absolute; left: 0; top: 0; height: 100%;
+  background: var(--red);
+  transition: width 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+  width: 0%;
+}
+
+/* ── STEPS CONTAINER ── */
+.steps { flex: 1; position: relative; overflow: hidden; }
+
+.step {
+  position: absolute; inset: 0;
+  display: flex; flex-direction: column;
+  align-items: center; justify-content: center;
+  padding: 40px 24px;
+  opacity: 0; pointer-events: none;
+  transform: translateX(40px);
+  transition: opacity 0.4s ease, transform 0.4s ease;
+  text-align: center;
+  overflow-y: auto;
+}
+
+.step::-webkit-scrollbar { width: 0; }
+
+.step.active {
+  opacity: 1; pointer-events: all; transform: none;
+}
+
+.step.exit {
+  opacity: 0; transform: translateX(-40px);
+  pointer-events: none;
+}
+
+/* STEP CONTENT WIDTHS */
+.step-inner { width: 100%; max-width: 620px; }
+
+/* ── STEP NUMBER ── */
+.step-num {
+  font-size: 11px; letter-spacing: 0.3em; text-transform: uppercase;
+  color: var(--red); margin-bottom: 20px;
+  display: flex; align-items: center; justify-content: center; gap: 10px;
+}
+
+.step-num::before, .step-num::after {
+  content: ''; flex: 1; max-width: 48px; height: 1px; background: rgba(212,43,32,0.4);
+}
+
+/* ── STEP ICON ── */
+.step-icon {
+  width: 64px; height: 64px; margin: 0 auto 28px;
+  border: 1px solid rgba(237,233,224,0.15);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 26px;
+  position: relative;
+}
+
+/* animated ring around icon */
+.step-icon::before {
+  content: '';
+  position: absolute; inset: -8px;
+  border: 1px solid rgba(212,43,32,0.2);
+  animation: spin 12s linear infinite;
+  clip-path: polygon(50% 0%, 100% 0%, 100% 50%);
+}
+
+/* ── STEP HEADLINE ── */
+.step-headline {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: clamp(52px, 8vw, 96px);
+  line-height: 0.88; letter-spacing: 0.01em;
+  color: var(--paper); margin-bottom: 16px;
+}
+
+.step-headline em { color: var(--red); font-style: normal; }
+
+.step-headline .outline {
+  color: transparent;
+  -webkit-text-stroke: 1px rgba(237,233,224,0.6);
+  display: block;
+}
+
+/* ── STEP BODY ── */
+.step-body {
+  font-family: 'Barlow Condensed', sans-serif;
+  font-weight: 300; font-size: 18px; line-height: 1.55;
+  color: rgba(237,233,224,0.6);
+  margin-bottom: 36px; max-width: 460px; margin-left: auto; margin-right: auto;
+}
+
+/* ── FEATURE LIST (step 2) ── */
+.feature-list {
+  display: grid; grid-template-columns: 1fr 1fr;
+  gap: 12px; margin-bottom: 36px; text-align: left;
+}
+
+.feat-item {
+  border: 1px solid rgba(237,233,224,0.1);
+  padding: 16px 18px;
+  display: flex; align-items: flex-start; gap: 12px;
+  transition: border-color 0.2s, background 0.2s;
+}
+
+.feat-item:hover {
+  border-color: rgba(237,233,224,0.25);
+  background: rgba(237,233,224,0.02);
+}
+
+.feat-item-icon { font-size: 18px; flex-shrink: 0; margin-top: 1px; }
+
+.feat-item-title {
+  font-family: 'Barlow Condensed', sans-serif;
+  font-size: 15px; font-weight: 700; text-transform: uppercase;
+  letter-spacing: 0.05em; color: var(--paper); margin-bottom: 3px; line-height: 1;
+}
+
+.feat-item-desc {
+  font-size: 12px; color: rgba(237,233,224,0.45); line-height: 1.5; letter-spacing: 0.03em;
+}
+
+/* ── FORM (step 3) ── */
+.form-group {
+  text-align: left; margin-bottom: 14px;
+}
+
+.form-label {
+  font-size: 11px; letter-spacing: 0.2em; text-transform: uppercase;
+  color: rgba(237,233,224,0.45); display: block; margin-bottom: 8px;
+}
+
+.form-input {
+  width: 100%; background: transparent;
+  border: 1px solid rgba(237,233,224,0.12);
+  color: var(--paper); padding: 13px 16px;
+  font-family: 'DM Mono', monospace; font-size: 14px;
+  outline: none; transition: border-color 0.15s, background 0.15s;
+  cursor: text;
+}
+
+.form-input:focus {
+  border-color: rgba(237,233,224,0.4);
+  background: rgba(237,233,224,0.02);
+}
+
+.form-input::placeholder { color: rgba(237,233,224,0.18); }
+
+.form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+
+.checkbox-row {
+  display: flex; align-items: center; gap: 14px;
+  padding: 14px 0; border-top: var(--rule); margin-top: 6px;
+  cursor: crosshair; text-align: left;
+}
+
+.custom-checkbox {
+  width: 20px; height: 20px; flex-shrink: 0;
+  border: 1px solid rgba(237,233,224,0.2);
+  display: flex; align-items: center; justify-content: center;
+  transition: all 0.15s;
+}
+
+.custom-checkbox.checked {
+  background: var(--red); border-color: var(--red);
+}
+
+.custom-checkbox.checked::after { content: '✓'; font-size: 11px; color: var(--paper); }
+
+.checkbox-label {
+  font-size: 13px; letter-spacing: 0.08em;
+  color: rgba(237,233,224,0.6); line-height: 1.4;
+}
+
+/* ── BOROUGH PICKER (step 3) ── */
+.borough-grid {
+  display: grid; grid-template-columns: repeat(3, 1fr);
+  gap: 10px; margin-bottom: 20px;
+}
+
+.boro-btn {
+  border: 1px solid rgba(237,233,224,0.1);
+  background: transparent; color: rgba(237,233,224,0.5);
+  padding: 13px 10px;
+  font-family: 'DM Mono', monospace; font-size: 12px;
+  letter-spacing: 0.12em; text-transform: uppercase;
+  cursor: crosshair; transition: all 0.15s; text-align: center;
+}
+
+.boro-btn:hover { border-color: rgba(237,233,224,0.3); color: var(--paper); }
+
+.boro-btn.sel {
+  border-color: var(--red); color: var(--paper);
+  background: rgba(212,43,32,0.08);
+}
+
+/* ── DONE SCREEN ── */
+.done-mark {
+  width: 72px; height: 72px; margin: 0 auto 32px;
+  border: 1px solid var(--red);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 28px; color: var(--red);
+}
+
+.alert-sample {
+  border: 1px solid rgba(237,233,224,0.1);
+  border-left: 2px solid var(--red);
+  padding: 16px 20px; margin: 0 auto 32px;
+  max-width: 480px; text-align: left;
+  background: rgba(212,43,32,0.03);
+}
+
+.alert-sample-lbl {
+  font-size: 10px; letter-spacing: 0.2em; text-transform: uppercase;
+  color: var(--red); margin-bottom: 8px;
+}
+
+.alert-sample-txt {
+  font-size: 13px; line-height: 1.65;
+  color: rgba(237,233,224,0.55);
+}
+
+/* ── BOTTOM BAR ── */
+.bottom-bar {
+  height: 68px; flex-shrink: 0;
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 0 32px;
+  border-top: var(--rule);
+  background: rgba(8,8,8,0.9);
+}
+
+.dot-nav {
+  display: flex; align-items: center; gap: 10px;
+}
+
+.dot {
+  width: 6px; height: 6px; border-radius: 50%;
+  background: rgba(237,233,224,0.18);
+  transition: background 0.25s, transform 0.25s;
+  cursor: crosshair;
+}
+
+.dot.active { background: var(--red); transform: scale(1.3); }
+.dot.done   { background: rgba(237,233,224,0.4); }
+
+.back-btn {
+  font-size: 12px; letter-spacing: 0.18em; text-transform: uppercase;
+  color: rgba(237,233,224,0.35); background: none; border: none;
+  cursor: crosshair; transition: color 0.15s; font-family: 'DM Mono', monospace;
+  display: flex; align-items: center; gap: 8px;
+}
+
+.back-btn:hover { color: var(--paper); }
+.back-btn:disabled { opacity: 0; pointer-events: none; }
+
+.next-btn {
+  font-size: 13px; letter-spacing: 0.2em; text-transform: uppercase;
+  color: var(--ink); background: var(--paper); border: none;
+  padding: 14px 36px; cursor: crosshair;
+  transition: background 0.15s, color 0.15s;
+  font-family: 'DM Mono', monospace;
+}
+
+.next-btn:hover { background: var(--red); color: var(--paper); }
+.next-btn.red { background: var(--red); color: var(--paper); }
+.next-btn.red:hover { background: #a82018; }
+
+/* ════════════════════════════════════════════
+   WATCHTOWER — RESPONSIVE CSS
+   Breakpoints:
+   Mobile:  max 767px
+   Tablet:  768px – 1023px
+   Desktop: 1024px+
+════════════════════════════════════════════ */
+
+/* ── TABLET (768–1023px) ── */
+@media (max-width: 1023px) {
+
+  /* NAV */
+  nav, .topnav {
+    height: 52px;
+  }
+
+  .nav-links { display: none; }
+
+  .nav-right, .tn-right { border-left: var(--rule); }
+
+  .nav-status, .tn-status { padding: 0 14px; font-size: 11px; }
+
+  /* HERO — stack wordmark + map */
+  .hero-wordmark-row {
+    grid-template-columns: 1fr;
+    padding: 24px 24px 0;
+  }
+
+  .hero-right-text { max-width: 100%; padding-bottom: 20px; }
+
+  .hero-wordmark { font-size: clamp(80px, 14vw, 140px); }
+
+  .hero-map-section {
+    grid-template-columns: 1fr;
+    grid-template-rows: 420px auto;
+    min-height: unset;
+    margin-top: 0;
+  }
+
+  .hero-map-wrap { border-right: none; border-bottom: var(--rule); }
+
+  .hero-feed { max-height: 300px; }
+
+  /* MANIFESTO */
+  .manifesto { grid-template-columns: 1fr; }
+  .man-num { display: none; }
+  .man-aside { border-left: none; border-top: var(--rule); padding: 20px 32px; }
+  .man-text { padding: 28px 32px; }
+
+  /* HOW */
+  .how-grid { grid-template-columns: 1fr 1fr; }
+  .how-cell:nth-child(2) { border-right: none; }
+  .how-cell:nth-child(3) { border-top: var(--rule); }
+
+  /* FEATURES */
+  .feat-grid { grid-template-columns: 1fr; }
+  .feat-cell { border-right: none !important; }
+
+  /* REPORT */
+  .report-section { grid-template-columns: 1fr; }
+  .report-left { border-right: none; border-bottom: var(--rule); }
+
+  /* ACCESS */
+  .access-strip { grid-template-columns: 1fr; }
+  .access-cell { border-right: none; border-bottom: var(--rule); }
+  .access-cell:last-child { border-bottom: none; }
+
+  /* FOOTER */
+  footer {
+    grid-template-columns: 1fr 1fr;
+    gap: 32px;
+  }
+  .ft-brand { grid-column: 1 / -1; }
+
+  /* SEC HEADER */
+  .sec-head { grid-template-columns: 60px 1fr; }
+  .sec-right { display: none; }
+
+  /* APP SHELL */
+  .shell { grid-template-rows: 52px 22px 1fr 56px; }
+
+  /* TOP NAV TABS — hide labels on tablet */
+  .tn-tab { padding: 0 14px; font-size: 11px; }
+  .tn-tab span:not(.tn-tab-icon):not(.tn-badge) { display: none; }
+
+  /* APP VIEWS */
+  .v-map { grid-template-columns: 1fr; }
+  .map-sidebar { display: none; }
+
+  .v-chat { grid-template-columns: 220px 1fr; }
+
+  .aid-grid { grid-template-columns: 1fr 1fr; }
+  .aid-card:nth-child(2n) { border-right: none; }
+  .aid-card:nth-child(n+3) { border-top: var(--rule); }
+
+  .np-grid { grid-template-columns: 1fr 1fr; }
+  .np-cell:nth-child(2n) { border-right: none; }
+
+  .v-profile { grid-template-columns: 240px 1fr; }
+
+  /* ONBOARDING */
+  .feature-list { grid-template-columns: 1fr; }
+  .form-row { grid-template-columns: 1fr; }
+  .borough-grid { grid-template-columns: 1fr 1fr 1fr; }
+
+}
+
+/* ── MOBILE (max 767px) ── */
+@media (max-width: 767px) {
+
+  /* NAV */
+  nav, .topnav { height: 52px; padding: 0 16px; }
+
+  .nav-logo, .tn-logo, .topbar-logo {
+    padding: 0 14px 0 0;
+    border-right: none;
+  }
+
+  .nav-logo-type, .tn-logo-type, .logo-text { font-size: 14px; }
+
+  .nav-links { display: none; }
+
+  .tn-tabs { gap: 0; }
+
+  .tn-tab {
+    padding: 0 10px;
+    font-size: 0; /* hide text labels */
+    gap: 0;
+  }
+
+  .tn-tab-icon { font-size: 16px; }
+  .tn-badge { position: absolute; top: 6px; right: 4px; width: 12px; height: 12px; font-size: 7px; }
+
+  .nav-status, .tn-status { display: none; }
+
+  .nav-cta { padding: 0 14px; font-size: 11px; }
+
+  /* TICKER */
+  .ticker-wrap, .ticker { height: 22px; }
+  .t-item { font-size: 9px; padding: 0 24px; }
+
+  /* HERO */
+  .hero { padding-top: 74px; }
+
+  .hero-wordmark-row {
+    grid-template-columns: 1fr;
+    padding: 20px 16px 0;
+    gap: 16px;
+  }
+
+  .hero-wordmark { font-size: clamp(64px, 18vw, 110px); line-height: 0.84; }
+
+  .hero-right-text { padding-bottom: 0; }
+
+  .hero-desc { font-size: 15px; margin-bottom: 18px; }
+
+  .hero-ctas { flex-direction: column; align-items: flex-start; gap: 12px; }
+
+  .hero-map-section {
+    grid-template-columns: 1fr;
+    grid-template-rows: 55vw auto;
+    margin-top: 16px;
+  }
+
+  .hero-map-wrap { border-right: none; border-bottom: var(--rule); min-height: 240px; }
+
+  .hero-feed { max-height: 260px; }
+
+  .map-tab-bar { overflow-x: auto; }
+  .map-tab { font-size: 10px; padding: 8px 12px; }
+
+  /* MANIFESTO */
+  .manifesto { grid-template-columns: 1fr; }
+  .man-num { display: none; }
+  .man-text { padding: 24px 20px; font-size: clamp(16px, 4vw, 24px); }
+  .man-aside { display: none; }
+
+  /* SEC HEADER */
+  .sec-head { grid-template-columns: 48px 1fr; }
+  .sec-n { padding: 12px 14px; font-size: 11px; }
+  .sec-title { padding: 12px 14px; font-size: 11px; }
+  .sec-right { display: none; }
+
+  /* HOW */
+  .how-grid { grid-template-columns: 1fr; }
+  .how-cell { border-right: none; padding: 32px 20px; }
+  .how-cell + .how-cell { border-top: var(--rule); }
+
+  /* TYPE BREAK */
+  .type-break { padding: 0 20px; }
+  .type-break-inner { font-size: clamp(36px, 8vw, 64px); padding: 16px 0; }
+
+  /* FEATURES */
+  .feat-grid { grid-template-columns: 1fr; }
+  .feat-cell { padding: 36px 20px; border-right: none !important; }
+  .feat-title { font-size: 42px; }
+
+  /* REPORT */
+  .report-section { grid-template-columns: 1fr; }
+  .report-left { padding: 36px 20px; border-right: none; border-bottom: var(--rule); }
+  .report-left h2 { font-size: 60px; }
+  .form-row.c2 { grid-template-columns: 1fr; }
+  .tog-row { grid-template-columns: 1fr; }
+  .report-right { padding: 28px 20px; }
+  .stat-n { font-size: 56px; }
+
+  /* ACCESS */
+  .access-strip { grid-template-columns: 1fr; }
+  .access-cell { padding: 24px 20px; border-right: none; border-bottom: var(--rule); }
+  .access-cell:last-child { border-bottom: none; }
+
+  /* FOOTER */
+  footer {
+    grid-template-columns: 1fr;
+    padding: 32px 20px 24px;
+    gap: 24px;
+  }
+  .ft-brand { font-size: 40px; }
+  .ft-bottom { padding: 14px 20px; flex-direction: column; gap: 6px; }
+
+  /* ── APP SHELL MOBILE ── */
+  .shell { grid-template-rows: 52px 20px 1fr 58px; }
+
+  /* TOP NAV — icon only */
+  .tn-tabs { overflow-x: auto; }
+  .tn-tab { padding: 0 14px; font-size: 0; }
+  .tn-tab-icon { font-size: 17px; }
+
+  /* VIEWS FULL WIDTH */
+  .v-map { grid-template-columns: 1fr; }
+  .map-sidebar { display: none; }
+
+  /* CHAT — full width, hide channel list on mobile */
+  .v-chat { grid-template-columns: 1fr; }
+  .chat-channels { display: none; }
+  .chat-main { display: flex; }
+
+  /* MUTUAL AID */
+  .v-aid {}
+  .aid-header { padding: 16px 16px 14px; flex-direction: column; align-items: flex-start; gap: 14px; }
+  .aid-title { font-size: 36px; }
+  .aid-filters { overflow-x: auto; }
+  .aid-grid { grid-template-columns: 1fr; }
+  .aid-card { border-right: none !important; padding: 20px 16px; }
+
+  /* ALERTS */
+  .alerts-header { padding: 16px 16px 14px; flex-direction: column; align-items: flex-start; gap: 12px; }
+  .alerts-title { font-size: 36px; }
+  .alert-body { padding: 14px 16px; }
+  .alert-time-col { padding: 14px 14px; }
+  .notif-prefs { padding: 20px 16px; }
+  .np-grid { grid-template-columns: 1fr; }
+  .np-cell { border-right: none !important; }
+
+  /* PROFILE */
+  .v-profile { grid-template-columns: 1fr; }
+  .profile-left { border-right: none; border-bottom: var(--rule); padding: 20px 16px; }
+  .profile-main { padding: 20px 16px; }
+
+  /* CHAT INPUT */
+  .chat-input-wrap { padding: 10px 14px; }
+  .chat-input { font-size: 14px; padding: 10px 12px; }
+  .send-btn { padding: 10px 14px; font-size: 11px; }
+
+  /* MESSAGES */
+  .messages { padding: 14px 16px; }
+  .msg { padding: 5px 0; }
+  .msg:hover { margin: 0 -16px; padding: 5px 16px; }
+  .msg-text { font-size: 13px; }
+
+  /* BOTTOM TAB BAR */
+  .bottombar { height: 58px; }
+  .bot-label { font-size: 8px; }
+  .bot-icon { font-size: 18px; }
+
+  /* ONBOARDING INDEX.HTML */
+  .step { padding: 24px 16px; }
+  .step-headline { font-size: clamp(44px, 12vw, 80px); }
+  .step-body { font-size: 16px; }
+  .feature-list { grid-template-columns: 1fr; gap: 10px; }
+  .form-row { grid-template-columns: 1fr !important; }
+  .borough-grid { grid-template-columns: 1fr 1fr; }
+  .bottom-bar { padding: 0 16px; }
+
+  /* TOPBAR (onboarding) */
+  .topbar { padding: 0 16px; }
+  .tb-logo-text { font-size: 14px; }
+  .tb-back { font-size: 11px; }
+
+  /* PROFILE PAGE FORMS */
+  .conf-grid { grid-template-columns: 1fr; }
+  .lang-grid { grid-template-columns: 1fr 1fr; }
+
+  /* HIDE heavy decorative elements on mobile */
+  .how-ghost { display: none; }
+  .feat-ghost { display: none; }
+  .hero-glitch { display: none; }
+
+}
+
+/* ── SMALL MOBILE (max 390px — iPhone SE, older phones) ── */
+@media (max-width: 390px) {
+
+  .hero-wordmark { font-size: 58px; }
+  .step-headline { font-size: 42px; }
+  .report-left h2 { font-size: 48px; }
+  .feat-title { font-size: 36px; }
+  .alerts-title, .aid-title { font-size: 30px; }
+
+  .next-btn { padding: 12px 20px; font-size: 12px; }
+  .bottom-bar { height: 62px; }
+
+  footer { padding: 24px 16px; }
+
+  .borough-grid { grid-template-columns: 1fr 1fr; }
+
+}
+
+/* ── SAFE AREA (iPhone notch / home bar) ── */
+@supports (padding: max(0px)) {
+  .bottom-bar, .bottombar {
+    padding-bottom: max(12px, env(safe-area-inset-bottom));
+  }
+  nav, .topnav {
+    padding-top: env(safe-area-inset-top);
+  }
+}
+
+
+
+/* ── MOBILE TOUCH FIXES ── */
+* { -webkit-tap-highlight-color: transparent; }
+button, a, [onclick] { touch-action: manipulation; }
+input, select, textarea { font-size: 16px !important; } /* prevent iOS zoom on focus */
+.chat-input { font-size: 16px !important; }
+</style>
+</head>
+<body>
+<div class="shell">
+
+  <!-- TOP BAR -->
+  <div class="topbar">
+    <a href="homepage.html" class="tb-logo">
+      <img src="Untitled-2.png" alt="WatchTower" class="tb-logo-img">
+      <span class="tb-logo-text">WATCHTOWER<sup>™</sup></span>
+    </a>
+    <a href="homepage.html" class="tb-back">← Back to site</a>
+  </div>
+
+  <!-- PROGRESS -->
+  <div class="progress-bar">
+    <div class="progress-fill" id="prog"></div>
+  </div>
+
+  <!-- STEPS -->
+  <div class="steps">
+
+    <!-- ── STEP 0: INTRO ── -->
+    <div class="step active" id="s0">
+      <div class="step-inner">
+        <div class="step-num">Welcome</div>
+
+        <div class="step-icon">📡</div>
+
+        <h1 class="step-headline">
+          YOUR<br>
+          <em>UTILITY</em><br>
+          <span class="outline">NETWORK.</span>
+        </h1>
+
+        <p class="step-body">
+          WatchTower is a community-powered app that tells you when your power and water go out — and when they're coming back. No hold music. No guessing.
+        </p>
+
+        <p style="font-size:12px;letter-spacing:0.18em;text-transform:uppercase;color:rgba(237,233,224,0.3)">
+          Setup takes 60 seconds. No account required.
+        </p>
+      </div>
+    </div>
+
+    <!-- ── STEP 1: HOW IT WORKS ── -->
+    <div class="step" id="s1">
+      <div class="step-inner">
+        <div class="step-num">01 — How It Works</div>
+
+        <h1 class="step-headline">
+          BUILT FOR<br>
+          <em>WHEN</em><br>
+          <span class="outline">IT BREAKS.</span>
+        </h1>
+
+        <div class="feature-list">
+          <div class="feat-item">
+            <span class="feat-item-icon">🗺</span>
+            <div>
+              <div class="feat-item-title">Live Map</div>
+              <div class="feat-item-desc">Color-coded blocks show exactly what's on or out in your neighborhood</div>
+            </div>
+          </div>
+          <div class="feat-item">
+            <span class="feat-item-icon">✅</span>
+            <div>
+              <div class="feat-item-title">One-Tap Reports</div>
+              <div class="feat-item-desc">Log an outage or restoration in seconds. Works offline, works at 2% battery</div>
+            </div>
+          </div>
+          <div class="feat-item">
+            <span class="feat-item-icon">💬</span>
+            <div>
+              <div class="feat-item-title">Community Chat</div>
+              <div class="feat-item-desc">Connect with neighbors during outages — share updates, resources, and timelines</div>
+            </div>
+          </div>
+          <div class="feat-item">
+            <span class="feat-item-icon">🤝</span>
+            <div>
+              <div class="feat-item-title">Mutual Aid</div>
+              <div class="feat-item-desc">See who has ice, a generator, or charging — and post what you can offer</div>
+            </div>
+          </div>
+          <div class="feat-item">
+            <span class="feat-item-icon">🔔</span>
+            <div>
+              <div class="feat-item-title">Smart Alerts</div>
+              <div class="feat-item-desc">Get texts when utilities are restored in your building. App, SMS, or call-in</div>
+            </div>
+          </div>
+          <div class="feat-item">
+            <span class="feat-item-icon">🔋</span>
+            <div>
+              <div class="feat-item-title">Battery Saver</div>
+              <div class="feat-item-desc">Ultra-low power mode so WatchTower doesn't drain the battery you need most</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── STEP 2: LOCATION ── -->
+    <div class="step" id="s2">
+      <div class="step-inner">
+        <div class="step-num">02 — Your Location</div>
+
+        <h1 class="step-headline">
+          WHERE<br>
+          ARE<br>
+          <em>YOU?</em>
+        </h1>
+
+        <p class="step-body">WatchTower pulls the live feed for your neighborhood. Drop your zip and pick your borough.</p>
+
+        <div class="form-row" style="margin-bottom:14px">
+          <div class="form-group" style="margin-bottom:0">
+            <label class="form-label">Zip Code *</label>
+            <input class="form-input" type="text" placeholder="e.g. 10451" maxlength="5" id="zip-input">
+          </div>
+          <div class="form-group" style="margin-bottom:0">
+            <label class="form-label">Cross Street (optional)</label>
+            <input class="form-input" type="text" placeholder="e.g. 138th &amp; Willis">
+          </div>
+        </div>
+
+        <div class="borough-grid">
+          <button class="boro-btn" onclick="selectBoro(this)">Bronx</button>
+          <button class="boro-btn" onclick="selectBoro(this)">Brooklyn</button>
+          <button class="boro-btn" onclick="selectBoro(this)">Manhattan</button>
+          <button class="boro-btn" onclick="selectBoro(this)">Queens</button>
+          <button class="boro-btn" onclick="selectBoro(this)">Staten Island</button>
+          <button class="boro-btn" onclick="selectBoro(this)">Auto-detect</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── STEP 3: ALERTS ── -->
+    <div class="step" id="s3">
+      <div class="step-inner">
+        <div class="step-num">03 — Stay Connected</div>
+
+        <h1 class="step-headline">
+          HOW DO<br>
+          WE REACH<br>
+          <em>YOU?</em>
+        </h1>
+
+        <p class="step-body">WatchTower works by app, SMS, or call-in. Add your phone and we'll text you the moment something changes in your area.</p>
+
+        <div class="form-group">
+          <label class="form-label">Phone / SMS — recommended</label>
+          <input class="form-input" type="tel" placeholder="e.g. 917-555-0100">
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Email — optional</label>
+          <input class="form-input" type="email" placeholder="e.g. name@email.com">
+        </div>
+
+        <div class="checkbox-row" onclick="toggleCheck(this)">
+          <div class="custom-checkbox checked" id="notif-check"></div>
+          <span class="checkbox-label">Send me alerts when utilities go out or come back in my area</span>
+        </div>
+
+        <div class="checkbox-row" onclick="toggleCheck(this)">
+          <div class="custom-checkbox" id="aid-check"></div>
+          <span class="checkbox-label">Notify me when neighbors post mutual aid resources nearby</span>
+        </div>
+
+        <p style="font-size:11px;letter-spacing:0.1em;color:rgba(237,233,224,0.25);margin-top:14px;line-height:1.7;text-align:left">
+          No account. No data sharing. Reports are anonymous by default.<br>
+          You can also reach WatchTower by SMS — text <span style="color:rgba(212,43,32,0.8)">START</span> to <span style="color:rgba(212,43,32,0.8)">917-WT-NOW1</span>
+        </p>
+      </div>
+    </div>
+
+    <!-- ── STEP 4: DONE ── -->
+    <div class="step" id="s4">
+      <div class="step-inner">
+        <div class="step-num">You're Live</div>
+
+        <div class="done-mark">✓</div>
+
+        <h1 class="step-headline">
+          WATCH<br>
+          <em>TOWER</em><br>
+          <span class="outline">IS ON.</span>
+        </h1>
+
+        <p class="step-body" style="margin-bottom:28px">
+          You're connected to the community grid. WatchTower is now monitoring your area and will alert you the moment something changes.
+        </p>
+
+        <div class="alert-sample">
+          <div class="alert-sample-lbl">Sample alert — what you'll receive</div>
+          <div class="alert-sample-txt">
+            WATCHTOWER: ⚡ Power out confirmed — 138th St / Willis Ave (10451).<br>
+            Reported by 6 neighbors · Updated 2 min ago.<br>
+            Reply STATUS for live map link.
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div><!-- /steps -->
+
+  <!-- BOTTOM BAR -->
+  <div class="bottom-bar">
+    <button class="back-btn" id="back-btn" disabled onclick="prevStep()">← Back</button>
+
+    <div class="dot-nav" id="dots">
+      <div class="dot active" onclick="goTo(0)"></div>
+      <div class="dot" onclick="goTo(1)"></div>
+      <div class="dot" onclick="goTo(2)"></div>
+      <div class="dot" onclick="goTo(3)"></div>
+      <div class="dot" onclick="goTo(4)"></div>
+    </div>
+
+    <button class="next-btn" id="next-btn" onclick="nextStep()">Get Started →</button>
+  </div>
+
+</div><!-- /shell -->
+
+<script>
+let cur = 0;
+const total = 5;
+
+const labels = [
+  'Get Started →',
+  'Next →',
+  'Next →',
+  'Next →',
+  'View Live Map →'
+];
+
+function render() {
+  // steps
+  document.querySelectorAll('.step').forEach((s, i) => {
+    s.classList.remove('active', 'exit');
+    if (i === cur) s.classList.add('active');
+  });
+
+  // progress bar
+  document.getElementById('prog').style.width = ((cur / (total - 1)) * 100) + '%';
+
+  // dots
+  document.querySelectorAll('.dot').forEach((d, i) => {
+    d.classList.remove('active', 'done');
+    if (i === cur) d.classList.add('active');
+    else if (i < cur) d.classList.add('done');
+  });
+
+  // back btn
+  document.getElementById('back-btn').disabled = cur === 0;
+
+  // next btn
+  const btn = document.getElementById('next-btn');
+  btn.textContent = labels[cur];
+  if (cur === total - 1) {
+    btn.classList.add('red');
+  } else {
+    btn.classList.remove('red');
+  }
+}
+
+function nextStep() {
+  if (cur === total - 1) {
+    window.location.href = 'loading.html';
+    return;
+  }
+
+  const leaving = document.getElementById('s' + cur);
+  leaving.classList.add('exit');
+  setTimeout(() => leaving.classList.remove('exit'), 400);
+
+  cur++;
+  render();
+}
+
+function prevStep() {
+  if (cur === 0) return;
+  cur--;
+  render();
+}
+
+function goTo(n) {
+  if (n > cur) return; // only go back via dots
+  cur = n;
+  render();
+}
+
+function selectBoro(btn) {
+  document.querySelectorAll('.boro-btn').forEach(b => b.classList.remove('sel'));
+  btn.classList.add('sel');
+}
+
+function toggleCheck(row) {
+  const box = row.querySelector('.custom-checkbox');
+  box.classList.toggle('checked');
+}
+
+render();
+</script>
+</body>
+</html>

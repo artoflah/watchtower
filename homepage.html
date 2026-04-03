@@ -1,0 +1,1705 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>WATCHTOWER — NYC Utility Grid</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Mono:ital,wght@0,300;0,400;0,500;1,400&family=Barlow+Condensed:wght@200;300;400;600;700;900&display=swap');
+
+/* ─── TOKENS ─── */
+:root {
+  --ink:    #080808;
+  --paper:  #ede9e0;
+  --red:    #d42b20;
+  --red2:   #ff3b2f;
+  --mid:    #888;
+  --dim:    #1e1e1e;
+  --faint:  rgba(237,233,224,0.04);
+  --rule:   1px solid rgba(237,233,224,0.1);
+  --ruleB:  1px solid rgba(237,233,224,0.22);
+}
+
+/* ─── RESET ─── */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+body {
+  background: var(--ink);
+  color: var(--paper);
+  font-family: 'DM Mono', monospace;
+  cursor: crosshair;
+}
+
+/* ─── GRAIN ─── */
+body::before {
+  content: '';
+  position: fixed; inset: 0; z-index: 9000; pointer-events: none;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 512 512' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='f'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.75' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23f)'/%3E%3C/svg%3E");
+  opacity: 0.055; mix-blend-mode: overlay;
+}
+
+/* ─── GRID BG ─── */
+body::after {
+  content: '';
+  position: fixed; inset: 0; z-index: 0; pointer-events: none;
+  background-image:
+    linear-gradient(rgba(237,233,224,0.022) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(237,233,224,0.022) 1px, transparent 1px);
+  background-size: 52px 52px;
+}
+
+/* ─── ANIMATIONS ─── */
+@keyframes blink    { 0%,100%{opacity:1} 50%{opacity:0.2} }
+@keyframes ticker   { 0%{transform:translateX(0)} 100%{transform:translateX(-50%)} }
+@keyframes fadeUp   { from{opacity:0;transform:translateY(16px)} to{opacity:1;transform:none} }
+@keyframes fadeIn   { from{opacity:0;transform:translateY(8px)} to{opacity:1;transform:none} }
+@keyframes pulse    { 0%,100%{box-shadow:0 0 0 0 rgba(212,43,32,0.4)} 50%{box-shadow:0 0 0 8px rgba(212,43,32,0)} }
+@keyframes flicker  { 0%,97%{opacity:1} 98%{opacity:0.75} 100%{opacity:1} }
+@keyframes glitch   { 0%,100%{clip-path:inset(0 0 100% 0)} 8%{clip-path:inset(25% 0 65% 0)} 18%{clip-path:inset(75% 0 10% 0)} 28%{clip-path:inset(5% 0 88% 0)} 38%{clip-path:inset(55% 0 38% 0)} 48%{clip-path:inset(0 0 100% 0)} }
+@keyframes scanline { 0%{top:-3px} 100%{top:100%} }
+@keyframes dot3     { 0%,80%,100%{opacity:0.15} 40%{opacity:1} }
+
+/* ─── SCROLLBAR ─── */
+::-webkit-scrollbar { width: 3px; height: 3px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: #1a1a1a; }
+
+/* ─── SHARED: TOP NAV ─── */
+nav, .topnav {
+  position: fixed; top: 0; left: 0; right: 0; z-index: 500;
+  display: flex; align-items: stretch; height: 56px;
+  border-bottom: var(--rule);
+  background: rgba(8,8,8,0.97);
+  backdrop-filter: blur(12px);
+}
+
+.nav-logo, .tn-logo, .topbar-logo {
+  display: flex; align-items: center;
+  padding: 0 20px; gap: 12px;
+  border-right: var(--rule);
+  text-decoration: none; flex-shrink: 0;
+}
+
+.nav-logo-img, .tn-logo-img {
+  width: 32px; height: 32px;
+  object-fit: contain; display: block;
+}
+
+.nav-logo-type, .tn-logo-type, .logo-text {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 17px; letter-spacing: 0.2em;
+  color: var(--paper);
+  display: flex; align-items: baseline; gap: 4px;
+}
+
+.nav-logo-type sup, .tn-logo-type sup, .logo-text sup {
+  font-family: 'DM Mono', monospace;
+  font-size: 15px; color: rgba(237,233,224,0.5);
+  position: relative; top: -3px; letter-spacing: 0.08em;
+}
+
+/* ─── SHARED: TICKER ─── */
+.ticker-wrap, .ticker {
+  background: var(--red); overflow: hidden;
+  display: flex; align-items: center;
+  height: 26px;
+}
+
+.ticker-track {
+  display: flex; white-space: nowrap;
+  animation: ticker 28s linear infinite;
+}
+
+.t-item {
+  font-size: 13px; letter-spacing: 0.18em; text-transform: uppercase;
+  padding: 0 48px; color: var(--paper);
+}
+
+/* ─── SHARED: BUTTONS ─── */
+.btn-fill {
+  font-size: 13px; letter-spacing: 0.22em; text-transform: uppercase;
+  color: var(--ink); background: var(--paper);
+  padding: 13px 26px; text-decoration: none;
+  border: none; cursor: crosshair; display: inline-block;
+  transition: background 0.15s, color 0.15s;
+  font-family: 'DM Mono', monospace;
+}
+.btn-fill:hover { background: var(--red); color: var(--paper); }
+
+.btn-ghost {
+  font-size: 13px; letter-spacing: 0.18em; text-transform: uppercase;
+  color: rgba(237,233,224,0.5); text-decoration: none; transition: color 0.15s;
+}
+.btn-ghost:hover { color: var(--paper); }
+
+/* ─── SHARED: STATUS BADGES ─── */
+.bOUT  { background: var(--red); color: var(--paper); }
+.bON   { border: 1px solid rgba(237,233,224,0.12); color: rgba(237,233,224,0.32); }
+.bPART { background: rgba(160,120,10,0.18); color: #c8a020; border: 1px solid rgba(160,120,10,0.3); }
+
+/* ─── SHARED: LIVE DOT ─── */
+.live-dot {
+  display: flex; align-items: center; gap: 7px;
+  font-size: 12px; letter-spacing: 0.16em; text-transform: uppercase;
+  color: var(--red2);
+}
+.live-dot::before {
+  content: ''; width: 5px; height: 5px;
+  background: var(--red2); border-radius: 50%;
+  animation: blink 1.4s ease-in-out infinite;
+}
+
+/* ─── SHARED: TOGGLE SWITCH ─── */
+.sw {
+  position: relative; width: 38px; height: 20px; flex-shrink: 0; cursor: crosshair;
+}
+.sw input { opacity: 0; width: 0; height: 0; position: absolute; }
+.sw-t {
+  position: absolute; inset: 0;
+  background: rgba(237,233,224,0.07);
+  border: 1px solid rgba(237,233,224,0.14);
+  transition: all 0.2s;
+}
+.sw-d {
+  position: absolute; top: 3px; left: 3px;
+  width: 12px; height: 12px;
+  background: var(--mid); transition: all 0.2s;
+}
+.sw input:checked ~ .sw-t { background: rgba(212,43,32,0.2); border-color: var(--red); }
+.sw input:checked ~ .sw-d { transform: translateX(18px); background: var(--red); }
+
+/* ─── SHARED: SECTION HEADER ─── */
+.sec-head {
+  display: grid; grid-template-columns: 80px 1fr auto;
+  border-bottom: var(--rule); border-top: var(--rule);
+  position: relative; z-index: 1;
+}
+.sec-n {
+  font-size: 13px; letter-spacing: 0.2em; color: rgba(237,233,224,0.5);
+  padding: 16px 24px; border-right: var(--rule); display: flex; align-items: center;
+}
+.sec-title {
+  font-size: 13px; letter-spacing: 0.22em; text-transform: uppercase;
+  color: rgba(237,233,224,0.5); padding: 16px 28px; display: flex; align-items: center;
+}
+.sec-right {
+  padding: 16px 28px; border-left: var(--rule);
+  font-size: 13px; letter-spacing: 0.14em;
+  color: rgba(237,233,224,0.45); display: flex; align-items: center;
+}
+
+/* ─── SHARED: FORM INPUTS ─── */
+.f-in {
+  background: transparent;
+  border: 1px solid rgba(237,233,224,0.1);
+  color: var(--paper); padding: 11px 14px;
+  font-family: 'DM Mono', monospace; font-size: 15px;
+  outline: none; appearance: none; width: 100%;
+  transition: border-color 0.15s, background 0.15s; cursor: crosshair;
+}
+.f-in:focus { border-color: rgba(237,233,224,0.6); background: rgba(237,233,224,0.015); }
+.f-in::placeholder { color: #2a2a2a; }
+
+/* ─── SHARED: FEED ROWS ─── */
+.f-row {
+  display: grid; grid-template-columns: 1fr 48px 54px;
+  align-items: center; gap: 8px;
+  padding: 11px 24px; border-bottom: var(--rule);
+  cursor: crosshair; transition: background 0.12s;
+}
+.f-row:hover { background: var(--faint); }
+.f-zone { font-size: 14px; color: rgba(237,233,224,0.62); letter-spacing: 0.03em; line-height: 1.3; }
+.f-zone small { display: block; font-size: 15px; color: rgba(237,233,224,0.5); letter-spacing: 0.1em; margin-top: 1px; }
+.f-type { font-size: 15px; letter-spacing: 0.1em; text-transform: uppercase; color: rgba(237,233,224,0.5); text-align: right; }
+.f-badge { font-size: 15px; letter-spacing: 0.1em; text-transform: uppercase; padding: 3px 6px; text-align: center; }
+
+/* ─── SHARED: NAV STATUS ─── */
+.nav-status, .tn-status {
+  display: flex; align-items: center; gap: 7px;
+  padding: 0 18px; border-right: var(--rule);
+  font-size: 12px; letter-spacing: 0.16em; text-transform: uppercase; color: var(--red2);
+}
+.nav-status::before, .tn-status::before {
+  content: ''; width: 5px; height: 5px;
+  background: var(--red2); border-radius: 50%;
+  animation: blink 1.4s ease-in-out infinite;
+}
+
+/* ─── SHARED: MAP COMPONENTS ─── */
+.map-controls {
+  display: flex; align-items: center;
+  border-bottom: var(--rule); flex-shrink: 0;
+  background: rgba(8,8,8,0.9);
+}
+.mc-label {
+  font-size: 12px; letter-spacing: 0.18em; text-transform: uppercase;
+  color: rgba(237,233,224,0.5); padding: 9px 16px; border-right: var(--rule);
+  white-space: nowrap; flex-shrink: 0;
+}
+.hood-tabs { display: flex; overflow-x: auto; flex: 1; }
+.hood-tabs::-webkit-scrollbar { height: 2px; }
+.hood-tabs::-webkit-scrollbar-thumb { background: #222; }
+.hood-tab {
+  font-size: 12px; letter-spacing: 0.14em; text-transform: uppercase;
+  color: rgba(237,233,224,0.5); padding: 9px 15px; border-right: var(--rule);
+  cursor: crosshair; white-space: nowrap; flex-shrink: 0;
+  transition: color 0.15s, background 0.15s;
+  background: none; border-top: none; border-bottom: 2px solid transparent; border-left: none;
+  font-family: 'DM Mono', monospace;
+}
+.hood-tab:hover { color: var(--paper); background: var(--faint); }
+.hood-tab.active { color: var(--paper); border-bottom-color: var(--red); }
+
+.gmap-iframe {
+  width: 100%; height: 100%; border: none; position: absolute; inset: 0;
+  filter: grayscale(100%) invert(92%) contrast(88%); opacity: 0.82;
+}
+.map-tint {
+  position: absolute; inset: 0; z-index: 2; pointer-events: none;
+  background: rgba(8,8,8,0.3); mix-blend-mode: multiply;
+}
+.map-xhair {
+  position: absolute; top: 50%; left: 50%; z-index: 3;
+  transform: translate(-50%,-50%); width: 20px; height: 20px; pointer-events: none;
+}
+.map-xhair::before, .map-xhair::after { content: ''; position: absolute; background: var(--red); }
+.map-xhair::before { width: 1px; height: 100%; left: 50%; top: 0; }
+.map-xhair::after  { height: 1px; width: 100%; top: 50%; left: 0; }
+.map-xhair-dot {
+  position: absolute; top: 50%; left: 50%;
+  transform: translate(-50%,-50%);
+  width: 5px; height: 5px; background: var(--red); border-radius: 50%;
+  animation: pulse 2.2s ease-in-out infinite;
+}
+.map-pins { position: absolute; inset: 0; z-index: 4; pointer-events: none; }
+.pin { position: absolute; display: flex; align-items: center; gap: 5px; pointer-events: all; cursor: crosshair; }
+.pin-dot { width: 8px; height: 8px; border-radius: 50%; border: 1px solid rgba(8,8,8,0.5); flex-shrink: 0; }
+.p-out { background: var(--red2); }
+.p-on  { background: #2a9944; }
+.p-par { background: #c8a020; }
+.pin-lbl {
+  font-family: 'DM Mono', monospace;
+  font-size: 15px; letter-spacing: 0.1em; text-transform: uppercase;
+  color: var(--paper); background: rgba(8,8,8,0.75);
+  padding: 2px 6px; border: 1px solid rgba(237,233,224,0.12); white-space: nowrap;
+}
+.map-ts {
+  position: absolute; bottom: 12px; right: 14px; z-index: 5;
+  font-size: 15px; letter-spacing: 0.14em; text-transform: uppercase;
+  color: rgba(237,233,224,0.55); background: rgba(8,8,8,0.65); padding: 3px 8px;
+}
+
+/* ─── SHARED: REVEAL ANIMATION ─── */
+.reveal { opacity: 0; transform: translateY(14px); transition: opacity 0.6s ease, transform 0.6s ease; }
+.reveal.vis { opacity: 1; transform: none; }
+
+/* ─── SHARED: TYPE BREAK ─── */
+.type-break {
+  padding: 0 44px; border-bottom: var(--ruleB);
+  position: relative; z-index: 1; overflow: hidden;
+}
+.type-break-inner {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: clamp(56px, 9vw, 130px); line-height: 0.88;
+  color: transparent; -webkit-text-stroke: 1px rgba(237,233,224,0.13);
+  white-space: nowrap; padding: 24px 0; letter-spacing: 0.04em;
+  transition: -webkit-text-stroke-color 0.4s;
+}
+.type-break:hover .type-break-inner { -webkit-text-stroke-color: rgba(237,233,224,0.55); }
+.type-break-inner span { color: var(--red); -webkit-text-stroke: 0; }
+
+/* ─── SHARED: FOOTER ─── */
+footer {
+  padding: 52px 40px 32px;
+  display: grid; grid-template-columns: 1fr 1fr 1fr auto;
+  gap: 40px; align-items: end;
+  position: relative; z-index: 1; border-top: var(--ruleB);
+}
+.ft-brand {
+  font-family: 'Bebas Neue', sans-serif; font-size: 52px; line-height: 0.92;
+  color: rgba(237,233,224,0.6); letter-spacing: 0.06em;
+}
+.ft-col h4 {
+  font-size: 12px; letter-spacing: 0.18em; text-transform: uppercase;
+  color: rgba(237,233,224,0.5); margin-bottom: 14px;
+}
+.ft-col ul { list-style: none; display: flex; flex-direction: column; gap: 9px; }
+.ft-col ul a { font-size: 14px; color: rgba(237,233,224,0.5); text-decoration: none; transition: color 0.15s; }
+.ft-col ul a:hover { color: var(--paper); }
+.ft-bottom {
+  border-top: var(--rule); padding: 18px 40px;
+  display: flex; justify-content: space-between;
+  position: relative; z-index: 1;
+}
+.ft-bottom p { font-size: 12px; letter-spacing: 0.14em; text-transform: uppercase; color: rgba(237,233,224,0.4); }
+
+
+
+
+html { scroll-behavior: smooth; }
+body { overflow-x: hidden; }
+
+/* ── NAV ── */
+nav {
+  height: 54px;
+  display: flex; align-items: stretch;
+}
+
+.nav-links {
+  display: flex; align-items: center;
+  list-style: none; flex: 1; padding: 0 16px; gap: 2px;
+}
+
+.nav-links a {
+  font-size: 13px; letter-spacing: 0.16em; text-transform: uppercase;
+  color: rgba(237,233,224,0.5); text-decoration: none; padding: 6px 14px;
+  transition: color 0.15s, background 0.15s;
+}
+
+.nav-links a:hover { color: var(--paper); background: var(--faint); }
+
+.nav-right { display: flex; align-items: stretch; border-left: var(--rule); margin-left: auto; }
+
+.nav-cta {
+  display: flex; align-items: center; padding: 0 24px;
+  font-size: 13px; letter-spacing: 0.16em; text-transform: uppercase;
+  color: var(--ink); background: var(--paper); text-decoration: none;
+  transition: background 0.15s, color 0.15s; white-space: nowrap;
+}
+
+.nav-cta:hover { background: var(--red); color: var(--paper); }
+
+/* ── TICKER OFFSET ── */
+.ticker-wrap {
+  position: fixed; top: 54px; left: 0; right: 0; z-index: 499;
+}
+
+/* ── HERO ── */
+.hero {
+  padding-top: 80px; /* nav + ticker */
+  min-height: 100vh;
+  display: flex; flex-direction: column;
+  border-bottom: var(--ruleB);
+  position: relative; z-index: 1;
+}
+
+/* WORDMARK ROW */
+.hero-wordmark-row {
+  padding: 36px 40px 0;
+  display: grid;
+  grid-template-columns: 1fr auto;
+  align-items: end;
+  gap: 40px;
+  position: relative; z-index: 10;
+  /* this whole row will fade on map hover */
+  transition: opacity 0.5s ease;
+}
+
+.hero-wordmark-row.map-hovered { opacity: 0; }
+
+.hero-wordmark {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: clamp(110px, 16vw, 220px);
+  line-height: 0.82;
+  letter-spacing: -0.01em;
+  color: var(--paper);
+  user-select: none;
+}
+
+.hero-wordmark .wm-outline {
+  display: block;
+  color: transparent;
+  -webkit-text-stroke: 1.5px var(--paper);
+  opacity: 0.8;
+}
+
+.hero-wordmark .wm-outline em {
+  color: var(--red);
+  -webkit-text-stroke: 0;
+  font-style: normal;
+}
+
+/* HERO RIGHT — eyebrow + desc */
+.hero-right-text {
+  max-width: 340px;
+  padding-bottom: 16px;
+}
+
+.hero-eyebrow {
+  font-size: 12px; letter-spacing: 0.22em; text-transform: uppercase;
+  color: rgba(237,233,224,0.5);
+  margin-bottom: 14px;
+  display: flex; align-items: center; gap: 12px;
+}
+
+.hero-eyebrow::before {
+  content: ''; width: 20px; height: 1px;
+  background: var(--red); display: inline-block; flex-shrink: 0;
+}
+
+.hero-desc {
+  font-family: 'Barlow Condensed', sans-serif;
+  font-weight: 300; font-size: 18px; line-height: 1.5;
+  color: rgba(237,233,224,0.55);
+  margin-bottom: 24px;
+}
+
+.hero-ctas { display: flex; gap: 18px; align-items: center; }
+
+.btn-ghost-hero {
+  font-size: 13px; letter-spacing: 0.16em; text-transform: uppercase;
+  color: rgba(237,233,224,0.45); text-decoration: none; transition: color 0.15s;
+}
+.btn-ghost-hero:hover { color: var(--paper); }
+
+/* MAP + FEED CONTAINER */
+.hero-map-section {
+  flex: 1;
+  display: grid;
+  grid-template-columns: 1fr 320px;
+  min-height: 520px;
+  margin-top: 28px;
+  position: relative;
+}
+
+/* THE MAP */
+.hero-map-wrap {
+  position: relative;
+  overflow: hidden;
+  border-right: var(--rule);
+  border-top: var(--rule);
+  cursor: crosshair;
+}
+
+.hero-map-wrap:hover ~ .hero-feed { opacity: 1; }
+
+.gmap-iframe {
+  width: 100%; height: 100%;
+  border: none; position: absolute; inset: 0;
+  filter: grayscale(100%) invert(92%) contrast(88%);
+  opacity: 0.82;
+  transition: opacity 0.5s ease, filter 0.5s ease;
+}
+
+/* map brightens on hover */
+.hero-map-wrap:hover .gmap-iframe {
+  opacity: 1;
+  filter: grayscale(85%) invert(92%) contrast(92%);
+}
+
+.map-tint {
+  position: absolute; inset: 0; z-index: 2; pointer-events: none;
+  background: rgba(8,8,8,0.28); mix-blend-mode: multiply;
+  transition: opacity 0.5s ease;
+}
+
+.hero-map-wrap:hover .map-tint { opacity: 0.4; }
+
+/* map neighborhood tabs */
+.map-tab-bar {
+  position: absolute; top: 0; left: 0; right: 0; z-index: 5;
+  display: flex; overflow-x: auto; background: rgba(8,8,8,0.82);
+  border-bottom: var(--rule);
+  backdrop-filter: blur(6px);
+}
+
+.map-tab-bar::-webkit-scrollbar { height: 2px; }
+.map-tab-bar::-webkit-scrollbar-thumb { background: #333; }
+
+.map-tab {
+  font-size: 11px; letter-spacing: 0.14em; text-transform: uppercase;
+  color: rgba(237,233,224,0.45); padding: 9px 16px;
+  border-right: var(--rule); cursor: crosshair; white-space: nowrap; flex-shrink: 0;
+  transition: color 0.15s, background 0.15s;
+  background: none; border-top: none; border-bottom: 2px solid transparent; border-left: none;
+  font-family: 'DM Mono', monospace;
+}
+
+.map-tab:hover { color: var(--paper); background: rgba(237,233,224,0.04); }
+.map-tab.active { color: var(--paper); border-bottom-color: var(--red); }
+
+/* crosshair */
+.map-xhair {
+  position: absolute; top: 50%; left: 50%; z-index: 6;
+  transform: translate(-50%,-50%); width: 22px; height: 22px;
+  pointer-events: none;
+  transition: opacity 0.4s ease;
+}
+
+.hero-map-wrap:hover .map-xhair { opacity: 0.5; }
+
+.map-xhair::before, .map-xhair::after { content: ''; position: absolute; background: var(--red); }
+.map-xhair::before { width: 1px; height: 100%; left: 50%; top: 0; }
+.map-xhair::after  { height: 1px; width: 100%; top: 50%; left: 0; }
+
+.map-xhair-dot {
+  position: absolute; top: 50%; left: 50%;
+  transform: translate(-50%,-50%);
+  width: 6px; height: 6px; background: var(--red); border-radius: 50%;
+  animation: pulse 2.2s ease-in-out infinite;
+}
+
+/* outage pins */
+.map-pins { position: absolute; inset: 0; z-index: 4; pointer-events: none; padding-top: 38px; }
+
+.pin {
+  position: absolute; display: flex; align-items: center; gap: 6px;
+  pointer-events: all; cursor: crosshair;
+  opacity: 0.85; transition: opacity 0.15s;
+}
+
+.pin:hover { opacity: 1; }
+
+.pin-dot { width: 9px; height: 9px; border-radius: 50%; border: 1px solid rgba(8,8,8,0.5); flex-shrink: 0; }
+.p-out { background: var(--red2); }
+.p-on  { background: #2a9944; }
+.p-par { background: #c8a020; }
+
+.pin-lbl {
+  font-family: 'DM Mono', monospace;
+  font-size: 11px; letter-spacing: 0.08em; text-transform: uppercase;
+  color: var(--paper); background: rgba(8,8,8,0.8);
+  padding: 3px 8px; border: 1px solid rgba(237,233,224,0.14); white-space: nowrap;
+}
+
+/* hover label on map */
+.map-hover-label {
+  position: absolute; bottom: 16px; left: 50%;
+  transform: translateX(-50%);
+  z-index: 7; pointer-events: none;
+  font-size: 11px; letter-spacing: 0.2em; text-transform: uppercase;
+  color: rgba(237,233,224,0.4);
+  opacity: 0; transition: opacity 0.4s ease;
+  white-space: nowrap;
+}
+
+.hero-map-wrap:hover .map-hover-label { opacity: 1; }
+
+/* map timestamp */
+.map-ts {
+  position: absolute; bottom: 14px; right: 16px; z-index: 6;
+  font-size: 11px; letter-spacing: 0.12em; text-transform: uppercase;
+  color: rgba(237,233,224,0.35); background: rgba(8,8,8,0.65); padding: 4px 10px;
+}
+
+/* ── LIVE FEED SIDEBAR ── */
+.hero-feed {
+  border-top: var(--rule);
+  display: flex; flex-direction: column;
+  overflow: hidden;
+  transition: opacity 0.3s ease;
+}
+
+.feed-head {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 13px 20px; border-bottom: var(--rule); flex-shrink: 0;
+}
+
+.feed-lbl {
+  font-size: 11px; letter-spacing: 0.2em; text-transform: uppercase;
+  color: rgba(237,233,224,0.5);
+}
+
+.feed-live {
+  display: flex; align-items: center; gap: 7px;
+  font-size: 11px; letter-spacing: 0.14em; text-transform: uppercase;
+  color: var(--red2);
+}
+
+.feed-live::before {
+  content: ''; width: 6px; height: 6px;
+  background: var(--red2); border-radius: 50%;
+  animation: blink 1.4s ease-in-out infinite;
+}
+
+.feed-rows { flex: 1; overflow-y: auto; }
+.feed-rows::-webkit-scrollbar { width: 2px; }
+.feed-rows::-webkit-scrollbar-thumb { background: #1a1a1a; }
+
+.f-row {
+  display: grid; grid-template-columns: 1fr auto;
+  align-items: start; gap: 10px;
+  padding: 12px 20px; border-bottom: var(--rule);
+  cursor: crosshair; transition: background 0.12s;
+}
+
+.f-row:hover { background: var(--faint); }
+
+.f-zone { font-size: 12px; color: rgba(237,233,224,0.75); line-height: 1.3; }
+.f-zone small { display: block; font-size: 11px; color: rgba(237,233,224,0.4); margin-top: 2px; letter-spacing: 0.06em; }
+
+.f-badge {
+  font-size: 11px; letter-spacing: 0.08em; text-transform: uppercase;
+  padding: 3px 7px; text-align: center; flex-shrink: 0; margin-top: 2px;
+}
+
+.feed-footer {
+  padding: 12px 20px; border-top: var(--rule); flex-shrink: 0;
+  display: flex; justify-content: space-between;
+}
+
+.feed-footer a {
+  font-size: 11px; letter-spacing: 0.14em; text-transform: uppercase;
+  color: rgba(237,233,224,0.4); text-decoration: none; transition: color 0.15s;
+}
+
+.feed-footer a:hover { color: var(--paper); }
+
+/* ── MANIFESTO ── */
+.manifesto {
+  border-bottom: var(--ruleB);
+  display: grid; grid-template-columns: 140px 1fr 200px;
+  position: relative; z-index: 1;
+}
+
+.man-num {
+  font-size: 13px; letter-spacing: 0.18em; color: rgba(237,233,224,0.4);
+  padding: 32px; border-right: var(--rule); display: flex; align-items: center;
+}
+
+.man-text {
+  padding: 36px 52px;
+  font-family: 'Barlow Condensed', sans-serif;
+  font-size: clamp(20px, 2.6vw, 34px); font-weight: 300; line-height: 1.3;
+  color: rgba(237,233,224,0.62); letter-spacing: 0.02em;
+}
+
+.man-text strong { color: var(--paper); font-weight: 600; }
+.man-text em { color: var(--red); font-style: normal; font-weight: 600; }
+
+.man-aside {
+  padding: 32px; border-left: var(--rule);
+  display: flex; flex-direction: column; justify-content: flex-end;
+}
+
+.man-aside p {
+  font-size: 12px; letter-spacing: 0.1em;
+  color: rgba(237,233,224,0.35); line-height: 1.8;
+}
+
+/* ── HOW ── */
+.how-grid {
+  display: grid; grid-template-columns: repeat(4,1fr);
+  position: relative; z-index: 1; border-bottom: var(--ruleB);
+}
+
+.how-cell {
+  padding: 44px 32px; border-right: var(--rule);
+  position: relative; overflow: hidden; transition: background 0.2s;
+}
+
+.how-cell:last-child { border-right: none; }
+.how-cell:hover { background: rgba(237,233,224,0.018); }
+
+.how-ghost {
+  font-family: 'Bebas Neue', sans-serif; font-size: 130px; line-height: 1;
+  color: rgba(237,233,224,0.04); position: absolute; top: 0; right: 8px;
+  pointer-events: none; user-select: none; transition: color 0.2s;
+}
+
+.how-cell:hover .how-ghost { color: rgba(212,43,32,0.07); }
+
+.how-icon {
+  width: 32px; height: 32px; margin-bottom: 24px;
+  border: 1px solid rgba(237,233,224,0.14);
+  display: flex; align-items: center; justify-content: center;
+}
+
+.how-title {
+  font-family: 'Barlow Condensed', sans-serif;
+  font-size: 21px; font-weight: 700; text-transform: uppercase;
+  letter-spacing: 0.05em; color: var(--paper); margin-bottom: 12px; line-height: 1.05;
+}
+
+.how-body { font-size: 13px; line-height: 1.8; color: rgba(237,233,224,0.5); }
+
+/* ── TYPE BREAK already in shared ── */
+
+/* ── FEATURES ── */
+.feat-grid {
+  display: grid; grid-template-columns: 1fr 1fr;
+  position: relative; z-index: 1; border-bottom: var(--ruleB);
+}
+
+.feat-cell {
+  padding: 56px 52px; border-right: var(--rule); border-bottom: var(--rule);
+  position: relative; overflow: hidden; transition: background 0.2s;
+}
+
+.feat-cell:nth-child(even) { border-right: none; }
+.feat-cell:nth-child(n+3) { border-bottom: none; }
+.feat-cell:hover { background: rgba(237,233,224,0.015); }
+
+.feat-tag {
+  font-size: 12px; letter-spacing: 0.22em; text-transform: uppercase;
+  color: var(--red); margin-bottom: 18px;
+  display: flex; align-items: center; gap: 10px;
+}
+
+.feat-tag::before {
+  content: ''; width: 14px; height: 1px;
+  background: var(--red); display: inline-block; flex-shrink: 0;
+}
+
+.feat-title {
+  font-family: 'Bebas Neue', sans-serif; font-size: 54px;
+  color: var(--paper); margin-bottom: 16px; line-height: 0.92;
+}
+
+.feat-body { font-size: 13px; line-height: 1.8; color: rgba(237,233,224,0.5); max-width: 320px; }
+
+.feat-ghost {
+  font-family: 'Bebas Neue', sans-serif; font-size: 200px;
+  color: rgba(237,233,224,0.025); position: absolute; bottom: -36px; right: -12px;
+  line-height: 1; pointer-events: none; user-select: none;
+}
+
+/* ── REPORT ── */
+.report-section {
+  display: grid; grid-template-columns: 1fr 340px;
+  position: relative; z-index: 1; border-bottom: var(--ruleB);
+}
+
+.report-left { padding: 64px 52px; border-right: var(--rule); }
+
+.report-left h2 {
+  font-family: 'Bebas Neue', sans-serif; font-size: 84px; line-height: 0.88;
+  color: var(--paper); margin-bottom: 8px;
+}
+
+.report-sub {
+  font-size: 12px; letter-spacing: 0.14em; font-style: italic;
+  color: rgba(237,233,224,0.45); margin-bottom: 40px;
+}
+
+.form-row { display: grid; gap: 12px; margin-bottom: 12px; }
+.c2 { grid-template-columns: 1fr 1fr; }
+
+.field { display: flex; flex-direction: column; gap: 7px; }
+
+.field label {
+  font-size: 12px; letter-spacing: 0.2em; text-transform: uppercase;
+  color: rgba(237,233,224,0.5);
+}
+
+.tog-row { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin: 20px 0; }
+
+.tog {
+  padding: 13px; border: 1px solid rgba(237,233,224,0.1);
+  background: transparent; color: rgba(237,233,224,0.4);
+  font-family: 'DM Mono', monospace;
+  font-size: 12px; letter-spacing: 0.12em; text-transform: uppercase;
+  cursor: crosshair; transition: all 0.15s;
+}
+
+.tog:hover, .tog.on {
+  border-color: var(--red); color: var(--paper); background: rgba(212,43,32,0.07);
+}
+
+.submit {
+  width: 100%; padding: 14px; background: var(--red); color: var(--paper); border: none;
+  font-family: 'DM Mono', monospace; font-size: 13px; letter-spacing: 0.18em;
+  text-transform: uppercase; cursor: crosshair; transition: background 0.15s; margin-top: 4px;
+}
+
+.submit:hover { background: #a82018; }
+
+.report-right { padding: 64px 40px; }
+
+.stat-b { padding: 28px 0; border-bottom: var(--rule); }
+.stat-b:first-child { padding-top: 0; }
+.stat-b:last-child { border-bottom: none; }
+
+.stat-n { font-family: 'Bebas Neue', sans-serif; font-size: 72px; line-height: 1; color: var(--paper); }
+.stat-n em { color: var(--red); font-style: normal; }
+.stat-l { font-size: 12px; letter-spacing: 0.18em; text-transform: uppercase; color: rgba(237,233,224,0.5); margin-top: 2px; }
+.stat-d { font-size: 12px; color: rgba(237,233,224,0.35); margin-top: 6px; line-height: 1.6; }
+
+/* ── ACCESS ── */
+.access-strip {
+  display: grid; grid-template-columns: repeat(3,1fr);
+  border-bottom: var(--ruleB); position: relative; z-index: 1;
+}
+
+.access-cell {
+  padding: 40px; border-right: var(--rule);
+  display: flex; gap: 22px; align-items: flex-start;
+  transition: background 0.2s;
+}
+
+.access-cell:last-child { border-right: none; }
+.access-cell:hover { background: rgba(237,233,224,0.018); }
+
+.ac-icon {
+  width: 36px; height: 36px; flex-shrink: 0;
+  border: 1px solid rgba(237,233,224,0.14);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 16px; margin-top: 2px;
+}
+
+.ac-title {
+  font-family: 'Barlow Condensed', sans-serif;
+  font-size: 18px; font-weight: 700; text-transform: uppercase;
+  letter-spacing: 0.05em; color: var(--paper); margin-bottom: 5px; line-height: 1;
+}
+
+.ac-val { font-size: 12px; letter-spacing: 0.08em; color: var(--red); margin-bottom: 5px; }
+.ac-desc { font-size: 12px; line-height: 1.7; color: rgba(237,233,224,0.45); }
+
+
+
+
+/* ── LOGO SIZE FIX ── */
+.nav-logo-img { width: 34px !important; height: 34px !important; max-width: 34px; object-fit: contain; display: block; }
+img[alt="WatchTower"] { max-width: 34px; max-height: 34px; }
+
+
+/* ════════════════════════════════════════════
+   WATCHTOWER — RESPONSIVE CSS
+   Breakpoints:
+   Mobile:  max 767px
+   Tablet:  768px – 1023px
+   Desktop: 1024px+
+════════════════════════════════════════════ */
+
+/* ── TABLET (768–1023px) ── */
+@media (max-width: 1023px) {
+
+  /* NAV */
+  nav, .topnav {
+    height: 52px;
+  }
+
+  .nav-links { display: none; }
+
+  .nav-right, .tn-right { border-left: var(--rule); }
+
+  .nav-status, .tn-status { padding: 0 14px; font-size: 11px; }
+
+  /* HERO — stack wordmark + map */
+  .hero-wordmark-row {
+    grid-template-columns: 1fr;
+    padding: 24px 24px 0;
+  }
+
+  .hero-right-text { max-width: 100%; padding-bottom: 20px; }
+
+  .hero-wordmark { font-size: clamp(80px, 14vw, 140px); }
+
+  .hero-map-section {
+    grid-template-columns: 1fr;
+    grid-template-rows: 420px auto;
+    min-height: unset;
+    margin-top: 0;
+  }
+
+  .hero-map-wrap { border-right: none; border-bottom: var(--rule); }
+
+  .hero-feed { max-height: 300px; }
+
+  /* MANIFESTO */
+  .manifesto { grid-template-columns: 1fr; }
+  .man-num { display: none; }
+  .man-aside { border-left: none; border-top: var(--rule); padding: 20px 32px; }
+  .man-text { padding: 28px 32px; }
+
+  /* HOW */
+  .how-grid { grid-template-columns: 1fr 1fr; }
+  .how-cell:nth-child(2) { border-right: none; }
+  .how-cell:nth-child(3) { border-top: var(--rule); }
+
+  /* FEATURES */
+  .feat-grid { grid-template-columns: 1fr; }
+  .feat-cell { border-right: none !important; }
+
+  /* REPORT */
+  .report-section { grid-template-columns: 1fr; }
+  .report-left { border-right: none; border-bottom: var(--rule); }
+
+  /* ACCESS */
+  .access-strip { grid-template-columns: 1fr; }
+  .access-cell { border-right: none; border-bottom: var(--rule); }
+  .access-cell:last-child { border-bottom: none; }
+
+  /* FOOTER */
+  footer {
+    grid-template-columns: 1fr 1fr;
+    gap: 32px;
+  }
+  .ft-brand { grid-column: 1 / -1; }
+
+  /* SEC HEADER */
+  .sec-head { grid-template-columns: 60px 1fr; }
+  .sec-right { display: none; }
+
+  /* APP SHELL */
+  .shell { grid-template-rows: 52px 22px 1fr 56px; }
+
+  /* TOP NAV TABS — hide labels on tablet */
+  .tn-tab { padding: 0 14px; font-size: 11px; }
+  .tn-tab span:not(.tn-tab-icon):not(.tn-badge) { display: none; }
+
+  /* APP VIEWS */
+  .v-map { grid-template-columns: 1fr; }
+  .map-sidebar { display: none; }
+
+  .v-chat { grid-template-columns: 220px 1fr; }
+
+  .aid-grid { grid-template-columns: 1fr 1fr; }
+  .aid-card:nth-child(2n) { border-right: none; }
+  .aid-card:nth-child(n+3) { border-top: var(--rule); }
+
+  .np-grid { grid-template-columns: 1fr 1fr; }
+  .np-cell:nth-child(2n) { border-right: none; }
+
+  .v-profile { grid-template-columns: 240px 1fr; }
+
+  /* ONBOARDING */
+  .feature-list { grid-template-columns: 1fr; }
+  .form-row { grid-template-columns: 1fr; }
+  .borough-grid { grid-template-columns: 1fr 1fr 1fr; }
+
+}
+
+/* ── MOBILE (max 767px) ── */
+@media (max-width: 767px) {
+
+  /* NAV */
+  nav, .topnav { height: 52px; padding: 0 16px; }
+
+  .nav-logo, .tn-logo, .topbar-logo {
+    padding: 0 14px 0 0;
+    border-right: none;
+  }
+
+  .nav-logo-type, .tn-logo-type, .logo-text { font-size: 14px; }
+
+  .nav-links { display: none; }
+
+  .tn-tabs { gap: 0; }
+
+  .tn-tab {
+    padding: 0 10px;
+    font-size: 0; /* hide text labels */
+    gap: 0;
+  }
+
+  .tn-tab-icon { font-size: 16px; }
+  .tn-badge { position: absolute; top: 6px; right: 4px; width: 12px; height: 12px; font-size: 7px; }
+
+  .nav-status, .tn-status { display: none; }
+
+  .nav-cta { padding: 0 14px; font-size: 11px; }
+
+  /* TICKER */
+  .ticker-wrap, .ticker { height: 22px; }
+  .t-item { font-size: 9px; padding: 0 24px; }
+
+  /* HERO */
+  .hero { padding-top: 74px; }
+
+  .hero-wordmark-row {
+    grid-template-columns: 1fr;
+    padding: 20px 16px 0;
+    gap: 16px;
+  }
+
+  .hero-wordmark { font-size: clamp(64px, 18vw, 110px); line-height: 0.84; }
+
+  .hero-right-text { padding-bottom: 0; }
+
+  .hero-desc { font-size: 15px; margin-bottom: 18px; }
+
+  .hero-ctas { flex-direction: column; align-items: flex-start; gap: 12px; }
+
+  .hero-map-section {
+    grid-template-columns: 1fr;
+    grid-template-rows: 55vw auto;
+    margin-top: 16px;
+  }
+
+  .hero-map-wrap { border-right: none; border-bottom: var(--rule); min-height: 240px; }
+
+  .hero-feed { max-height: 260px; }
+
+  .map-tab-bar { overflow-x: auto; }
+  .map-tab { font-size: 10px; padding: 8px 12px; }
+
+  /* MANIFESTO */
+  .manifesto { grid-template-columns: 1fr; }
+  .man-num { display: none; }
+  .man-text { padding: 24px 20px; font-size: clamp(16px, 4vw, 24px); }
+  .man-aside { display: none; }
+
+  /* SEC HEADER */
+  .sec-head { grid-template-columns: 48px 1fr; }
+  .sec-n { padding: 12px 14px; font-size: 11px; }
+  .sec-title { padding: 12px 14px; font-size: 11px; }
+  .sec-right { display: none; }
+
+  /* HOW */
+  .how-grid { grid-template-columns: 1fr; }
+  .how-cell { border-right: none; padding: 32px 20px; }
+  .how-cell + .how-cell { border-top: var(--rule); }
+
+  /* TYPE BREAK */
+  .type-break { padding: 0 20px; }
+  .type-break-inner { font-size: clamp(36px, 8vw, 64px); padding: 16px 0; }
+
+  /* FEATURES */
+  .feat-grid { grid-template-columns: 1fr; }
+  .feat-cell { padding: 36px 20px; border-right: none !important; }
+  .feat-title { font-size: 42px; }
+
+  /* REPORT */
+  .report-section { grid-template-columns: 1fr; }
+  .report-left { padding: 36px 20px; border-right: none; border-bottom: var(--rule); }
+  .report-left h2 { font-size: 60px; }
+  .form-row.c2 { grid-template-columns: 1fr; }
+  .tog-row { grid-template-columns: 1fr; }
+  .report-right { padding: 28px 20px; }
+  .stat-n { font-size: 56px; }
+
+  /* ACCESS */
+  .access-strip { grid-template-columns: 1fr; }
+  .access-cell { padding: 24px 20px; border-right: none; border-bottom: var(--rule); }
+  .access-cell:last-child { border-bottom: none; }
+
+  /* FOOTER */
+  footer {
+    grid-template-columns: 1fr;
+    padding: 32px 20px 24px;
+    gap: 24px;
+  }
+  .ft-brand { font-size: 40px; }
+  .ft-bottom { padding: 14px 20px; flex-direction: column; gap: 6px; }
+
+  /* ── APP SHELL MOBILE ── */
+  .shell { grid-template-rows: 52px 20px 1fr 58px; }
+
+  /* TOP NAV — icon only */
+  .tn-tabs { overflow-x: auto; }
+  .tn-tab { padding: 0 14px; font-size: 0; }
+  .tn-tab-icon { font-size: 17px; }
+
+  /* VIEWS FULL WIDTH */
+  .v-map { grid-template-columns: 1fr; }
+  .map-sidebar { display: none; }
+
+  /* CHAT — full width, hide channel list on mobile */
+  .v-chat { grid-template-columns: 1fr; }
+  .chat-channels { display: none; }
+  .chat-main { display: flex; }
+
+  /* MUTUAL AID */
+  .v-aid {}
+  .aid-header { padding: 16px 16px 14px; flex-direction: column; align-items: flex-start; gap: 14px; }
+  .aid-title { font-size: 36px; }
+  .aid-filters { overflow-x: auto; }
+  .aid-grid { grid-template-columns: 1fr; }
+  .aid-card { border-right: none !important; padding: 20px 16px; }
+
+  /* ALERTS */
+  .alerts-header { padding: 16px 16px 14px; flex-direction: column; align-items: flex-start; gap: 12px; }
+  .alerts-title { font-size: 36px; }
+  .alert-body { padding: 14px 16px; }
+  .alert-time-col { padding: 14px 14px; }
+  .notif-prefs { padding: 20px 16px; }
+  .np-grid { grid-template-columns: 1fr; }
+  .np-cell { border-right: none !important; }
+
+  /* PROFILE */
+  .v-profile { grid-template-columns: 1fr; }
+  .profile-left { border-right: none; border-bottom: var(--rule); padding: 20px 16px; }
+  .profile-main { padding: 20px 16px; }
+
+  /* CHAT INPUT */
+  .chat-input-wrap { padding: 10px 14px; }
+  .chat-input { font-size: 14px; padding: 10px 12px; }
+  .send-btn { padding: 10px 14px; font-size: 11px; }
+
+  /* MESSAGES */
+  .messages { padding: 14px 16px; }
+  .msg { padding: 5px 0; }
+  .msg:hover { margin: 0 -16px; padding: 5px 16px; }
+  .msg-text { font-size: 13px; }
+
+  /* BOTTOM TAB BAR */
+  .bottombar { height: 58px; }
+  .bot-label { font-size: 8px; }
+  .bot-icon { font-size: 18px; }
+
+  /* ONBOARDING INDEX.HTML */
+  .step { padding: 24px 16px; }
+  .step-headline { font-size: clamp(44px, 12vw, 80px); }
+  .step-body { font-size: 16px; }
+  .feature-list { grid-template-columns: 1fr; gap: 10px; }
+  .form-row { grid-template-columns: 1fr !important; }
+  .borough-grid { grid-template-columns: 1fr 1fr; }
+  .bottom-bar { padding: 0 16px; }
+
+  /* TOPBAR (onboarding) */
+  .topbar { padding: 0 16px; }
+  .tb-logo-text { font-size: 14px; }
+  .tb-back { font-size: 11px; }
+
+  /* PROFILE PAGE FORMS */
+  .conf-grid { grid-template-columns: 1fr; }
+  .lang-grid { grid-template-columns: 1fr 1fr; }
+
+  /* HIDE heavy decorative elements on mobile */
+  .how-ghost { display: none; }
+  .feat-ghost { display: none; }
+  .hero-glitch { display: none; }
+
+}
+
+/* ── SMALL MOBILE (max 390px — iPhone SE, older phones) ── */
+@media (max-width: 390px) {
+
+  .hero-wordmark { font-size: 58px; }
+  .step-headline { font-size: 42px; }
+  .report-left h2 { font-size: 48px; }
+  .feat-title { font-size: 36px; }
+  .alerts-title, .aid-title { font-size: 30px; }
+
+  .next-btn { padding: 12px 20px; font-size: 12px; }
+  .bottom-bar { height: 62px; }
+
+  footer { padding: 24px 16px; }
+
+  .borough-grid { grid-template-columns: 1fr 1fr; }
+
+}
+
+/* ── SAFE AREA (iPhone notch / home bar) ── */
+@supports (padding: max(0px)) {
+  .bottom-bar, .bottombar {
+    padding-bottom: max(12px, env(safe-area-inset-bottom));
+  }
+  nav, .topnav {
+    padding-top: env(safe-area-inset-top);
+  }
+}
+
+
+
+/* ── MOBILE TOUCH FIXES ── */
+* { -webkit-tap-highlight-color: transparent; }
+button, a, [onclick] { touch-action: manipulation; }
+input, select, textarea { font-size: 16px !important; } /* prevent iOS zoom on focus */
+.chat-input { font-size: 16px !important; }
+
+/* HAMBURGER */
+.nav-hamburger {
+  display: none;
+  flex-direction: column; gap: 5px; justify-content: center; align-items: center;
+  width: 40px; height: 52px;
+  background: none; border: none; cursor: pointer; padding: 0 12px;
+  border-left: var(--rule);
+}
+
+.nav-hamburger span {
+  display: block; width: 18px; height: 1px; background: rgba(237,233,224,0.6);
+  transition: all 0.2s;
+}
+
+.nav-hamburger.open span:nth-child(1) { transform: translateY(6px) rotate(45deg); }
+.nav-hamburger.open span:nth-child(2) { opacity: 0; }
+.nav-hamburger.open span:nth-child(3) { transform: translateY(-6px) rotate(-45deg); }
+
+.mobile-nav-drawer {
+  display: none;
+  position: fixed; top: 74px; left: 0; right: 0; z-index: 498;
+  background: rgba(8,8,8,0.98);
+  border-bottom: var(--ruleB);
+  flex-direction: column;
+  backdrop-filter: blur(12px);
+}
+
+.mobile-nav-drawer a {
+  font-size: 14px; letter-spacing: 0.16em; text-transform: uppercase;
+  color: rgba(237,233,224,0.6); text-decoration: none;
+  padding: 18px 20px; border-bottom: var(--rule);
+  transition: color 0.15s, background 0.15s;
+}
+
+.mobile-nav-drawer a:hover { color: var(--paper); background: var(--faint); }
+.mobile-nav-drawer a:last-child { border-bottom: none; color: var(--red); }
+
+.mobile-nav-drawer.open { display: flex; animation: slideDown 0.2s ease; }
+
+@keyframes slideDown {
+  from { opacity: 0; transform: translateY(-8px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+@media (max-width: 767px) {
+  .nav-hamburger { display: flex; }
+}
+
+</style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav>
+  <a href="homepage.html" class="nav-logo">
+    <img src="Untitled-2.png" alt="WatchTower" class="nav-logo-img">
+    <div class="nav-logo-type">WATCHTOWER<sup>™</sup></div>
+  </a>
+  <ul class="nav-links">
+    <li><a href="#how">How It Works</a></li>
+    <li><a href="#features">Features</a></li>
+    <li><a href="#report">Report</a></li>
+  </ul>
+  <div class="nav-right">
+    <span class="nav-status">4 Active Outages</span>
+    <a href="app.html" class="nav-cta">Open App →</a>
+  </div>
+</nav>
+
+<!-- TICKER -->
+<div class="ticker-wrap">
+  <div class="ticker-track">
+    <span class="t-item">⚡ OUT — Bronx, 138th &amp; Willis · 4 min ago</span>
+    <span class="t-item"> · </span>
+    <span class="t-item">💧 RESTORED — Crown Heights · 12 min ago</span>
+    <span class="t-item"> · </span>
+    <span class="t-item">⚡ PARTIAL — East Flatbush, Ave D · 31 min ago</span>
+    <span class="t-item"> · </span>
+    <span class="t-item">💧 OUT — Bushwick, Knickerbocker · 1 hr ago</span>
+    <span class="t-item"> · </span>
+    <span class="t-item">⚡ RESTORED — Harlem, W 125th · 2 hr ago</span>
+    <span class="t-item"> · </span>
+    <span class="t-item">⚡ OUT — Bronx, 138th &amp; Willis · 4 min ago</span>
+    <span class="t-item"> · </span>
+    <span class="t-item">💧 RESTORED — Crown Heights · 12 min ago</span>
+    <span class="t-item"> · </span>
+    <span class="t-item">⚡ PARTIAL — East Flatbush, Ave D · 31 min ago</span>
+    <span class="t-item"> · </span>
+    <span class="t-item">💧 OUT — Bushwick, Knickerbocker · 1 hr ago</span>
+    <span class="t-item"> · </span>
+    <span class="t-item">⚡ RESTORED — Harlem, W 125th · 2 hr ago</span>
+  </div>
+</div>
+
+<!-- HERO -->
+<section class="hero" id="home">
+
+  <!-- WORDMARK ROW — fades on map hover -->
+  <div class="hero-wordmark-row" id="wordmark-row">
+    <div class="hero-wordmark">
+      WATCH<br>
+      <span class="wm-outline">T<em>OW</em>ER</span>
+    </div>
+    <div class="hero-right-text">
+      <p class="hero-eyebrow">Community Utility Network — NYC</p>
+      <p class="hero-desc">Know when your power and water go out — before your phone does. Community-verified, real-time status for every NYC neighborhood.</p>
+      <div class="hero-ctas">
+        <a href="#report" class="btn-fill">Report an Outage</a>
+        <a href="app.html" class="btn-ghost-hero">→ Open App</a>
+      </div>
+    </div>
+  </div>
+
+  <!-- MAP + FEED -->
+  <div class="hero-map-section">
+
+    <!-- GOOGLE MAP -->
+    <div class="hero-map-wrap" id="hero-map"
+         onmouseenter="document.getElementById('wordmark-row').classList.add('map-hovered')"
+         onmouseleave="document.getElementById('wordmark-row').classList.remove('map-hovered')">
+
+      <!-- neighborhood tabs -->
+      <div class="map-tab-bar">
+        <button class="map-tab active" onclick="jumpMap('South+Bronx,+New+York,+NY',this)">S. Bronx</button>
+        <button class="map-tab" onclick="jumpMap('Bedford-Stuyvesant,+Brooklyn,+NY',this)">Bed-Stuy</button>
+        <button class="map-tab" onclick="jumpMap('Crown+Heights,+Brooklyn,+NY',this)">Crown Hts</button>
+        <button class="map-tab" onclick="jumpMap('Bushwick,+Brooklyn,+NY',this)">Bushwick</button>
+        <button class="map-tab" onclick="jumpMap('Harlem,+Manhattan,+NY',this)">Harlem</button>
+        <button class="map-tab" onclick="jumpMap('Washington+Heights,+Manhattan,+NY',this)">Wash. Hts</button>
+        <button class="map-tab" onclick="jumpMap('Jamaica,+Queens,+NY',this)">Jamaica</button>
+        <button class="map-tab" onclick="jumpMap('Red+Hook,+Brooklyn,+NY',this)">Red Hook</button>
+        <button class="map-tab" onclick="jumpMap('East+Flatbush,+Brooklyn,+NY',this)">E. Flatbush</button>
+        <button class="map-tab" onclick="jumpMap('Mott+Haven,+Bronx,+NY',this)">Mott Haven</button>
+      </div>
+
+      <!-- live map -->
+      <iframe
+        id="gmap"
+        class="gmap-iframe"
+        loading="lazy"
+        allowfullscreen
+        referrerpolicy="no-referrer-when-downgrade"
+        src="https://maps.google.com/maps?q=South+Bronx,+New+York,+NY&t=m&z=14&output=embed&iwloc=near">
+      </iframe>
+
+      <div class="map-tint"></div>
+
+      <div class="map-xhair"><div class="map-xhair-dot"></div></div>
+
+      <!-- outage pins -->
+      <div class="map-pins">
+        <div class="pin" style="top:30%;left:32%">
+          <div class="pin-dot p-out"></div>
+          <span class="pin-lbl">⚡ OUT · 138th</span>
+        </div>
+        <div class="pin" style="top:48%;left:54%">
+          <div class="pin-dot p-par"></div>
+          <span class="pin-lbl">~ PARTIAL</span>
+        </div>
+        <div class="pin" style="top:62%;left:26%">
+          <div class="pin-dot p-on"></div>
+          <span class="pin-lbl">✓ ON</span>
+        </div>
+        <div class="pin" style="top:74%;left:68%">
+          <div class="pin-dot p-out"></div>
+          <span class="pin-lbl">💧 OUT</span>
+        </div>
+      </div>
+
+      <div class="map-hover-label">Explore the grid</div>
+      <div class="map-ts" id="map-ts">Last updated 2 min ago</div>
+    </div>
+
+    <!-- LIVE FEED SIDEBAR -->
+    <div class="hero-feed">
+      <div class="feed-head">
+        <span class="feed-lbl">Live Status</span>
+        <span class="feed-live">Live</span>
+      </div>
+      <div class="feed-rows">
+        <div class="f-row">
+          <div class="f-zone">Bronx — 138th / Willis<small>4 min ago · Power</small></div>
+          <span class="f-badge bOUT">Out</span>
+        </div>
+        <div class="f-row">
+          <div class="f-zone">Crown Heights — Nostrand<small>12 min ago · Water</small></div>
+          <span class="f-badge bON">On</span>
+        </div>
+        <div class="f-row">
+          <div class="f-zone">East Flatbush — Ave D<small>31 min ago · Power</small></div>
+          <span class="f-badge bPART">Partial</span>
+        </div>
+        <div class="f-row">
+          <div class="f-zone">Bushwick — Knickerbocker<small>1 hr ago · Water</small></div>
+          <span class="f-badge bOUT">Out</span>
+        </div>
+        <div class="f-row">
+          <div class="f-zone">Harlem — W 125th St<small>2 hr ago · Power</small></div>
+          <span class="f-badge bON">On</span>
+        </div>
+        <div class="f-row">
+          <div class="f-zone">Bed-Stuy — Malcolm X Blvd<small>2 hr ago · Power</small></div>
+          <span class="f-badge bON">On</span>
+        </div>
+        <div class="f-row">
+          <div class="f-zone">S. Bronx — Grand Concourse<small>3 hr ago · Water</small></div>
+          <span class="f-badge bPART">Partial</span>
+        </div>
+        <div class="f-row">
+          <div class="f-zone">Washington Hts — 181st<small>3 hr ago · Power</small></div>
+          <span class="f-badge bOUT">Out</span>
+        </div>
+        <div class="f-row">
+          <div class="f-zone">Jamaica, Queens — Sutphin<small>4 hr ago · Water</small></div>
+          <span class="f-badge bON">On</span>
+        </div>
+        <div class="f-row">
+          <div class="f-zone">Mott Haven — 3rd Ave<small>5 hr ago · Power</small></div>
+          <span class="f-badge bOUT">Out</span>
+        </div>
+        <div class="f-row">
+          <div class="f-zone">Red Hook — Van Brunt<small>6 hr ago · Water</small></div>
+          <span class="f-badge bON">On</span>
+        </div>
+        <div class="f-row">
+          <div class="f-zone">Flatbush — Church Ave<small>6 hr ago · Power</small></div>
+          <span class="f-badge bPART">Partial</span>
+        </div>
+      </div>
+      <div class="feed-footer">
+        <a href="app.html">View all →</a>
+        <a href="#report">+ Report</a>
+      </div>
+    </div>
+  </div>
+
+</section>
+
+<!-- MANIFESTO -->
+<div class="manifesto reveal">
+  <div class="man-num">// 001</div>
+  <p class="man-text">
+    When the lights go out, <strong>you shouldn't be in the dark</strong> about it.<br>
+    WatchTower is a <em>community-powered</em> utility grid for NYC —<br>
+    built for the moments when everything else stops working.
+  </p>
+  <div class="man-aside">
+    <p>App · SMS · Call-In<br>Works on 2% battery<br>No account required</p>
+  </div>
+</div>
+
+<!-- HOW IT WORKS -->
+<section id="how">
+  <div class="sec-head">
+    <span class="sec-n">01</span>
+    <span class="sec-title">How It Works</span>
+    <span class="sec-right">Four steps. Fifteen seconds.</span>
+  </div>
+  <div class="how-grid">
+    <div class="how-cell reveal">
+      <span class="how-ghost">1</span>
+      <div class="how-icon">
+        <svg width="18" height="18" viewBox="0 0 18 18" fill="none">
+          <circle cx="9" cy="9" r="3" fill="#d42b20"/>
+          <circle cx="9" cy="9" r="6.5" stroke="#d42b20" stroke-width="0.6" stroke-dasharray="2 2"/>
+          <circle cx="9" cy="9" r="8.5" stroke="rgba(237,233,224,0.2)" stroke-width="0.5"/>
+        </svg>
+      </div>
+      <p class="how-title">Open &<br>Scan</p>
+      <p class="how-body">Color-coded map loads instantly. Green means on. Red means out. No guesswork.</p>
+    </div>
+    <div class="how-cell reveal" style="transition-delay:.07s">
+      <span class="how-ghost">2</span>
+      <div class="how-icon">
+        <svg width="18" height="18" viewBox="0 0 18 18" fill="none">
+          <path d="M3 9L7 13L15 5" stroke="#d42b20" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+      </div>
+      <p class="how-title">Tap to<br>Report</p>
+      <p class="how-body">One tap to log an outage or restoration. Works offline. Works at 2% battery.</p>
+    </div>
+    <div class="how-cell reveal" style="transition-delay:.14s">
+      <span class="how-ghost">3</span>
+      <div class="how-icon">
+        <svg width="18" height="18" viewBox="0 0 18 18" fill="none">
+          <path d="M2 16L9 3L16 16Z" stroke="rgba(237,233,224,0.3)" stroke-width="0.75" fill="none"/>
+          <line x1="9" y1="7.5" x2="9" y2="12" stroke="#d42b20" stroke-width="1.5"/>
+          <circle cx="9" cy="13.5" r="0.9" fill="#d42b20"/>
+        </svg>
+      </div>
+      <p class="how-title">Get<br>Verified</p>
+      <p class="how-body">Reports cross-referenced with neighbors and utility data. Every entry is timestamped.</p>
+    </div>
+    <div class="how-cell reveal" style="transition-delay:.21s">
+      <span class="how-ghost">4</span>
+      <div class="how-icon">
+        <svg width="18" height="18" viewBox="0 0 18 18" fill="none">
+          <line x1="9" y1="2" x2="9" y2="16" stroke="#d42b20" stroke-width="1.5" stroke-linecap="round"/>
+          <path d="M2 16Q9 2 16 16" stroke="rgba(237,233,224,0.2)" stroke-width="0.75" fill="none"/>
+          <circle cx="9" cy="2" r="1.5" fill="#d42b20"/>
+        </svg>
+      </div>
+      <p class="how-title">Stay<br>Informed</p>
+      <p class="how-body">Texts when utilities are restored. App, SMS, or call-in — your choice.</p>
+    </div>
+  </div>
+</section>
+
+<!-- TYPE BREAK -->
+<div class="type-break">
+  <p class="type-break-inner">WHEN THE<span>&nbsp;GRID FAILS</span>&nbsp;— WE DON'T.</p>
+</div>
+
+<!-- FEATURES -->
+<section id="features">
+  <div class="sec-head">
+    <span class="sec-n">02</span>
+    <span class="sec-title">Built for When Things Break Down</span>
+    <span class="sec-right">Core features</span>
+  </div>
+  <div class="feat-grid">
+    <div class="feat-cell reveal">
+      <p class="feat-tag">Communication</p>
+      <h3 class="feat-title">APP.<br>TEXT.<br>CALL.</h3>
+      <p class="feat-body">No data? No problem. Report or check status by SMS or hotline. WatchTower reaches you however it can.</p>
+      <span class="feat-ghost">01</span>
+    </div>
+    <div class="feat-cell reveal" style="transition-delay:.08s">
+      <p class="feat-tag">Battery</p>
+      <h3 class="feat-title">SAVER<br>MODE<br>ON.</h3>
+      <p class="feat-body">Ultra-low power mode drops background activity to near zero. We won't drain the battery you need most.</p>
+      <span class="feat-ghost">02</span>
+    </div>
+    <div class="feat-cell reveal">
+      <p class="feat-tag">Verification</p>
+      <h3 class="feat-title">KNOW<br>IT'S<br>REAL.</h3>
+      <p class="feat-body">Reports cross-referenced and timestamped. "Updated 4 min ago" means exactly that — no stale data.</p>
+      <span class="feat-ghost">03</span>
+    </div>
+    <div class="feat-cell reveal" style="transition-delay:.08s">
+      <p class="feat-tag">Community</p>
+      <h3 class="feat-title">MUTUAL<br>AID<br>GRID.</h3>
+      <p class="feat-body">Ice. Generator. Childcare. Plumber. Share and request resources in your building during an outage.</p>
+      <span class="feat-ghost">04</span>
+    </div>
+  </div>
+</section>
+
+<!-- REPORT -->
+<section id="report">
+  <div class="sec-head">
+    <span class="sec-n">03</span>
+    <span class="sec-title">Report Your Status</span>
+    <span class="sec-right">No account needed · 15 seconds</span>
+  </div>
+  <div class="report-section">
+    <div class="report-left reveal">
+      <h2>IS YOUR<br>POWER<br>ON?</h2>
+      <p class="report-sub">// anonymous by default. no sign-in required.</p>
+      <div class="form-row c2">
+        <div class="field">
+          <label>Zip Code</label>
+          <input class="f-in" type="text" placeholder="e.g. 10451" maxlength="5">
+        </div>
+        <div class="field">
+          <label>Cross Street (optional)</label>
+          <input class="f-in" type="text" placeholder="e.g. 138th &amp; Willis">
+        </div>
+      </div>
+      <div class="form-row c2">
+        <div class="field">
+          <label>Utility</label>
+          <select class="f-in">
+            <option>⚡ Power</option>
+            <option>💧 Water</option>
+            <option>Both</option>
+          </select>
+        </div>
+        <div class="field">
+          <label>How long ago?</label>
+          <input class="f-in" type="text" placeholder="e.g. 2 hrs ago">
+        </div>
+      </div>
+      <div class="tog-row">
+        <button class="tog on">⚡ Out — Not working</button>
+        <button class="tog">✓ Back — Restored</button>
+      </div>
+      <button class="submit">Submit Report →</button>
+    </div>
+    <div class="report-right reveal" style="transition-delay:.1s">
+      <div class="stat-b">
+        <div class="stat-n">3<em>,</em>241</div>
+        <div class="stat-l">Reports this week</div>
+        <div class="stat-d">Across 47 NYC zip codes</div>
+      </div>
+      <div class="stat-b">
+        <div class="stat-n">~94<em>%</em></div>
+        <div class="stat-l">Verification accuracy</div>
+        <div class="stat-d">Cross-checked with utility provider data</div>
+      </div>
+      <div class="stat-b">
+        <div class="stat-n">4<em>min</em></div>
+        <div class="stat-l">Avg. update interval</div>
+        <div class="stat-d">Continuously timestamped and verified</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ACCESS -->
+<div class="access-strip">
+  <div class="access-cell reveal">
+    <div class="ac-icon">📱</div>
+    <div>
+      <p class="ac-title">Via App</p>
+      <p class="ac-val">watchtower-nyc.app</p>
+      <p class="ac-desc">Full map, report flow, mutual aid grid, battery saver. iOS + Android.</p>
+    </div>
+  </div>
+  <div class="access-cell reveal" style="transition-delay:.07s">
+    <div class="ac-icon">💬</div>
+    <div>
+      <p class="ac-title">Via SMS</p>
+      <p class="ac-val">Text START to 917-WT-NOW1</p>
+      <p class="ac-desc">Text OUT or BACK with your zip. No data or smartphone required.</p>
+    </div>
+  </div>
+  <div class="access-cell reveal" style="transition-delay:.14s">
+    <div class="ac-icon">📞</div>
+    <div>
+      <p class="ac-title">Via Phone</p>
+      <p class="ac-val">1-800-WATCH-TWR</p>
+      <p class="ac-desc">Multilingual operators. Available 24/7 during active outages.</p>
+    </div>
+  </div>
+</div>
+
+<!-- FOOTER -->
+<footer>
+  <div class="ft-brand">WATCH<br>TOWER</div>
+  <div class="ft-col">
+    <h4>Product</h4>
+    <ul>
+      <li><a href="#how">How It Works</a></li>
+      <li><a href="app.html">Status Map</a></li>
+      <li><a href="#report">Report Outage</a></li>
+      <li><a href="app.html">Mutual Aid Grid</a></li>
+    </ul>
+  </div>
+  <div class="ft-col">
+    <h4>Access</h4>
+    <ul>
+      <li><a href="#">SMS Hotline</a></li>
+      <li><a href="#">Call-In Number</a></li>
+      <li><a href="#">Language Options</a></li>
+      <li><a href="#">Accessibility</a></li>
+    </ul>
+  </div>
+  <a href="app.html" class="btn-fill" style="align-self:flex-end">Open App →</a>
+</footer>
+<div class="ft-bottom">
+  <p>WatchTower™ — NYC Community Utility Network</p>
+  <p>Community-powered. Verification-verified. Always on.</p>
+</div>
+
+<script>
+// map jump
+function jumpMap(q, btn) {
+  document.querySelectorAll('.map-tab').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  const iframe = document.getElementById('gmap');
+  iframe.src = `https://maps.google.com/maps?q=${q}&t=m&z=14&output=embed&iwloc=near`;
+  const ts = document.getElementById('map-ts');
+  ts.textContent = 'Loading...';
+  iframe.onload = () => { ts.textContent = 'Last updated just now'; };
+}
+
+// report toggle
+document.querySelectorAll('.tog').forEach(btn => {
+  btn.addEventListener('click', () => {
+    document.querySelectorAll('.tog').forEach(b => b.classList.remove('on'));
+    btn.classList.add('on');
+  });
+});
+
+// scroll reveals
+const obs = new IntersectionObserver(entries => {
+  entries.forEach(e => { if (e.isIntersecting) e.target.classList.add('vis'); });
+}, { threshold: 0.07 });
+document.querySelectorAll('.reveal').forEach(el => obs.observe(el));
+
+// pulse out badges
+setInterval(() => {
+  document.querySelectorAll('.bOUT').forEach(b => {
+    b.style.opacity = '0.5';
+    setTimeout(() => b.style.opacity = '1', 500);
+  });
+}, 7000);
+</script>
+<script>
+function toggleMobileNav() {
+  const drawer = document.getElementById('mobile-nav');
+  const btn = document.getElementById('nav-hamburger');
+  drawer.classList.toggle('open');
+  btn.classList.toggle('open');
+}
+function closeMobileNav() {
+  document.getElementById('mobile-nav').classList.remove('open');
+  document.getElementById('nav-hamburger').classList.remove('open');
+}
+</script>
+</body>
+</html>
