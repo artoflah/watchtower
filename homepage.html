@@ -4,8 +4,10 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>WATCHTOWER — NYC Utility Grid</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Mono:ital,wght@0,300;0,400;0,500;1,400&family=Barlow+Condensed:wght@200;300;400;600;700;900&display=swap" rel="stylesheet">
 <style>
-@import url('https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Mono:ital,wght@0,300;0,400;0,500;1,400&family=Barlow+Condensed:wght@200;300;400;600;700;900&display=swap');
 
 /* ─── TOKENS ─── */
 :root {
@@ -376,41 +378,82 @@ nav {
 
 /* ── HERO ── */
 .hero {
-  padding-top: 80px; /* nav + ticker */
-  min-height: 100vh;
-  display: flex; flex-direction: column;
-  border-bottom: var(--ruleB);
+  padding-top: 80px;
+  height: 100vh;
+  min-height: 600px;
   position: relative; z-index: 1;
+  border-bottom: var(--ruleB);
+  overflow: hidden;
 }
 
-/* WORDMARK ROW */
-.hero-wordmark-row {
-  padding: 36px 40px 0;
-  display: grid;
-  grid-template-columns: 1fr auto;
-  align-items: end;
-  gap: 40px;
-  position: relative; z-index: 10;
-  /* this whole row will fade on map hover */
+/* MAP fills the entire hero */
+.hero-map-section {
+  position: absolute;
+  inset: 0; top: 0;
+  width: 100%; height: 100%;
+  z-index: 1;
+}
+
+.hero-map-wrap {
+  position: absolute; inset: 0;
+  border-right: none; border-top: none;
+  cursor: crosshair;
+}
+
+.hero-map-wrap:hover .gmap-iframe {
+  opacity: 1;
+  filter: grayscale(80%) invert(92%) contrast(92%);
+}
+
+.hero-map-wrap .map-tint {
+  background: rgba(8,8,8,0.52);
   transition: opacity 0.5s ease;
 }
 
-.hero-wordmark-row.map-hovered { opacity: 0; }
+.hero-map-wrap:hover .map-tint { opacity: 0.6; }
+
+/* LIVE FEED — fixed right sidebar overlaid on map */
+.hero-feed {
+  position: absolute;
+  top: 0; right: 0; bottom: 0;
+  width: 300px;
+  border-left: var(--rule);
+  background: rgba(8,8,8,0.82);
+  backdrop-filter: blur(12px);
+  z-index: 5;
+  display: flex; flex-direction: column;
+}
+
+/* WORDMARK ROW — overlaid on top of map, bottom-left */
+.hero-wordmark-row {
+  position: absolute;
+  left: 0; right: 300px;
+  bottom: 0;
+  z-index: 10;
+  padding: 0 40px 40px;
+  display: flex;
+  flex-direction: column;
+  transition: opacity 0.5s ease;
+  background: linear-gradient(to top, rgba(8,8,8,0.85) 0%, rgba(8,8,8,0.4) 60%, transparent 100%);
+}
+
+.hero-wordmark-row.map-hovered { opacity: 0; pointer-events: none; }
 
 .hero-wordmark {
   font-family: 'Bebas Neue', sans-serif;
-  font-size: clamp(110px, 16vw, 220px);
+  font-size: clamp(96px, 14vw, 200px);
   line-height: 0.82;
   letter-spacing: -0.01em;
   color: var(--paper);
   user-select: none;
+  margin-bottom: 20px;
 }
 
 .hero-wordmark .wm-outline {
   display: block;
   color: transparent;
   -webkit-text-stroke: 1.5px var(--paper);
-  opacity: 0.8;
+  opacity: 0.85;
 }
 
 .hero-wordmark .wm-outline em {
@@ -419,86 +462,40 @@ nav {
   font-style: normal;
 }
 
-/* HERO RIGHT — eyebrow + desc */
+/* description + buttons sit below the wordmark */
 .hero-right-text {
-  max-width: 340px;
-  padding-bottom: 16px;
+  max-width: 520px;
+  display: flex;
+  align-items: center;
+  gap: 32px;
+  flex-wrap: wrap;
 }
 
-.hero-eyebrow {
-  font-size: 12px; letter-spacing: 0.22em; text-transform: uppercase;
-  color: rgba(237,233,224,0.5);
-  margin-bottom: 14px;
-  display: flex; align-items: center; gap: 12px;
-}
-
-.hero-eyebrow::before {
-  content: ''; width: 20px; height: 1px;
-  background: var(--red); display: inline-block; flex-shrink: 0;
-}
+.hero-eyebrow { display: none; }
 
 .hero-desc {
   font-family: 'Barlow Condensed', sans-serif;
-  font-weight: 300; font-size: 18px; line-height: 1.5;
-  color: rgba(237,233,224,0.55);
-  margin-bottom: 24px;
+  font-weight: 300; font-size: 17px; line-height: 1.5;
+  color: rgba(237,233,224,0.7);
+  max-width: 340px;
+  margin-bottom: 0;
 }
 
-.hero-ctas { display: flex; gap: 18px; align-items: center; }
+.hero-ctas { display: flex; gap: 14px; align-items: center; flex-shrink: 0; }
 
 .btn-ghost-hero {
   font-size: 13px; letter-spacing: 0.16em; text-transform: uppercase;
-  color: rgba(237,233,224,0.45); text-decoration: none; transition: color 0.15s;
+  color: rgba(237,233,224,0.55); text-decoration: none; transition: color 0.15s;
 }
 .btn-ghost-hero:hover { color: var(--paper); }
 
-/* MAP + FEED CONTAINER */
-.hero-map-section {
-  flex: 1;
-  display: grid;
-  grid-template-columns: 1fr 320px;
-  min-height: 520px;
-  margin-top: 28px;
-  position: relative;
-}
-
-/* THE MAP */
-.hero-map-wrap {
-  position: relative;
-  overflow: hidden;
-  border-right: var(--rule);
-  border-top: var(--rule);
-  cursor: crosshair;
-}
-
-.hero-map-wrap:hover ~ .hero-feed { opacity: 1; }
-
-.gmap-iframe {
-  width: 100%; height: 100%;
-  border: none; position: absolute; inset: 0;
-  filter: grayscale(100%) invert(92%) contrast(88%);
-  opacity: 0.82;
-  transition: opacity 0.5s ease, filter 0.5s ease;
-}
-
-/* map brightens on hover */
-.hero-map-wrap:hover .gmap-iframe {
-  opacity: 1;
-  filter: grayscale(85%) invert(92%) contrast(92%);
-}
-
-.map-tint {
-  position: absolute; inset: 0; z-index: 2; pointer-events: none;
-  background: rgba(8,8,8,0.28); mix-blend-mode: multiply;
-  transition: opacity 0.5s ease;
-}
-
-.hero-map-wrap:hover .map-tint { opacity: 0.4; }
-
-/* map neighborhood tabs */
+/* MAP TABS — sit at the very top of the map area */
 .map-tab-bar {
-  position: absolute; top: 0; left: 0; right: 0; z-index: 5;
-  display: flex; overflow-x: auto; background: rgba(8,8,8,0.82);
+  position: absolute;
+  top: 0; left: 0; right: 300px;
+  z-index: 6;
+  display: flex; overflow-x: auto;
+  background: rgba(8,8,8,0.75);
   border-bottom: var(--rule);
   backdrop-filter: blur(6px);
 }
@@ -508,7 +505,7 @@ nav {
 
 .map-tab {
   font-size: 11px; letter-spacing: 0.14em; text-transform: uppercase;
-  color: rgba(237,233,224,0.45); padding: 9px 16px;
+  color: rgba(237,233,224,0.45); padding: 10px 18px;
   border-right: var(--rule); cursor: crosshair; white-space: nowrap; flex-shrink: 0;
   transition: color 0.15s, background 0.15s;
   background: none; border-top: none; border-bottom: 2px solid transparent; border-left: none;
@@ -518,20 +515,16 @@ nav {
 .map-tab:hover { color: var(--paper); background: rgba(237,233,224,0.04); }
 .map-tab.active { color: var(--paper); border-bottom-color: var(--red); }
 
-/* crosshair */
+/* crosshair + pins stay same */
 .map-xhair {
-  position: absolute; top: 50%; left: 50%; z-index: 6;
+  position: absolute; top: 50%; left: calc(50% - 150px); z-index: 6;
   transform: translate(-50%,-50%); width: 22px; height: 22px;
-  pointer-events: none;
-  transition: opacity 0.4s ease;
+  pointer-events: none; transition: opacity 0.4s ease;
 }
-
-.hero-map-wrap:hover .map-xhair { opacity: 0.5; }
-
+.hero-map-wrap:hover .map-xhair { opacity: 0.4; }
 .map-xhair::before, .map-xhair::after { content: ''; position: absolute; background: var(--red); }
 .map-xhair::before { width: 1px; height: 100%; left: 50%; top: 0; }
 .map-xhair::after  { height: 1px; width: 100%; top: 50%; left: 0; }
-
 .map-xhair-dot {
   position: absolute; top: 50%; left: 50%;
   transform: translate(-50%,-50%);
@@ -539,111 +532,90 @@ nav {
   animation: pulse 2.2s ease-in-out infinite;
 }
 
-/* outage pins */
-.map-pins { position: absolute; inset: 0; z-index: 4; pointer-events: none; padding-top: 38px; }
-
-.pin {
-  position: absolute; display: flex; align-items: center; gap: 6px;
-  pointer-events: all; cursor: crosshair;
-  opacity: 0.85; transition: opacity 0.15s;
+.map-pins {
+  position: absolute; inset: 0; z-index: 4; pointer-events: none;
+  padding-top: 42px; padding-right: 300px;
 }
 
+.pin { position: absolute; display: flex; align-items: center; gap: 6px; pointer-events: all; cursor: crosshair; opacity: 0.9; transition: opacity 0.15s; }
 .pin:hover { opacity: 1; }
-
 .pin-dot { width: 9px; height: 9px; border-radius: 50%; border: 1px solid rgba(8,8,8,0.5); flex-shrink: 0; }
-.p-out { background: var(--red2); }
-.p-on  { background: #2a9944; }
-.p-par { background: #c8a020; }
-
+.p-out { background: var(--red2); } .p-on { background: #2a9944; } .p-par { background: #c8a020; }
 .pin-lbl {
   font-family: 'DM Mono', monospace;
   font-size: 11px; letter-spacing: 0.08em; text-transform: uppercase;
   color: var(--paper); background: rgba(8,8,8,0.8);
-  padding: 3px 8px; border: 1px solid rgba(237,233,224,0.14); white-space: nowrap;
+  padding: 3px 8px; border: 1px solid rgba(237,233,224,0.15); white-space: nowrap;
 }
 
-/* hover label on map */
 .map-hover-label {
-  position: absolute; bottom: 16px; left: 50%;
+  position: absolute; bottom: 80px; left: 50%;
   transform: translateX(-50%);
   z-index: 7; pointer-events: none;
   font-size: 11px; letter-spacing: 0.2em; text-transform: uppercase;
-  color: rgba(237,233,224,0.4);
-  opacity: 0; transition: opacity 0.4s ease;
-  white-space: nowrap;
+  color: rgba(237,233,224,0.35);
+  opacity: 0; transition: opacity 0.4s ease; white-space: nowrap;
 }
-
 .hero-map-wrap:hover .map-hover-label { opacity: 1; }
 
-/* map timestamp */
 .map-ts {
-  position: absolute; bottom: 14px; right: 16px; z-index: 6;
+  position: absolute; bottom: 14px; right: 316px; z-index: 6;
   font-size: 11px; letter-spacing: 0.12em; text-transform: uppercase;
-  color: rgba(237,233,224,0.35); background: rgba(8,8,8,0.65); padding: 4px 10px;
+  color: rgba(237,233,224,0.3); background: rgba(8,8,8,0.65); padding: 4px 10px;
 }
 
-/* ── LIVE FEED SIDEBAR ── */
-.hero-feed {
-  border-top: var(--rule);
-  display: flex; flex-direction: column;
-  overflow: hidden;
-  transition: opacity 0.3s ease;
+/* ── RESPONSIVE HERO OVERRIDES ── */
+@media (max-width: 1023px) {
+  .hero-feed {
+    width: 260px;
+  }
+  .hero-wordmark-row {
+    right: 260px;
+    padding: 0 28px 32px;
+  }
+  .map-tab-bar { right: 260px; }
+  .map-pins { padding-right: 260px; }
+  .map-ts { right: 276px; }
+  .hero-wordmark { font-size: clamp(72px, 13vw, 150px); }
 }
 
-.feed-head {
-  display: flex; align-items: center; justify-content: space-between;
-  padding: 13px 20px; border-bottom: var(--rule); flex-shrink: 0;
+@media (max-width: 767px) {
+  .hero { height: 100svh; min-height: 500px; }
+
+  .hero-feed {
+    position: absolute;
+    top: auto; bottom: 0; left: 0; right: 0;
+    width: 100%;
+    height: 220px;
+    border-left: none;
+    border-top: var(--rule);
+  }
+
+  .hero-wordmark-row {
+    left: 0; right: 0;
+    bottom: 220px;
+    padding: 0 16px 20px;
+    background: linear-gradient(to top, rgba(8,8,8,0.9) 0%, rgba(8,8,8,0.5) 70%, transparent 100%);
+  }
+
+  .hero-right-text {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 14px;
+  }
+
+  .hero-desc { max-width: 100%; font-size: 15px; }
+
+  .hero-wordmark { font-size: clamp(58px, 16vw, 96px); margin-bottom: 12px; }
+
+  .map-tab-bar { right: 0; top: 0; }
+  .map-pins { padding-right: 0; padding-bottom: 220px; }
+  .map-ts { right: 12px; bottom: 232px; }
+  .map-xhair { left: 50%; }
 }
 
-.feed-lbl {
-  font-size: 11px; letter-spacing: 0.2em; text-transform: uppercase;
-  color: rgba(237,233,224,0.5);
-}
+/* ── LIVE FEED SIDEBAR INTERNALS ── */
 
-.feed-live {
-  display: flex; align-items: center; gap: 7px;
-  font-size: 11px; letter-spacing: 0.14em; text-transform: uppercase;
-  color: var(--red2);
-}
-
-.feed-live::before {
-  content: ''; width: 6px; height: 6px;
-  background: var(--red2); border-radius: 50%;
-  animation: blink 1.4s ease-in-out infinite;
-}
-
-.feed-rows { flex: 1; overflow-y: auto; }
-.feed-rows::-webkit-scrollbar { width: 2px; }
-.feed-rows::-webkit-scrollbar-thumb { background: #1a1a1a; }
-
-.f-row {
-  display: grid; grid-template-columns: 1fr auto;
-  align-items: start; gap: 10px;
-  padding: 12px 20px; border-bottom: var(--rule);
-  cursor: crosshair; transition: background 0.12s;
-}
-
-.f-row:hover { background: var(--faint); }
-
-.f-zone { font-size: 12px; color: rgba(237,233,224,0.75); line-height: 1.3; }
-.f-zone small { display: block; font-size: 11px; color: rgba(237,233,224,0.4); margin-top: 2px; letter-spacing: 0.06em; }
-
-.f-badge {
-  font-size: 11px; letter-spacing: 0.08em; text-transform: uppercase;
-  padding: 3px 7px; text-align: center; flex-shrink: 0; margin-top: 2px;
-}
-
-.feed-footer {
-  padding: 12px 20px; border-top: var(--rule); flex-shrink: 0;
-  display: flex; justify-content: space-between;
-}
-
-.feed-footer a {
-  font-size: 11px; letter-spacing: 0.14em; text-transform: uppercase;
-  color: rgba(237,233,224,0.4); text-decoration: none; transition: color 0.15s;
-}
-
-.feed-footer a:hover { color: var(--paper); }
 
 /* ── MANIFESTO ── */
 .manifesto {
@@ -1238,6 +1210,19 @@ input, select, textarea { font-size: 16px !important; } /* prevent iOS zoom on f
   .nav-hamburger { display: flex; }
 }
 
+
+/* only the wordmark text fades on map hover, not the buttons */
+#hero-wordmark-only {
+  transition: opacity 0.5s ease;
+}
+#hero-wordmark-only.map-hovered {
+  opacity: 0;
+}
+/* make sure the CTA row never fades */
+.hero-wordmark-row.map-hovered {
+  opacity: 1 !important;
+}
+
 </style>
 </head>
 <body>
@@ -1287,45 +1272,13 @@ input, select, textarea { font-size: 16px !important; } /* prevent iOS zoom on f
 <!-- HERO -->
 <section class="hero" id="home">
 
-  <!-- WORDMARK ROW — fades on map hover -->
-  <div class="hero-wordmark-row" id="wordmark-row">
-    <div class="hero-wordmark">
-      WATCH<br>
-      <span class="wm-outline">T<em>OW</em>ER</span>
-    </div>
-    <div class="hero-right-text">
-      <p class="hero-eyebrow">Community Utility Network — NYC</p>
-      <p class="hero-desc">Know when your power and water go out — before your phone does. Community-verified, real-time status for every NYC neighborhood.</p>
-      <div class="hero-ctas">
-        <a href="#report" class="btn-fill">Report an Outage</a>
-        <a href="app.html" class="btn-ghost-hero">→ Open App</a>
-      </div>
-    </div>
-  </div>
-
-  <!-- MAP + FEED -->
+  <!-- FULL-BLEED MAP (fills entire hero) -->
   <div class="hero-map-section">
-
-    <!-- GOOGLE MAP -->
     <div class="hero-map-wrap" id="hero-map"
-         onmouseenter="document.getElementById('wordmark-row').classList.add('map-hovered')"
-         onmouseleave="document.getElementById('wordmark-row').classList.remove('map-hovered')">
+         onmouseenter="document.getElementById('hero-wordmark-only').classList.add('map-hovered')"
+         onmouseleave="document.getElementById('hero-wordmark-only').classList.remove('map-hovered')">
 
-      <!-- neighborhood tabs -->
-      <div class="map-tab-bar">
-        <button class="map-tab active" onclick="jumpMap('South+Bronx,+New+York,+NY',this)">S. Bronx</button>
-        <button class="map-tab" onclick="jumpMap('Bedford-Stuyvesant,+Brooklyn,+NY',this)">Bed-Stuy</button>
-        <button class="map-tab" onclick="jumpMap('Crown+Heights,+Brooklyn,+NY',this)">Crown Hts</button>
-        <button class="map-tab" onclick="jumpMap('Bushwick,+Brooklyn,+NY',this)">Bushwick</button>
-        <button class="map-tab" onclick="jumpMap('Harlem,+Manhattan,+NY',this)">Harlem</button>
-        <button class="map-tab" onclick="jumpMap('Washington+Heights,+Manhattan,+NY',this)">Wash. Hts</button>
-        <button class="map-tab" onclick="jumpMap('Jamaica,+Queens,+NY',this)">Jamaica</button>
-        <button class="map-tab" onclick="jumpMap('Red+Hook,+Brooklyn,+NY',this)">Red Hook</button>
-        <button class="map-tab" onclick="jumpMap('East+Flatbush,+Brooklyn,+NY',this)">E. Flatbush</button>
-        <button class="map-tab" onclick="jumpMap('Mott+Haven,+Bronx,+NY',this)">Mott Haven</button>
-      </div>
-
-      <!-- live map -->
+      <!-- live map iframe -->
       <iframe
         id="gmap"
         class="gmap-iframe"
@@ -1336,93 +1289,81 @@ input, select, textarea { font-size: 16px !important; } /* prevent iOS zoom on f
       </iframe>
 
       <div class="map-tint"></div>
-
       <div class="map-xhair"><div class="map-xhair-dot"></div></div>
 
       <!-- outage pins -->
       <div class="map-pins">
-        <div class="pin" style="top:30%;left:32%">
-          <div class="pin-dot p-out"></div>
-          <span class="pin-lbl">⚡ OUT · 138th</span>
+        <div class="pin" style="top:32%;left:28%">
+          <div class="pin-dot p-out"></div><span class="pin-lbl">⚡ OUT · 138th</span>
         </div>
-        <div class="pin" style="top:48%;left:54%">
-          <div class="pin-dot p-par"></div>
-          <span class="pin-lbl">~ PARTIAL</span>
+        <div class="pin" style="top:50%;left:50%">
+          <div class="pin-dot p-par"></div><span class="pin-lbl">~ PARTIAL</span>
         </div>
-        <div class="pin" style="top:62%;left:26%">
-          <div class="pin-dot p-on"></div>
-          <span class="pin-lbl">✓ ON</span>
+        <div class="pin" style="top:62%;left:22%">
+          <div class="pin-dot p-on"></div><span class="pin-lbl">✓ ON</span>
         </div>
-        <div class="pin" style="top:74%;left:68%">
-          <div class="pin-dot p-out"></div>
-          <span class="pin-lbl">💧 OUT</span>
+        <div class="pin" style="top:42%;left:62%">
+          <div class="pin-dot p-out"></div><span class="pin-lbl">💧 OUT</span>
         </div>
       </div>
 
       <div class="map-hover-label">Explore the grid</div>
       <div class="map-ts" id="map-ts">Last updated 2 min ago</div>
     </div>
+  </div>
 
-    <!-- LIVE FEED SIDEBAR -->
-    <div class="hero-feed">
-      <div class="feed-head">
-        <span class="feed-lbl">Live Status</span>
-        <span class="feed-live">Live</span>
+  <!-- NEIGHBORHOOD TABS — overlaid top of map -->
+  <div class="map-tab-bar">
+    <button class="map-tab active" onclick="jumpMap('South+Bronx,+New+York,+NY',this)">S. Bronx</button>
+    <button class="map-tab" onclick="jumpMap('Bedford-Stuyvesant,+Brooklyn,+NY',this)">Bed-Stuy</button>
+    <button class="map-tab" onclick="jumpMap('Crown+Heights,+Brooklyn,+NY',this)">Crown Hts</button>
+    <button class="map-tab" onclick="jumpMap('Bushwick,+Brooklyn,+NY',this)">Bushwick</button>
+    <button class="map-tab" onclick="jumpMap('Harlem,+Manhattan,+NY',this)">Harlem</button>
+    <button class="map-tab" onclick="jumpMap('Washington+Heights,+Manhattan,+NY',this)">Wash. Hts</button>
+    <button class="map-tab" onclick="jumpMap('Jamaica,+Queens,+NY',this)">Jamaica</button>
+    <button class="map-tab" onclick="jumpMap('Red+Hook,+Brooklyn,+NY',this)">Red Hook</button>
+    <button class="map-tab" onclick="jumpMap('East+Flatbush,+Brooklyn,+NY',this)">E. Flatbush</button>
+    <button class="map-tab" onclick="jumpMap('Mott+Haven,+Bronx,+NY',this)">Mott Haven</button>
+  </div>
+
+  <!-- WORDMARK + CTA — overlaid bottom-left of map -->
+  <div class="hero-wordmark-row" id="wordmark-row">
+    <div class="hero-wordmark" id="hero-wordmark-only">
+      WATCH<br>
+      <span class="wm-outline">T<em>OW</em>ER</span>
+    </div>
+    <div class="hero-right-text">
+      <p class="hero-desc">Know when your power and water go out — before your phone does. Community-verified, real-time status for every NYC neighborhood.</p>
+      <div class="hero-ctas">
+        <a href="#report" class="btn-fill">Report an Outage</a>
+        <a href="app.html" class="btn-ghost-hero">→ Open App</a>
       </div>
-      <div class="feed-rows">
-        <div class="f-row">
-          <div class="f-zone">Bronx — 138th / Willis<small>4 min ago · Power</small></div>
-          <span class="f-badge bOUT">Out</span>
-        </div>
-        <div class="f-row">
-          <div class="f-zone">Crown Heights — Nostrand<small>12 min ago · Water</small></div>
-          <span class="f-badge bON">On</span>
-        </div>
-        <div class="f-row">
-          <div class="f-zone">East Flatbush — Ave D<small>31 min ago · Power</small></div>
-          <span class="f-badge bPART">Partial</span>
-        </div>
-        <div class="f-row">
-          <div class="f-zone">Bushwick — Knickerbocker<small>1 hr ago · Water</small></div>
-          <span class="f-badge bOUT">Out</span>
-        </div>
-        <div class="f-row">
-          <div class="f-zone">Harlem — W 125th St<small>2 hr ago · Power</small></div>
-          <span class="f-badge bON">On</span>
-        </div>
-        <div class="f-row">
-          <div class="f-zone">Bed-Stuy — Malcolm X Blvd<small>2 hr ago · Power</small></div>
-          <span class="f-badge bON">On</span>
-        </div>
-        <div class="f-row">
-          <div class="f-zone">S. Bronx — Grand Concourse<small>3 hr ago · Water</small></div>
-          <span class="f-badge bPART">Partial</span>
-        </div>
-        <div class="f-row">
-          <div class="f-zone">Washington Hts — 181st<small>3 hr ago · Power</small></div>
-          <span class="f-badge bOUT">Out</span>
-        </div>
-        <div class="f-row">
-          <div class="f-zone">Jamaica, Queens — Sutphin<small>4 hr ago · Water</small></div>
-          <span class="f-badge bON">On</span>
-        </div>
-        <div class="f-row">
-          <div class="f-zone">Mott Haven — 3rd Ave<small>5 hr ago · Power</small></div>
-          <span class="f-badge bOUT">Out</span>
-        </div>
-        <div class="f-row">
-          <div class="f-zone">Red Hook — Van Brunt<small>6 hr ago · Water</small></div>
-          <span class="f-badge bON">On</span>
-        </div>
-        <div class="f-row">
-          <div class="f-zone">Flatbush — Church Ave<small>6 hr ago · Power</small></div>
-          <span class="f-badge bPART">Partial</span>
-        </div>
-      </div>
-      <div class="feed-footer">
-        <a href="app.html">View all →</a>
-        <a href="#report">+ Report</a>
-      </div>
+    </div>
+  </div>
+
+  <!-- LIVE FEED — overlaid right sidebar -->
+  <div class="hero-feed">
+    <div class="feed-head">
+      <span class="feed-lbl">Live Status</span>
+      <span class="feed-live">Live</span>
+    </div>
+    <div class="feed-rows">
+      <div class="f-row"><div class="f-zone">Bronx — 138th / Willis<small>4 min ago · Power</small></div><span class="f-badge bOUT">Out</span></div>
+      <div class="f-row"><div class="f-zone">Crown Heights — Nostrand<small>12 min ago · Water</small></div><span class="f-badge bON">On</span></div>
+      <div class="f-row"><div class="f-zone">East Flatbush — Ave D<small>31 min ago · Power</small></div><span class="f-badge bPART">Partial</span></div>
+      <div class="f-row"><div class="f-zone">Bushwick — Knickerbocker<small>1 hr ago · Water</small></div><span class="f-badge bOUT">Out</span></div>
+      <div class="f-row"><div class="f-zone">Harlem — W 125th St<small>2 hr ago · Power</small></div><span class="f-badge bON">On</span></div>
+      <div class="f-row"><div class="f-zone">Bed-Stuy — Malcolm X Blvd<small>2 hr ago · Power</small></div><span class="f-badge bON">On</span></div>
+      <div class="f-row"><div class="f-zone">S. Bronx — Grand Concourse<small>3 hr ago · Water</small></div><span class="f-badge bPART">Partial</span></div>
+      <div class="f-row"><div class="f-zone">Washington Hts — 181st<small>3 hr ago · Power</small></div><span class="f-badge bOUT">Out</span></div>
+      <div class="f-row"><div class="f-zone">Jamaica, Queens — Sutphin<small>4 hr ago · Water</small></div><span class="f-badge bON">On</span></div>
+      <div class="f-row"><div class="f-zone">Mott Haven — 3rd Ave<small>5 hr ago · Power</small></div><span class="f-badge bOUT">Out</span></div>
+      <div class="f-row"><div class="f-zone">Red Hook — Van Brunt<small>6 hr ago · Water</small></div><span class="f-badge bON">On</span></div>
+      <div class="f-row"><div class="f-zone">Flatbush — Church Ave<small>6 hr ago · Power</small></div><span class="f-badge bPART">Partial</span></div>
+    </div>
+    <div class="feed-footer">
+      <a href="app.html">View all →</a>
+      <a href="#report">+ Report</a>
     </div>
   </div>
 
