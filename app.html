@@ -71,11 +71,12 @@ body::after {
 
 /* ─── SHARED: TOP NAV ─── */
 nav, .topnav {
-  position: fixed; top: 0; left: 0; right: 0; z-index: 500;
-  display: flex; align-items: stretch; height: 56px;
+  grid-row: 1;
+  display: flex; align-items: stretch; height: 52px;
   border-bottom: var(--rule);
   background: rgba(8,8,8,0.97);
   backdrop-filter: blur(12px);
+  z-index: 10;
 }
 
 .nav-logo, .tn-logo, .topbar-logo {
@@ -105,9 +106,10 @@ nav, .topnav {
 
 /* ─── SHARED: TICKER ─── */
 .ticker-wrap, .ticker {
+  grid-row: 2;
   background: var(--red); overflow: hidden;
   display: flex; align-items: center;
-  height: 26px;
+  height: 24px;
 }
 
 .ticker-track {
@@ -406,6 +408,7 @@ input, select, textarea { font-size: 16px !important; }
 
 /* BOTTOM BAR */
 .bottombar {
+  grid-row: 4;
   display: flex; border-top: var(--ruleB);
   background: rgba(8,8,8,0.97);
   backdrop-filter: blur(12px);
@@ -458,7 +461,7 @@ input, select, textarea { font-size: 16px !important; }
 .hood-tab { font-size: 11px; letter-spacing: 0.12em; text-transform: uppercase; color: rgba(237,233,224,0.45); padding: 9px 16px; border-right: var(--rule); cursor: crosshair; white-space: nowrap; flex-shrink: 0; background: none; border-top: none; border-bottom: 2px solid transparent; border-left: none; font-family: 'DM Mono', monospace; transition: color 0.15s; }
 .hood-tab:hover { color: var(--paper); background: var(--faint); }
 .hood-tab.active { color: var(--paper); border-bottom-color: var(--red); }
-#leaflet-map { position: absolute; inset: 0; }
+#leaflet-map { position: absolute; top: 38px; left: 0; right: 0; bottom: 0; }
 
 /* LEAFLET DARK STYLE */
 .leaflet-tile { filter: invert(100%) hue-rotate(180deg) brightness(0.85) contrast(0.9) saturate(0.4); }
