@@ -624,6 +624,72 @@ body { top: 0 !important; }
   grid-template-columns: 1fr 52px;
 }
 
+
+/* ── MAP PIN SVG OVERLAY ── */
+.pin-svg {
+  position: absolute;
+  inset: 0; width: 100%; height: 100%;
+  z-index: 4; pointer-events: none;
+}
+
+.pin-labels {
+  position: absolute;
+  inset: 0; z-index: 5; pointer-events: none;
+}
+
+.pin-label {
+  position: absolute;
+  transform: translate(-50%, -100%);
+  background: rgba(8,8,8,0.85);
+  border: 1px solid rgba(237,233,224,0.18);
+  color: var(--paper);
+  font-family: 'DM Mono', monospace;
+  font-size: 10px; letter-spacing: 0.06em; text-transform: uppercase;
+  padding: 3px 8px; white-space: nowrap;
+  pointer-events: all; cursor: crosshair;
+  transition: opacity 0.2s;
+  margin-top: -10px;
+}
+
+.pin-label:hover { background: rgba(8,8,8,0.98); border-color: var(--red); }
+.pin-label.out  { border-left: 2px solid var(--red2); }
+.pin-label.on   { border-left: 2px solid #2a9944; }
+.pin-label.part { border-left: 2px solid #c8a020; }
+
+/* Resources section */
+.resources-view { overflow-y: auto; padding: 0; }
+.resources-header { padding: 22px 32px 16px; border-bottom: var(--rule); display: flex; align-items: flex-end; justify-content: space-between; }
+.resources-title { font-family: 'Bebas Neue', sans-serif; font-size: 44px; line-height: 0.9; color: var(--paper); }
+.resources-title em { color: var(--red); font-style: normal; }
+.resources-sub { font-size: 12px; letter-spacing: 0.1em; color: rgba(237,233,224,0.55); margin-top: 4px; }
+.res-boro-tabs { display: flex; border-bottom: var(--rule); overflow-x: auto; }
+.res-boro-tab { font-size: 11px; letter-spacing: 0.14em; text-transform: uppercase; color: rgba(237,233,224,0.5); padding: 10px 18px; border-right: var(--rule); cursor: crosshair; white-space: nowrap; flex-shrink: 0; background: none; border-top: none; border-bottom: 2px solid transparent; border-left: none; font-family: 'DM Mono', monospace; transition: color 0.15s; }
+.res-boro-tab.active { color: var(--paper); border-bottom-color: var(--red); }
+.res-category { padding: 0; }
+.res-cat-header { padding: 14px 32px; border-bottom: var(--rule); background: rgba(237,233,224,0.02); display: flex; align-items: center; gap: 12px; }
+.res-cat-icon { font-size: 16px; }
+.res-cat-title { font-family: 'Barlow Condensed', sans-serif; font-size: 18px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.06em; color: var(--paper); }
+.res-cat-count { font-size: 10px; letter-spacing: 0.14em; color: rgba(237,233,224,0.4); }
+.res-grid { display: grid; grid-template-columns: repeat(3,1fr); }
+.res-card { padding: 20px 24px; border-right: var(--rule); border-bottom: var(--rule); cursor: crosshair; transition: background 0.12s; }
+.res-card:nth-child(3n) { border-right: none; }
+.res-card:hover { background: var(--faint); }
+.res-name { font-family: 'Barlow Condensed', sans-serif; font-size: 16px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; color: var(--paper); margin-bottom: 4px; line-height: 1.1; }
+.res-addr { font-size: 11px; color: rgba(237,233,224,0.55); margin-bottom: 4px; line-height: 1.5; }
+.res-phone { font-size: 11px; color: var(--red); letter-spacing: 0.06em; }
+.res-hours { font-size: 10px; color: rgba(237,233,224,0.4); margin-top: 3px; }
+.res-tag { display: inline-block; font-size: 9px; letter-spacing: 0.14em; text-transform: uppercase; padding: 2px 7px; border: 1px solid; margin-bottom: 6px; }
+.res-tag.open { border-color: #2a9944; color: #2a9944; }
+.res-tag.er { border-color: var(--red); color: var(--red2); }
+.res-tag.utility { border-color: #c8a020; color: #c8a020; }
+
+@media (max-width: 767px) {
+  .res-grid { grid-template-columns: 1fr; }
+  .res-card { border-right: none; }
+  .res-cat-header { padding: 12px 16px; }
+  .resources-header { padding: 16px; flex-direction: column; align-items: flex-start; gap: 8px; }
+}
+
 </style>
 </head>
 <body>
@@ -641,6 +707,7 @@ body { top: 0 !important; }
       <li class="tn-tab" onclick="switchTab(2,this)"><span class="tn-tab-icon">🤝</span> Mutual Aid</li>
       <li class="tn-tab" onclick="switchTab(3,this)"><span class="tn-tab-icon">🔔</span> Alerts <span class="tn-badge">5</span></li>
       <li class="tn-tab" onclick="switchTab(4,this)"><span class="tn-tab-icon">👤</span> Profile</li>
+      <li class="tn-tab" onclick="switchTab(5,this)"><span class="tn-tab-icon">🏥</span> Resources</li>
     </ul>
     <div class="tn-right">
       <span class="tn-status">4 Active Outages</span>
@@ -678,58 +745,62 @@ body { top: 0 !important; }
     <!-- ══ VIEW 1: MAP ══ -->
     <div class="view active" id="v0">
       <div class="v-map">
+
+        <!-- LIVE FEED SIDEBAR -->
         <div class="map-sidebar">
           <div class="ms-head">
-            <div class="ms-title">LIVE FEED</div>
-            <div class="ms-sub">NYC · All Boroughs · Updated 2 min ago</div>
+            <div class="ms-title" id="feed-title">LIVE FEED</div>
+            <div class="ms-sub" id="feed-sub">NYC · All Boroughs · Updated 2 min ago</div>
           </div>
-          <div class="feed-rows">
-            <div class="f-row"><div class="f-zone">Bronx — 138th / Willis<small>4 min ago</small></div><span class="f-type">Power</span><span class="f-badge bOUT">Out</span></div>
-            <div class="f-row"><div class="f-zone">Crown Heights — Nostrand<small>12 min ago</small></div><span class="f-type">Water</span><span class="f-badge bON">On</span></div>
-            <div class="f-row"><div class="f-zone">East Flatbush — Ave D<small>31 min ago</small></div><span class="f-type">Power</span><span class="f-badge bPART">PART</span></div>
-            <div class="f-row"><div class="f-zone">Bushwick — Knickerbocker<small>1 hr ago</small></div><span class="f-type">Water</span><span class="f-badge bOUT">Out</span></div>
-            <div class="f-row"><div class="f-zone">Harlem — W 125th St<small>2 hr ago</small></div><span class="f-type">Power</span><span class="f-badge bON">On</span></div>
-            <div class="f-row"><div class="f-zone">Bed-Stuy — Malcolm X<small>2 hr ago</small></div><span class="f-type">Power</span><span class="f-badge bON">On</span></div>
-            <div class="f-row"><div class="f-zone">S. Bronx — Grand Concourse<small>3 hr ago</small></div><span class="f-type">Water</span><span class="f-badge bPART">PART</span></div>
-            <div class="f-row"><div class="f-zone">Washington Hts — 181st<small>3 hr ago</small></div><span class="f-type">Power</span><span class="f-badge bOUT">Out</span></div>
-            <div class="f-row"><div class="f-zone">Jamaica, Queens<small>4 hr ago</small></div><span class="f-type">Water</span><span class="f-badge bON">On</span></div>
-            <div class="f-row"><div class="f-zone">Mott Haven — 3rd Ave<small>5 hr ago</small></div><span class="f-type">Power</span><span class="f-badge bOUT">Out</span></div>
+          <div class="feed-rows" id="map-feed-rows">
+            <!-- populated by JS -->
           </div>
           <div class="ms-footer">
             <button class="ms-report-btn" onclick="switchTab(1)">+ Report / Ask in Chat</button>
           </div>
         </div>
+
+        <!-- MAP AREA -->
         <div class="map-main">
           <div class="map-controls">
             <span class="mc-label">Jump to</span>
             <div class="hood-tabs">
-              <button class="hood-tab active" onclick="jumpMap('South+Bronx,+New+York,+NY',this)">South Bronx</button>
-              <button class="hood-tab" onclick="jumpMap('Bedford-Stuyvesant,+Brooklyn,+NY',this)">Bed-Stuy</button>
-              <button class="hood-tab" onclick="jumpMap('Crown+Heights,+Brooklyn,+NY',this)">Crown Heights</button>
-              <button class="hood-tab" onclick="jumpMap('Bushwick,+Brooklyn,+NY',this)">Bushwick</button>
-              <button class="hood-tab" onclick="jumpMap('Harlem,+Manhattan,+NY',this)">Harlem</button>
-              <button class="hood-tab" onclick="jumpMap('Washington+Heights,+Manhattan,+NY',this)">Washington Hts</button>
-              <button class="hood-tab" onclick="jumpMap('Jamaica,+Queens,+NY',this)">Jamaica</button>
-              <button class="hood-tab" onclick="jumpMap('Red+Hook,+Brooklyn,+NY',this)">Red Hook</button>
+              <button class="hood-tab active" onclick="selectNeighborhood('all',this)">All NYC</button>
+              <button class="hood-tab" onclick="selectNeighborhood('bronx',this)">S. Bronx</button>
+              <button class="hood-tab" onclick="selectNeighborhood('bedstuy',this)">Bed-Stuy</button>
+              <button class="hood-tab" onclick="selectNeighborhood('crownhts',this)">Crown Hts</button>
+              <button class="hood-tab" onclick="selectNeighborhood('bushwick',this)">Bushwick</button>
+              <button class="hood-tab" onclick="selectNeighborhood('harlem',this)">Harlem</button>
+              <button class="hood-tab" onclick="selectNeighborhood('washhts',this)">Wash. Hts</button>
+              <button class="hood-tab" onclick="selectNeighborhood('jamaica',this)">Jamaica</button>
+              <button class="hood-tab" onclick="selectNeighborhood('redhook',this)">Red Hook</button>
+              <button class="hood-tab" onclick="selectNeighborhood('eflatbush',this)">E. Flatbush</button>
+              <button class="hood-tab" onclick="selectNeighborhood('motthaven',this)">Mott Haven</button>
+              <button class="hood-tab" onclick="selectNeighborhood('inwood',this)">Inwood</button>
+              <button class="hood-tab" onclick="selectNeighborhood('astoria',this)">Astoria</button>
             </div>
           </div>
-          <div class="gmap-wrap">
+
+          <div class="gmap-wrap" id="gmap-wrap">
             <iframe id="gmap" class="gmap-iframe" loading="lazy" allowfullscreen
-              src="https://maps.google.com/maps?q=South+Bronx,+New+York,+NY&t=m&z=14&output=embed&iwloc=near">
+              referrerpolicy="no-referrer-when-downgrade"
+              src="https://maps.google.com/maps?q=New+York+City,+NY&t=m&z=11&output=embed&iwloc=near">
             </iframe>
             <div class="map-tint"></div>
             <div class="map-xhair"><div class="map-xhair-dot"></div></div>
-            <div class="map-pins">
-              <div class="pin" style="top:28%;left:35%"><div class="pin-dot p-out"></div><span class="pin-lbl">⚡ OUT · 138th</span></div>
-              <div class="pin" style="top:46%;left:52%"><div class="pin-dot p-par"></div><span class="pin-lbl">~ PARTIAL</span></div>
-              <div class="pin" style="top:60%;left:28%"><div class="pin-dot p-on"></div><span class="pin-lbl">✓ ON</span></div>
-              <div class="pin" style="top:72%;left:65%"><div class="pin-dot p-out"></div><span class="pin-lbl">💧 OUT</span></div>
-            </div>
+            <!-- SVG overlay for coordinate-accurate pins -->
+            <svg id="pin-svg" class="pin-svg" viewBox="0 0 100 100" preserveAspectRatio="none">
+              <!-- pins rendered by JS as SVG circles -->
+            </svg>
+            <!-- pin labels layer -->
+            <div id="pin-labels" class="pin-labels"></div>
             <div class="map-ts" id="map-ts">Last updated 2 min ago</div>
           </div>
         </div>
       </div>
     </div>
+
+    <!-- ══ VIEW 2: CHAT
 
     <!-- ══ VIEW 2: CHAT (AI-powered) ══ -->
     <div class="view" id="v1">
@@ -2522,6 +2593,7 @@ body { top: 0 !important; }
       <li class="tn-tab" onclick="switchTab(2,this)"><span class="tn-tab-icon">🤝</span> Mutual Aid</li>
       <li class="tn-tab" onclick="switchTab(3,this)"><span class="tn-tab-icon">🔔</span> Alerts <span class="tn-badge">5</span></li>
       <li class="tn-tab" onclick="switchTab(4,this)"><span class="tn-tab-icon">👤</span> Profile</li>
+      <li class="tn-tab" onclick="switchTab(5,this)"><span class="tn-tab-icon">🏥</span> Resources</li>
     </ul>
     <div class="tn-right">
       <span class="tn-status">4 Active Outages</span>
@@ -2559,58 +2631,62 @@ body { top: 0 !important; }
     <!-- ══ VIEW 1: MAP ══ -->
     <div class="view active" id="v0">
       <div class="v-map">
+
+        <!-- LIVE FEED SIDEBAR -->
         <div class="map-sidebar">
           <div class="ms-head">
-            <div class="ms-title">LIVE FEED</div>
-            <div class="ms-sub">NYC · All Boroughs · Updated 2 min ago</div>
+            <div class="ms-title" id="feed-title">LIVE FEED</div>
+            <div class="ms-sub" id="feed-sub">NYC · All Boroughs · Updated 2 min ago</div>
           </div>
-          <div class="feed-rows">
-            <div class="f-row"><div class="f-zone">Bronx — 138th / Willis<small>4 min ago</small></div><span class="f-type">Power</span><span class="f-badge bOUT">Out</span></div>
-            <div class="f-row"><div class="f-zone">Crown Heights — Nostrand<small>12 min ago</small></div><span class="f-type">Water</span><span class="f-badge bON">On</span></div>
-            <div class="f-row"><div class="f-zone">East Flatbush — Ave D<small>31 min ago</small></div><span class="f-type">Power</span><span class="f-badge bPART">PART</span></div>
-            <div class="f-row"><div class="f-zone">Bushwick — Knickerbocker<small>1 hr ago</small></div><span class="f-type">Water</span><span class="f-badge bOUT">Out</span></div>
-            <div class="f-row"><div class="f-zone">Harlem — W 125th St<small>2 hr ago</small></div><span class="f-type">Power</span><span class="f-badge bON">On</span></div>
-            <div class="f-row"><div class="f-zone">Bed-Stuy — Malcolm X<small>2 hr ago</small></div><span class="f-type">Power</span><span class="f-badge bON">On</span></div>
-            <div class="f-row"><div class="f-zone">S. Bronx — Grand Concourse<small>3 hr ago</small></div><span class="f-type">Water</span><span class="f-badge bPART">PART</span></div>
-            <div class="f-row"><div class="f-zone">Washington Hts — 181st<small>3 hr ago</small></div><span class="f-type">Power</span><span class="f-badge bOUT">Out</span></div>
-            <div class="f-row"><div class="f-zone">Jamaica, Queens<small>4 hr ago</small></div><span class="f-type">Water</span><span class="f-badge bON">On</span></div>
-            <div class="f-row"><div class="f-zone">Mott Haven — 3rd Ave<small>5 hr ago</small></div><span class="f-type">Power</span><span class="f-badge bOUT">Out</span></div>
+          <div class="feed-rows" id="map-feed-rows">
+            <!-- populated by JS -->
           </div>
           <div class="ms-footer">
             <button class="ms-report-btn" onclick="switchTab(1)">+ Report / Ask in Chat</button>
           </div>
         </div>
+
+        <!-- MAP AREA -->
         <div class="map-main">
           <div class="map-controls">
             <span class="mc-label">Jump to</span>
             <div class="hood-tabs">
-              <button class="hood-tab active" onclick="jumpMap('South+Bronx,+New+York,+NY',this)">South Bronx</button>
-              <button class="hood-tab" onclick="jumpMap('Bedford-Stuyvesant,+Brooklyn,+NY',this)">Bed-Stuy</button>
-              <button class="hood-tab" onclick="jumpMap('Crown+Heights,+Brooklyn,+NY',this)">Crown Heights</button>
-              <button class="hood-tab" onclick="jumpMap('Bushwick,+Brooklyn,+NY',this)">Bushwick</button>
-              <button class="hood-tab" onclick="jumpMap('Harlem,+Manhattan,+NY',this)">Harlem</button>
-              <button class="hood-tab" onclick="jumpMap('Washington+Heights,+Manhattan,+NY',this)">Washington Hts</button>
-              <button class="hood-tab" onclick="jumpMap('Jamaica,+Queens,+NY',this)">Jamaica</button>
-              <button class="hood-tab" onclick="jumpMap('Red+Hook,+Brooklyn,+NY',this)">Red Hook</button>
+              <button class="hood-tab active" onclick="selectNeighborhood('all',this)">All NYC</button>
+              <button class="hood-tab" onclick="selectNeighborhood('bronx',this)">S. Bronx</button>
+              <button class="hood-tab" onclick="selectNeighborhood('bedstuy',this)">Bed-Stuy</button>
+              <button class="hood-tab" onclick="selectNeighborhood('crownhts',this)">Crown Hts</button>
+              <button class="hood-tab" onclick="selectNeighborhood('bushwick',this)">Bushwick</button>
+              <button class="hood-tab" onclick="selectNeighborhood('harlem',this)">Harlem</button>
+              <button class="hood-tab" onclick="selectNeighborhood('washhts',this)">Wash. Hts</button>
+              <button class="hood-tab" onclick="selectNeighborhood('jamaica',this)">Jamaica</button>
+              <button class="hood-tab" onclick="selectNeighborhood('redhook',this)">Red Hook</button>
+              <button class="hood-tab" onclick="selectNeighborhood('eflatbush',this)">E. Flatbush</button>
+              <button class="hood-tab" onclick="selectNeighborhood('motthaven',this)">Mott Haven</button>
+              <button class="hood-tab" onclick="selectNeighborhood('inwood',this)">Inwood</button>
+              <button class="hood-tab" onclick="selectNeighborhood('astoria',this)">Astoria</button>
             </div>
           </div>
-          <div class="gmap-wrap">
+
+          <div class="gmap-wrap" id="gmap-wrap">
             <iframe id="gmap" class="gmap-iframe" loading="lazy" allowfullscreen
-              src="https://maps.google.com/maps?q=South+Bronx,+New+York,+NY&t=m&z=14&output=embed&iwloc=near">
+              referrerpolicy="no-referrer-when-downgrade"
+              src="https://maps.google.com/maps?q=New+York+City,+NY&t=m&z=11&output=embed&iwloc=near">
             </iframe>
             <div class="map-tint"></div>
             <div class="map-xhair"><div class="map-xhair-dot"></div></div>
-            <div class="map-pins">
-              <div class="pin" style="top:28%;left:35%"><div class="pin-dot p-out"></div><span class="pin-lbl">⚡ OUT · 138th</span></div>
-              <div class="pin" style="top:46%;left:52%"><div class="pin-dot p-par"></div><span class="pin-lbl">~ PARTIAL</span></div>
-              <div class="pin" style="top:60%;left:28%"><div class="pin-dot p-on"></div><span class="pin-lbl">✓ ON</span></div>
-              <div class="pin" style="top:72%;left:65%"><div class="pin-dot p-out"></div><span class="pin-lbl">💧 OUT</span></div>
-            </div>
+            <!-- SVG overlay for coordinate-accurate pins -->
+            <svg id="pin-svg" class="pin-svg" viewBox="0 0 100 100" preserveAspectRatio="none">
+              <!-- pins rendered by JS as SVG circles -->
+            </svg>
+            <!-- pin labels layer -->
+            <div id="pin-labels" class="pin-labels"></div>
             <div class="map-ts" id="map-ts">Last updated 2 min ago</div>
           </div>
         </div>
       </div>
     </div>
+
+    <!-- ══ VIEW 2: CHAT
 
     <!-- ══ VIEW 2: CHAT (AI-powered) ══ -->
     <div class="view" id="v1">
@@ -3605,6 +3681,671 @@ window.loadChannel = function(el, name, location, meta, channelKey) {
   hideChannels();
 };
 
+</script>
+<script>
+// ══════════════════════════════════════════
+// WATCHTOWER APP — COMPLETE JS
+// ══════════════════════════════════════════
+
+// ── TAB SWITCHING ──
+function switchTab(n, btn) {
+  document.querySelectorAll('.view').forEach((v,i) => v.classList.toggle('active', i===n));
+  document.querySelectorAll('.tn-tab').forEach((t,i) => t.classList.toggle('active', i===n));
+  document.querySelectorAll('.bot-tab').forEach((t,i) => t.classList.toggle('active', i===n));
+}
+
+// ══════════════════════════════════════════
+// MAP DATA — NYC outage coordinates
+// lat/lng for each outage point
+// ══════════════════════════════════════════
+
+const OUTAGES = [
+  // BRONX
+  { id:'b1', lat:40.8061, lng:-73.9175, hood:'bronx', borough:'Bronx', label:'138th & Willis', type:'Power', status:'out', ago:'4 min' },
+  { id:'b2', lat:40.8167, lng:-73.9284, hood:'bronx', borough:'Bronx', label:'Grand Concourse', type:'Water', status:'part', ago:'3 hr' },
+  { id:'b3', lat:40.7957, lng:-73.9101, hood:'motthaven', borough:'Bronx', label:'3rd Ave / 138th', type:'Power', status:'out', ago:'5 hr' },
+  { id:'b4', lat:40.8290, lng:-73.9209, hood:'bronx', borough:'Bronx', label:'Fordham Rd', type:'Water', status:'on', ago:'1 hr' },
+  { id:'b5', lat:40.8448, lng:-73.8648, hood:'bronx', borough:'Bronx', label:'Pelham Pkwy', type:'Power', status:'on', ago:'8 hr' },
+
+  // BROOKLYN
+  { id:'k1', lat:40.6782, lng:-73.9442, hood:'bedstuy', borough:'Brooklyn', label:'Malcolm X Blvd', type:'Power', status:'on', ago:'2 hr' },
+  { id:'k2', lat:40.6681, lng:-73.9496, hood:'crownhts', borough:'Brooklyn', label:'Nostrand Ave', type:'Water', status:'on', ago:'12 min' },
+  { id:'k3', lat:40.6944, lng:-73.9213, hood:'bushwick', borough:'Brooklyn', label:'Knickerbocker', type:'Water', status:'out', ago:'1 hr' },
+  { id:'k4', lat:40.6501, lng:-73.9496, hood:'eflatbush', borough:'Brooklyn', label:'Ave D', type:'Power', status:'part', ago:'31 min' },
+  { id:'k5', lat:40.6745, lng:-74.0164, hood:'redhook', borough:'Brooklyn', label:'Van Brunt St', type:'Water', status:'on', ago:'6 hr' },
+  { id:'k6', lat:40.6360, lng:-73.9268, hood:'eflatbush', borough:'Brooklyn', label:'Church Ave', type:'Power', status:'part', ago:'6 hr' },
+  { id:'k7', lat:40.6396, lng:-73.8988, hood:'brooklyn', borough:'Brooklyn', label:'Pitkin Ave', type:'Power', status:'out', ago:'7 hr' },
+  { id:'k8', lat:40.6398, lng:-73.9419, hood:'flatbush', borough:'Brooklyn', label:'Flatbush Ave', type:'Water', status:'on', ago:'4 hr' },
+
+  // MANHATTAN
+  { id:'m1', lat:40.8116, lng:-73.9465, hood:'harlem', borough:'Manhattan', label:'W 125th St', type:'Power', status:'on', ago:'2 hr' },
+  { id:'m2', lat:40.8448, lng:-73.9393, hood:'washhts', borough:'Manhattan', label:'181st St', type:'Power', status:'out', ago:'3 hr' },
+  { id:'m3', lat:40.8679, lng:-73.9219, hood:'inwood', borough:'Manhattan', label:'Dyckman St', type:'Power', status:'part', ago:'9 hr' },
+  { id:'m4', lat:40.7831, lng:-73.9712, hood:'uws', borough:'Manhattan', label:'W 96th St', type:'Water', status:'on', ago:'5 hr' },
+  { id:'m5', lat:40.7282, lng:-73.9942, hood:'chelsea', borough:'Manhattan', label:'8th Ave', type:'Power', status:'on', ago:'11 hr' },
+
+  // QUEENS
+  { id:'q1', lat:40.6943, lng:-73.8010, hood:'jamaica', borough:'Queens', label:'Sutphin Blvd', type:'Water', status:'on', ago:'4 hr' },
+  { id:'q2', lat:40.7728, lng:-73.9301, hood:'astoria', borough:'Queens', label:'31st St', type:'Power', status:'part', ago:'2 hr' },
+  { id:'q3', lat:40.7282, lng:-73.8796, hood:'ridgewood', borough:'Queens', label:'Myrtle Ave', type:'Water', status:'out', ago:'6 hr' },
+  { id:'q4', lat:40.7489, lng:-73.8385, hood:'queens', borough:'Queens', label:'Hillside Ave', type:'Power', status:'on', ago:'8 hr' },
+
+  // STATEN ISLAND
+  { id:'s1', lat:40.6501, lng:-74.0966, hood:'si', borough:'Staten Island', label:'Bay St', type:'Power', status:'on', ago:'10 hr' },
+  { id:'s2', lat:40.6226, lng:-74.1052, hood:'si', borough:'Staten Island', label:'Richmond Ave', type:'Water', status:'part', ago:'7 hr' },
+];
+
+// Borough grouping for tabs
+const BOROUGH_HOODS = {
+  all: null,
+  bronx: ['bronx','motthaven'],
+  bedstuy: ['bedstuy'],
+  crownhts: ['crownhts'],
+  bushwick: ['bushwick'],
+  harlem: ['harlem'],
+  washhts: ['washhts'],
+  jamaica: ['jamaica'],
+  redhook: ['redhook'],
+  eflatbush: ['eflatbush','flatbush'],
+  motthaven: ['motthaven'],
+  inwood: ['inwood'],
+  astoria: ['astoria'],
+};
+
+// NYC bounding box for coordinate → percentage mapping
+const NYC_BOUNDS = {
+  north: 40.917, south: 40.477,
+  west:  -74.259, east: -73.700
+};
+
+function lngToX(lng) {
+  return ((lng - NYC_BOUNDS.west) / (NYC_BOUNDS.east - NYC_BOUNDS.west)) * 100;
+}
+function latToY(lat) {
+  return ((NYC_BOUNDS.north - lat) / (NYC_BOUNDS.north - NYC_BOUNDS.south)) * 100;
+}
+
+const STATUS_COLOR = { out:'#ff3b2f', part:'#c8a020', on:'#2a9944' };
+const STATUS_LABEL = { out:'OUT', part:'PART', on:'ON' };
+const STATUS_CLASS = { out:'bOUT', part:'bPART', on:'bON' };
+
+let currentNeighborhood = 'all';
+
+function renderMapPins(hood) {
+  const svg = document.getElementById('pin-svg');
+  const labels = document.getElementById('pin-labels');
+  if (!svg || !labels) return;
+
+  const hoods = BOROUGH_HOODS[hood];
+  const filtered = hoods ? OUTAGES.filter(o => hoods.includes(o.hood)) : OUTAGES;
+
+  // SVG circles
+  svg.innerHTML = filtered.map(o => {
+    const x = lngToX(o.lng);
+    const y = latToY(o.lat);
+    const col = STATUS_COLOR[o.status];
+    const r = o.status === 'out' ? 1.2 : 0.9;
+    return `<circle cx="${x}" cy="${y}" r="${r}" fill="${col}" stroke="rgba(8,8,8,0.6)" stroke-width="0.3" opacity="0.9"/>
+            <circle cx="${x}" cy="${y}" r="${r * 2.2}" fill="${col}" opacity="0.15"/>`;
+  }).join('');
+
+  // Labels
+  labels.innerHTML = filtered.map(o => {
+    const x = lngToX(o.lng);
+    const y = latToY(o.lat);
+    return `<div class="pin-label ${o.status}" style="left:${x}%;top:${y}%">
+      ${o.type === 'Power' ? '⚡' : '💧'} ${o.status.toUpperCase()} · ${o.label}
+    </div>`;
+  }).join('');
+}
+
+function renderFeed(hood) {
+  const rows = document.getElementById('map-feed-rows');
+  const title = document.getElementById('feed-title');
+  const sub = document.getElementById('feed-sub');
+  if (!rows) return;
+
+  const hoods = BOROUGH_HOODS[hood];
+  const filtered = hoods ? OUTAGES.filter(o => hoods.includes(o.hood)) : OUTAGES;
+
+  // Sort: out first, then part, then on
+  const order = { out:0, part:1, on:2 };
+  const sorted = [...filtered].sort((a,b) => order[a.status] - order[b.status]);
+
+  // Update header
+  if (title) title.textContent = hood === 'all' ? 'LIVE FEED' : filtered[0]?.borough?.toUpperCase() || 'LIVE FEED';
+  if (sub) sub.textContent = hood === 'all'
+    ? `NYC · All Boroughs · ${filtered.length} reports`
+    : `${filtered[0]?.borough || ''} · ${filtered.length} reports · Updated 2 min ago`;
+
+  rows.innerHTML = sorted.map(o => `
+    <div class="f-row">
+      <div class="f-zone">${o.borough} — ${o.label}<small>${o.ago} ago</small></div>
+      <span class="f-type">${o.type}</span>
+      <span class="f-badge ${STATUS_CLASS[o.status]}">${STATUS_LABEL[o.status]}</span>
+    </div>`).join('');
+}
+
+function selectNeighborhood(hood, btn) {
+  document.querySelectorAll('.hood-tab').forEach(b => b.classList.remove('active'));
+  if (btn) btn.classList.add('active');
+  currentNeighborhood = hood;
+
+  // Update map iframe
+  const mapQueries = {
+    all: 'New+York+City,+NY&z=11',
+    bronx: 'South+Bronx,+New+York,+NY&z=14',
+    bedstuy: 'Bedford-Stuyvesant,+Brooklyn,+NY&z=14',
+    crownhts: 'Crown+Heights,+Brooklyn,+NY&z=14',
+    bushwick: 'Bushwick,+Brooklyn,+NY&z=14',
+    harlem: 'Harlem,+Manhattan,+NY&z=14',
+    washhts: 'Washington+Heights,+Manhattan,+NY&z=14',
+    jamaica: 'Jamaica,+Queens,+NY&z=14',
+    redhook: 'Red+Hook,+Brooklyn,+NY&z=14',
+    eflatbush: 'East+Flatbush,+Brooklyn,+NY&z=14',
+    motthaven: 'Mott+Haven,+Bronx,+NY&z=14',
+    inwood: 'Inwood,+Manhattan,+NY&z=14',
+    astoria: 'Astoria,+Queens,+NY&z=14',
+  };
+
+  const q = mapQueries[hood] || 'New+York+City,+NY&z=11';
+  const iframe = document.getElementById('gmap');
+  if (iframe) {
+    iframe.src = `https://maps.google.com/maps?q=${q}&t=m&output=embed&iwloc=near`;
+  }
+
+  renderFeed(hood);
+  renderMapPins(hood);
+
+  const ts = document.getElementById('map-ts');
+  if (ts) ts.textContent = 'Loading...';
+  setTimeout(() => { if (ts) ts.textContent = 'Last updated just now'; }, 1200);
+}
+
+// ══════════════════════════════════════════
+// CHAT DATA — unique per channel
+// ══════════════════════════════════════════
+
+const CHANNELS = {
+  bronx: {
+    name: '#bronx-138th', meta: 'Bronx · 138th & Willis · 17 members · Power OUT', dot: 'ch-red',
+    msgs: [
+      {av:'WT', name:'WatchTower', cls:'wt verified is-alert', time:'6:14 AM', text:'⚡ Power outage confirmed — 138th St / Willis Ave (10451). Reported by 6 neighbors. Con Edison notified. Est. restoration: unknown.'},
+      {av:'JR', name:'JRivera_10451', cls:'verified', time:'6:22 AM', text:'whole block on Willis is out since 5:45. already called Con Ed, they said 4-6 hr window'},
+      {av:'TW', name:'T_Washington', cls:'', time:'6:31 AM', text:'my building on 3rd Ave has power — just 138th to 140th that\'s dark. probably transformer by the park'},
+      {av:'MG', name:'MG_Bronx', cls:'', time:'6:44 AM', text:'got a portable charger + extra batteries if anyone needs — I\'m at 610 E 138th, dm me 🔋'},
+      {av:'AL', name:'A_Lopez', cls:'', time:'7:02 AM', text:'anyone know if the community center on 138th has a generator? elderly neighbor needs medical equipment running'},
+      {av:'WT', name:'WatchTower', cls:'wt verified is-alert', time:'7:08 AM', text:'📌 St. Mary\'s Rec Center on St. Ann\'s Ave has power + generator — open to all neighbors. Priority for medical devices. See Resources tab.'},
+      {av:'KC', name:'KChan_138', cls:'', time:'7:29 AM', text:'Con Ed crew just pulled up outside, two trucks working on the box at the corner 🤞'},
+      {av:'TW', name:'T_Washington', cls:'', time:'7:41 AM', text:'any updates on timeline? my fridge food is gonna go bad'},
+      {av:'JR', name:'JRivera_10451', cls:'', time:'7:55 AM', text:'Con Ed rep said estimate is now 10AM. so maybe 2-3 more hours'},
+      {av:'WT', name:'WatchTower', cls:'wt verified is-alert', time:'8:00 AM', text:'📡 Tip: Con Edison outage map shows this as "under investigation." Updates at coned.com/outages or call 1-800-752-6633.'},
+    ]
+  },
+  bushwick: {
+    name: '#bushwick-water', meta: 'Bushwick · Knickerbocker Ave · 11 members · Water OUT', dot: 'ch-red',
+    msgs: [
+      {av:'WT', name:'WatchTower', cls:'wt verified is-alert', time:'5:50 AM', text:'💧 Water outage confirmed — Knickerbocker Ave area, Bushwick. NYC DEP notified. Fill bathtubs and containers now as precaution.'},
+      {av:'NR', name:'NRamirez_BK', cls:'', time:'5:58 AM', text:'been out since like 5am, no pressure at all. already called 311'},
+      {av:'DB', name:'D_Brooks', cls:'', time:'6:10 AM', text:'DEP truck spotted on Flushing Ave heading this way 👀'},
+      {av:'YC', name:'Y_Chen_Bush', cls:'', time:'6:22 AM', text:'I have about 8 gallons of jugs I can share — apartment 4F on Knickerbocker. knock or text first'},
+      {av:'WT', name:'WatchTower', cls:'wt verified is-alert', time:'6:45 AM', text:'📌 Boil-water advisory will likely follow when service resumes. Run cold water 2+ minutes before drinking after restoration.'},
+      {av:'MB', name:'M_Bonilla', cls:'', time:'7:00 AM', text:'just heard from my landlord — water main break on Flushing Ave. DEP is on it'},
+      {av:'NR', name:'NRamirez_BK', cls:'', time:'7:15 AM', text:'pressure coming back on my floor, very low tho. don\'t get excited yet'},
+      {av:'DB', name:'D_Brooks', cls:'', time:'7:28 AM', text:'same — trickle. better than nothing. keeping jugs full just in case'},
+      {av:'YC', name:'Y_Chen_Bush', cls:'', time:'7:45 AM', text:'definitely boil before drinking — water looks a little murky coming back'},
+      {av:'WT', name:'WatchTower', cls:'wt verified is-alert', time:'8:10 AM', text:'✓ Partial water restoration reported. Run tap 2+ min before use. Boil if drinking. DEP crew still on site.'},
+    ]
+  },
+  eflatbush: {
+    name: '#eflatbush-partial', meta: 'E. Flatbush · Ave D · 8 members · Power PARTIAL', dot: 'ch-yellow',
+    msgs: [
+      {av:'WT', name:'WatchTower', cls:'wt verified is-alert', time:'7:15 AM', text:'⚡ Partial outage — Ave D corridor, East Flatbush. Some buildings have power, others don\'t. 3 blocks affected.'},
+      {av:'CM', name:'C_Mensah', cls:'', time:'7:22 AM', text:'my building is back but neighbors across the street still out. really weird'},
+      {av:'TJ', name:'T_James_EF', cls:'', time:'7:30 AM', text:'1680 Ave D here — completely dark since 6am. called Con Ed, on hold for 25 mins 😤'},
+      {av:'SK', name:'S_King_Ave', cls:'', time:'7:44 AM', text:'1650 Ave D back on. try checking your breakers before calling Con Ed — some buildings tripped'},
+      {av:'CM', name:'C_Mensah', cls:'', time:'8:02 AM', text:'good call — checked ours and breaker tripped on 3rd floor hallway. reset it and lights came on!!'},
+      {av:'WT', name:'WatchTower', cls:'wt verified is-alert', time:'8:05 AM', text:'📌 Partial outages often cause tripped breakers inside buildings. Check your electrical panel before calling utilities.'},
+      {av:'TJ', name:'T_James_EF', cls:'', time:'8:18 AM', text:'SAME! super found our tripped breaker. we\'re back on. THANK YOU 🙏'},
+      {av:'WT', name:'WatchTower', cls:'wt verified is-alert', time:'8:22 AM', text:'✓ Multiple buildings on Ave D restored via breaker reset. If still out after checking, call Con Ed: 1-800-752-6633'},
+      {av:'LP', name:'L_Pierre_EF', cls:'', time:'8:35 AM', text:'still out at 1720 Ave D. checked all breakers, nothing tripped. must be external'},
+      {av:'SK', name:'S_King_Ave', cls:'', time:'8:40 AM', text:'@L_Pierre_EF tried calling 311? they can escalate to Con Ed faster sometimes'},
+    ]
+  },
+  washington: {
+    name: '#wash-hts-181st', meta: 'Washington Hts · 181st St · 6 members · Power OUT', dot: 'ch-red',
+    msgs: [
+      {av:'WT', name:'WatchTower', cls:'wt verified is-alert', time:'4:30 AM', text:'⚡ Power outage confirmed — 181st St area, Washington Heights. Reported at 4:28 AM. Con Ed ETA: approximately 8:00 PM.'},
+      {av:'MP', name:'M_Perez_WH', cls:'', time:'4:45 AM', text:'this is crazy, been out since 4am. I have work at 7. no alarm, no coffee, nothing 😭'},
+      {av:'LG', name:'L_Garcia_181', cls:'', time:'5:12 AM', text:'building manager says Con Ed gave 8pm estimate. whole day basically. stocking up on water now'},
+      {av:'DR', name:'D_Reyes_Hts', cls:'', time:'6:30 AM', text:'anyone know if the library on 179th has power? need to charge my work laptop'},
+      {av:'WT', name:'WatchTower', cls:'wt verified is-alert', time:'6:45 AM', text:'📌 George Washington Branch Library (549 W 179th St) confirmed open and powered. Multiple outlets available. Bring charger.'},
+      {av:'MP', name:'M_Perez_WH', cls:'', time:'7:00 AM', text:'lifesaver, heading there now. thanks watchtower 🙏'},
+      {av:'FR', name:'F_Rosario', cls:'', time:'7:20 AM', text:'also the church on 181st has extension cords outside if anyone just needs a quick charge'},
+      {av:'LG', name:'L_Garcia_181', cls:'', time:'9:15 AM', text:'Con Ed crew arrived on our block. looks like they\'re working on a transformer. fingers crossed'},
+      {av:'DR', name:'D_Reyes_Hts', cls:'', time:'9:45 AM', text:'anyone know if restaurants on 181st are open? nothing with electricity would be cooking obviously'},
+      {av:'WT', name:'WatchTower', cls:'wt verified is-alert', time:'10:00 AM', text:'📡 Bodegas and delis with gas stoves may have hot food available. Check around 183rd St and St Nicholas Ave.'},
+    ]
+  },
+  general: {
+    name: '#general-nyc', meta: 'All NYC Neighborhoods · 342 members', dot: 'ch-gray',
+    msgs: [
+      {av:'WT', name:'WatchTower', cls:'wt verified is-alert', time:'6:00 AM', text:'📡 Active outages as of 6AM: Power OUT — Bronx 138th/Willis, Wash Hts 181st, ENY Pitkin. Water OUT — Bushwick Knickerbocker, Queens Ridgewood. Partial — E.Flatbush Ave D, Bronx Grand Concourse.'},
+      {av:'RS', name:'R_Santos', cls:'', time:'6:14 AM', text:'PSA: fill bathtubs now if you\'re near Bushwick or surrounding — water pressure dropping fast across the area'},
+      {av:'AT', name:'A_Torres_NYC', cls:'', time:'6:32 AM', text:'reminder that St. Mary\'s Rec Center in the Bronx has generator + charging open to neighbors during outage'},
+      {av:'JL', name:'J_Lee_BK', cls:'', time:'7:05 AM', text:'Crown Heights water is back on. was out for about 3hrs. run your tap for 2 mins first before drinking'},
+      {av:'WT', name:'WatchTower', cls:'wt verified is-alert', time:'7:10 AM', text:'✓ Crown Heights water restoration confirmed by 4 neighbors. Harlem W125th power also restored.'},
+      {av:'MR', name:'M_Rivera_NYC', cls:'', time:'7:45 AM', text:'Harlem power back too. what a morning. everybody stay safe out there'},
+      {av:'PN', name:'P_Nguyen', cls:'', time:'8:00 AM', text:'Astoria has a partial — my building is on but the block east of me is dark. anyone else?'},
+      {av:'WT', name:'WatchTower', cls:'wt verified is-alert', time:'8:05 AM', text:'📌 Astoria partial outage logged — 31st St area. Con Ed aware. See map for exact coverage.'},
+      {av:'RS', name:'R_Santos', cls:'', time:'8:30 AM', text:'anyone with elderly neighbors without power — George Washington Library in WH and St Mary\'s Bronx both powered + accessible'},
+      {av:'WT', name:'WatchTower', cls:'wt verified is-alert', time:'9:00 AM', text:'📡 Status update 9AM: 4 active outages remain. 3 restored since 6AM. Est. full restoration across all areas: by end of day.'},
+    ]
+  },
+  'mutual-aid': {
+    name: '#mutual-aid-bronx', meta: 'Bronx Mutual Aid · 58 members', dot: 'ch-green',
+    msgs: [
+      {av:'MG', name:'MG_Bronx', cls:'', time:'6:44 AM', text:'🧊 Ice available — 2 bags free. 610 E 138th, apt 2B. Text before coming, going fast'},
+      {av:'CR', name:'C_Rivera_BX', cls:'', time:'6:52 AM', text:'🔌 2 extra USB battery banks fully charged — 550 Willis Ave. Come by, no charge needed'},
+      {av:'WT', name:'WatchTower', cls:'wt verified is-alert', time:'7:08 AM', text:'📌 St. Mary\'s Rec Center, St. Ann\'s Ave — power + generator + charging outlets. Open ALL neighbors. No signup. Priority medical devices.'},
+      {av:'AL', name:'A_Lopez', cls:'', time:'7:15 AM', text:'🏥 Still looking for generator for elderly neighbor w/ medical equipment. any help appreciated — dm me'},
+      {av:'JR', name:'JRivera_10451', cls:'', time:'7:22 AM', text:'@A_Lopez St Mary\'s can help — they have medical priority setup. Tell them WatchTower referred you'},
+      {av:'BM', name:'B_Morales_BX', cls:'', time:'7:35 AM', text:'🚗 Offering free rides to St Mary\'s or the shelter on St Ann\'s — elderly/disabled priority. Reply here with address'},
+      {av:'TW', name:'T_Washington', cls:'', time:'7:50 AM', text:'🥫 Canned food + bottled water to share — 595 E 138th, first floor. Knock anytime'},
+      {av:'EP', name:'E_Pagan', cls:'', time:'8:05 AM', text:'🕯️ Candles and matches if anyone needs — I have a bunch. 575 E 140th, text first'},
+      {av:'WT', name:'WatchTower', cls:'wt verified is-alert', time:'8:15 AM', text:'📌 Mutual aid map updated — 6 active offerings in 10451. Check Resources tab for full list including services.'},
+      {av:'NW', name:'N_Williams', cls:'', time:'8:28 AM', text:'anyone need a plumber? my neighbor is one, licensed, available today for emergencies in the Bronx — dm me for number'},
+    ]
+  }
+};
+
+let currentChannelKey = 'bronx';
+let chatHistory = [];
+
+const channelContexts = {
+  bronx: 'WatchTower AI in #bronx-138th. POWER OUTAGE at 138th St/Willis Ave, South Bronx (10451). Con Ed gave 4-6hr window. St Mary\'s Rec Center on St Ann\'s Ave has generator, open to neighbors. Be direct and community-focused.',
+  bushwick: 'WatchTower AI in #bushwick-water. WATER OUTAGE on Knickerbocker Ave, Bushwick. DEP crew on scene. Water main break on Flushing Ave. Boil water before drinking after restoration.',
+  eflatbush: 'WatchTower AI in #eflatbush-partial. PARTIAL POWER on Ave D, East Flatbush. Many buildings had tripped breakers — check electrical panel first before calling Con Ed.',
+  washington: 'WatchTower AI in #wash-hts-181st. POWER OUTAGE on 181st St, Washington Heights since 4AM. Con Ed ETA 8PM. GW Library on 179th St is open and powered.',
+  general: 'WatchTower AI in #general-nyc. Multiple active NYC outages. Crown Heights water and Harlem W125th power both restored. Be helpful citywide.',
+  'mutual-aid': 'WatchTower AI in #mutual-aid-bronx. Available: ice at 610 E 138th, USB banks at 550 Willis, St Mary\'s Rec Center has power/generator, free rides from B_Morales, food at 595 E 138th. Connect neighbors with resources.'
+};
+
+function appendMsg(m) {
+  const msgs = document.getElementById('messages');
+  if (!msgs) return;
+  const typing = document.getElementById('typing-indicator');
+  const isWT = m.cls && m.cls.includes('wt');
+  const isAlert = m.cls && m.cls.includes('is-alert');
+  const div = document.createElement('div');
+  div.className = 'msg' + (isAlert ? ' is-alert' : '');
+  div.innerHTML = `
+    <div class="msg-av ${isWT ? 'wt-av' : ''}">${m.av}</div>
+    <div>
+      <div class="msg-meta">
+        <span class="msg-name${isWT ? ' wt' : ''}${m.cls && m.cls.includes('verified') ? ' verified' : ''}">${m.name}</span>
+        <span class="msg-time">${m.time || ''}</span>
+      </div>
+      <div class="msg-text">${m.text}</div>
+    </div>`;
+  if (typing && typing.parentNode === msgs) msgs.insertBefore(div, typing);
+  else msgs.appendChild(div);
+  msgs.scrollTop = msgs.scrollHeight;
+}
+
+function loadChannel(el, key) {
+  document.querySelectorAll('.channel-item').forEach(c => c.classList.remove('active'));
+  if (el) { el.classList.add('active'); el.querySelector('.ch-unread')?.remove(); }
+  currentChannelKey = key;
+  chatHistory = [];
+  const ch = CHANNELS[key];
+  if (!ch) return;
+  document.getElementById('ch-name').textContent = ch.name;
+  document.getElementById('ch-meta').textContent = ch.meta;
+  const inputEl = document.querySelector('.chat-input');
+  if (inputEl) inputEl.placeholder = `Ask WatchTower or post in ${ch.name}...`;
+  const msgs = document.getElementById('messages');
+  if (!msgs) return;
+  msgs.innerHTML = '<div class="msg-date-div">Today</div>';
+  ch.msgs.forEach(m => appendMsg(m));
+  const typing = document.createElement('div');
+  typing.id = 'typing-indicator';
+  typing.className = 'typing-wrap';
+  typing.style.display = 'none';
+  typing.innerHTML = '<div class="msg-av wt-av">WT</div><div class="typing-dots"><span></span><span></span><span></span></div>';
+  msgs.appendChild(typing);
+  msgs.scrollTop = msgs.scrollHeight;
+  hideChannels();
+}
+
+function handleKey(e) {
+  if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); sendMessage(); }
+}
+
+async function sendMessage() {
+  const input = document.getElementById('chat-input');
+  const btn = document.getElementById('send-btn');
+  const text = input?.value?.trim();
+  if (!text || btn?.disabled) return;
+  const now = new Date().toLocaleTimeString('en-US', {hour:'numeric',minute:'2-digit'});
+  appendMsg({av:'YOU', name:'You', cls:'you', time:now, text:text.replace(/</g,'&lt;')});
+  input.value = ''; input.disabled = true; btn.disabled = true;
+  const typing = document.getElementById('typing-indicator');
+  if (typing) typing.style.display = 'flex';
+  const msgs = document.getElementById('messages');
+  if (msgs) msgs.scrollTop = msgs.scrollHeight;
+  chatHistory.push({role:'user', content:text});
+  try {
+    const res = await fetch('https://api.anthropic.com/v1/messages', {
+      method:'POST',
+      headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({
+        model:'claude-sonnet-4-20250514', max_tokens:800,
+        system: channelContexts[currentChannelKey] || channelContexts.general,
+        messages: chatHistory
+      })
+    });
+    const data = await res.json();
+    if (typing) typing.style.display = 'none';
+    const reply = data.content?.[0]?.text || 'Connection issue — try again.';
+    chatHistory.push({role:'assistant', content:reply});
+    appendMsg({av:'WT', name:'WatchTower', cls:'wt verified is-alert', time:new Date().toLocaleTimeString('en-US',{hour:'numeric',minute:'2-digit'}), text:reply.replace(/\n/g,'<br>')});
+  } catch(err) {
+    if (typing) typing.style.display = 'none';
+    appendMsg({av:'WT', name:'WatchTower', cls:'wt verified is-alert', time:new Date().toLocaleTimeString('en-US',{hour:'numeric',minute:'2-digit'}), text:'Connection issue. SMS backup: text STATUS to 917-WT-NOW1'});
+  }
+  if (input) input.disabled = false;
+  if (btn) btn.disabled = false;
+  if (input) input.focus();
+  if (msgs) msgs.scrollTop = msgs.scrollHeight;
+}
+function sendMsgBtn() { sendMessage(); }
+
+// ══════════════════════════════════════════
+// MUTUAL AID — 35 cards, organized by category
+// ══════════════════════════════════════════
+
+const AID_CATEGORIES = [
+  { id:'power', label:'⚡ Power & Charging', filter:'power' },
+  { id:'water', label:'💧 Water & Food', filter:'water' },
+  { id:'medical', label:'🏥 Medical & Elderly', filter:'medical' },
+  { id:'transport', label:'🚗 Transport & Rides', filter:'transport' },
+  { id:'services', label:'🔧 Services & Skills', filter:'services' },
+  { id:'shelter', label:'🏠 Shelter & Space', filter:'shelter' },
+];
+
+const ALL_AID = [
+  // POWER & CHARGING
+  {cat:'power', tag:'offer', tagClass:'tag-offer', icon:'🔌', title:'USB Battery Banks', desc:'2 fully charged USB battery banks. 550 Willis Ave, Bronx. Come by anytime.', user:'C_Rivera_BX', time:'45min', dist:'0.3 mi'},
+  {cat:'power', tag:'offer', tagClass:'tag-offer', icon:'⚡', title:'Generator Access', desc:'Generator running at Prospect Ave church — extension cords outside. Priority medical devices.', user:'ProspectAve_Ch', time:'1hr', dist:'0.9 mi'},
+  {cat:'power', tag:'offer', tagClass:'tag-offer', icon:'🔋', title:'Charging Station', desc:'St. Mary\'s Rec Center, St. Ann\'s Ave — power on, multiple outlets, open to all.', user:'WatchTower', time:'30min', dist:'0.5 mi'},
+  {cat:'power', tag:'need', tagClass:'tag-need', icon:'🔋', title:'Phone Charging', desc:'Need to charge my phone urgently — medical app I depend on. Washington Heights area.', user:'M_Perez_WH', time:'15min', dist:'0.2 mi'},
+  {cat:'power', tag:'offer', tagClass:'tag-offer', icon:'🕯️', title:'Candles + Flashlights', desc:'Extra candles and LED flashlights to give away. Mott Haven. First come first serve.', user:'MottHaven_R', time:'2hr', dist:'1.0 mi'},
+  {cat:'power', tag:'service', tagClass:'tag-svc', icon:'🛠️', title:'Generator Rental', desc:'Lending out small generator — need it back by tomorrow. Bed-Stuy. DM for details.', user:'BedStuy_Help', time:'3hr', dist:'1.4 mi'},
+
+  // WATER & FOOD
+  {cat:'water', tag:'offer', tagClass:'tag-offer', icon:'🧊', title:'Ice Available', desc:'2 bags of ice, free. 610 E 138th St, apt 2B, Bronx. Text before coming.', user:'MG_Bronx', time:'20min', dist:'0.3 mi'},
+  {cat:'water', tag:'offer', tagClass:'tag-offer', icon:'💧', title:'Water Jugs', desc:'6 gallons of water to share. Bushwick, Knickerbocker Ave. Pick up only.', user:'BushwickBlock', time:'1hr', dist:'1.4 mi'},
+  {cat:'water', tag:'offer', tagClass:'tag-offer', icon:'🥫', title:'Canned Food + Water', desc:'Sharing canned goods and bottled water. 595 E 138th, first floor. Knock anytime.', user:'T_Washington', time:'45min', dist:'0.4 mi'},
+  {cat:'water', tag:'offer', tagClass:'tag-offer', icon:'🥘', title:'Hot Meals', desc:'Cooking on gas stove — making rice and beans for neighbors. 3rd floor, 610 Willis Ave.', user:'D_Ortiz_BX', time:'1hr', dist:'0.6 mi'},
+  {cat:'water', tag:'need', tagClass:'tag-need', icon:'🍼', title:'Baby Formula Needed', desc:'Running low on baby formula and water for infant. Crown Heights. Any help appreciated.', user:'CrownHts_Mom', time:'30min', dist:'0.7 mi'},
+  {cat:'water', tag:'offer', tagClass:'tag-offer', icon:'☕', title:'Coffee + Snacks', desc:'Making coffee on camping stove — swing by 580 E 141st, Bronx. Free to neighbors.', user:'P_Cruz_BX', time:'2hr', dist:'0.5 mi'},
+
+  // MEDICAL & ELDERLY
+  {cat:'medical', tag:'need', tagClass:'tag-need', icon:'🏥', title:'Medical Equip Power', desc:'Elderly neighbor needs generator for medical equipment. Looking for powered location nearby.', user:'A_Lopez', time:'1hr', dist:'0.2 mi'},
+  {cat:'medical', tag:'service', tagClass:'tag-svc', icon:'💊', title:'Medication Coordination', desc:'Helping neighbors with refrigerated meds — can coordinate with local pharmacies. Call or DM.', user:'PharmHelp_NYC', time:'2hr', dist:'0.5 mi'},
+  {cat:'medical', tag:'offer', tagClass:'tag-offer', icon:'👴', title:'Wellness Checks', desc:'Checking on elderly residents without power on my block. Anyone want to help cover more ground?', user:'Comm_Patrol_BX', time:'3hr', dist:'0.3 mi'},
+  {cat:'medical', tag:'service', tagClass:'tag-svc', icon:'🩺', title:'Nurse On Call', desc:'Registered nurse available for non-emergency checks. Washington Heights area. Text first.', user:'RN_WashHts', time:'4hr', dist:'1.1 mi'},
+  {cat:'medical', tag:'need', tagClass:'tag-need', icon:'♿', title:'Wheelchair Accessible Ride', desc:'Need accessible transport to dialysis appointment. Bronx. ASAP.', user:'BX_Dialysis', time:'10min', dist:'0.4 mi'},
+  {cat:'medical', tag:'offer', tagClass:'tag-offer', icon:'🧸', title:'Childcare Help', desc:'Can watch 1-2 kids (ages 2-8) at my powered apartment. Washington Heights. Free during outage.', user:'D_Reyes', time:'2hr', dist:'0.8 mi'},
+
+  // TRANSPORT
+  {cat:'transport', tag:'offer', tagClass:'tag-offer', icon:'🚗', title:'Free Rides', desc:'Driving elderly/disabled to shelters or medical. Bronx only. Text address + destination.', user:'VolunteerBX', time:'1hr', dist:'2.0 mi'},
+  {cat:'transport', tag:'offer', tagClass:'tag-offer', icon:'🚗', title:'Car Pool to Library', desc:'Heading to GW Library on 179th — room for 3 more. Leaving from 181st & Broadway at 9AM.', user:'M_Perez_WH', time:'30min', dist:'0.3 mi'},
+  {cat:'transport', tag:'need', tagClass:'tag-need', icon:'🚌', title:'Ride to Shelter', desc:'Need ride to nearest cooling center with my mom (70). We\'re in E. Flatbush.', user:'EFlat_Fam', time:'45min', dist:'0.9 mi'},
+  {cat:'transport', tag:'offer', tagClass:'tag-offer', icon:'🛵', title:'Errand Runs', desc:'On a bike — can pick up meds, food, or supplies for neighbors who can\'t get out. Bushwick/Bed-Stuy.', user:'BikeHelper_BK', time:'1hr', dist:'1.2 mi'},
+
+  // SERVICES
+  {cat:'services', tag:'service', tagClass:'tag-svc', icon:'🔧', title:'Licensed Electrician', desc:'Available for emergency checks after power returns. Bronx + N. Brooklyn only. Licensed & insured.', user:'RElectric_BX', time:'3hr', dist:'1.1 mi'},
+  {cat:'services', tag:'service', tagClass:'tag-svc', icon:'🔧', title:'Emergency Plumbing', desc:'Licensed plumber for same-day emergency work. Brooklyn and Bronx. Evening slots open.', user:'FixItFast_NYC', time:'2hr', dist:'1.8 mi'},
+  {cat:'services', tag:'need', tagClass:'tag-need', icon:'🔧', title:'Plumber Needed', desc:'Pipe burst when pressure came back on. Need emergency plumber. Crown Heights. Can pay cash today.', user:'CrownHts_Pipe', time:'1hr', dist:'0.6 mi'},
+  {cat:'services', tag:'service', tagClass:'tag-svc', icon:'📱', title:'Tech Help', desc:'Can help elderly neighbors contact Con Ed, DEP, or family. Free. 181st St area.', user:'Tech_Help_WH', time:'2hr', dist:'0.4 mi'},
+  {cat:'services', tag:'service', tagClass:'tag-svc', icon:'🌐', title:'Translation Help', desc:'Fluent in Spanish + English. Helping neighbors call utility companies. S. Bronx.', user:'Bilingue_BX', time:'1hr', dist:'0.5 mi'},
+  {cat:'services', tag:'offer', tagClass:'tag-offer', icon:'🐾', title:'Pet Shelter', desc:'Can take in cats or small dogs for the day if you need to leave. Crown Heights.', user:'N_Brown_CH', time:'3hr', dist:'0.7 mi'},
+
+  // SHELTER
+  {cat:'shelter', tag:'offer', tagClass:'tag-offer', icon:'🏠', title:'Powered Apartment', desc:'Have power — neighbors welcome to come hang out, charge up, use AC. 3rd floor, 580 Av St Nicholas.', user:'WashHts_Open', time:'1hr', dist:'0.4 mi'},
+  {cat:'shelter', tag:'offer', tagClass:'tag-offer', icon:'🏢', title:'Office Space', desc:'Our office in Mott Haven has power + AC + wifi today. Open to neighbors 9AM-6PM. Bring ID.', user:'MottHaven_Biz', time:'2hr', dist:'0.8 mi'},
+  {cat:'shelter', tag:'need', tagClass:'tag-need', icon:'🏠', title:'Cooling Space Needed', desc:'Looking for AC space for my grandmother. Bronx, near 138th. She can\'t handle the heat.', user:'BX_GrandKid', time:'15min', dist:'0.2 mi'},
+  {cat:'shelter', tag:'offer', tagClass:'tag-offer', icon:'⛺', title:'Camping Equipment', desc:'Have a camp stove, lanterns, and a tent if anyone needs to go somewhere cooler. Ridgewood, Queens.', user:'OutdoorRidge', time:'4hr', dist:'2.1 mi'},
+  {cat:'shelter', tag:'service', tagClass:'tag-svc', icon:'🌡️', title:'Cooling Center Info', desc:'Mapped all open NYC cooling centers in affected areas. Will share list — just ask here.', user:'WatchTower', time:'30min', dist:'—'},
+];
+
+let currentAidFilter = 'all';
+let currentAidCat = 'all';
+
+function renderAid() {
+  const grid = document.getElementById('aid-grid');
+  if (!grid) return;
+
+  let items = [...ALL_AID];
+  if (currentAidCat !== 'all') items = items.filter(i => i.cat === currentAidCat);
+  if (currentAidFilter !== 'all') items = items.filter(i => i.tag === currentAidFilter);
+
+  document.getElementById('aid-count').textContent = items.length;
+
+  if (currentAidCat === 'all') {
+    // Group by category
+    const cats = AID_CATEGORIES.map(c => ({
+      ...c,
+      items: items.filter(i => i.cat === c.id)
+    })).filter(c => c.items.length > 0);
+
+    grid.innerHTML = cats.map(cat => `
+      <div class="res-cat-header">
+        <span class="res-cat-icon">${cat.label.split(' ')[0]}</span>
+        <span class="res-cat-title">${cat.label.slice(2)}</span>
+        <span class="res-cat-count">${cat.items.length} listings</span>
+      </div>
+      <div class="aid-grid">
+        ${cat.items.map(renderAidCard).join('')}
+      </div>`).join('');
+  } else {
+    grid.innerHTML = `<div class="aid-grid">${items.map(renderAidCard).join('')}</div>`;
+  }
+}
+
+function renderAidCard(c) {
+  return `<div class="aid-card">
+    <div class="aid-card-top">
+      <span class="aid-tag ${c.tagClass}">${c.tag === 'offer' ? 'Offering' : c.tag === 'need' ? 'Requesting' : 'Service'}</span>
+      <span class="aid-dist">${c.dist}</span>
+    </div>
+    <span class="aid-card-icon">${c.icon}</span>
+    <div class="aid-card-title">${c.title}</div>
+    <div class="aid-card-desc">${c.desc}</div>
+    <div class="aid-card-meta">
+      <span class="aid-card-user">by <strong>${c.user}</strong> · ${c.time}</span>
+      <button class="aid-contact-btn">Contact →</button>
+    </div>
+  </div>`;
+}
+
+function filterAid(type, btn) {
+  document.querySelectorAll('.aid-filter').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  currentAidFilter = type;
+  renderAid();
+}
+
+function selectAidCat(cat, btn) {
+  document.querySelectorAll('.aid-cat-tab').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  currentAidCat = cat;
+  currentAidFilter = 'all';
+  document.querySelectorAll('.aid-filter').forEach(b => { if(b.dataset.type === 'all') b.classList.add('active'); else b.classList.remove('active'); });
+  renderAid();
+}
+
+function shuffleAid() {
+  ALL_AID.sort(() => Math.random() - 0.5);
+  renderAid();
+  const btn = document.querySelector('.aid-shuffle-btn');
+  if (btn) { btn.style.color = 'var(--red)'; btn.style.borderColor = 'var(--red)'; setTimeout(() => { btn.style.color=''; btn.style.borderColor=''; }, 400); }
+}
+
+// ══════════════════════════════════════════
+// RESOURCES — Urgent care, Con Ed, National Grid, Cooling Centers
+// ══════════════════════════════════════════
+
+const RESOURCES = [
+  // URGENT CARE / HOSPITALS
+  {cat:'urgent', boro:'bronx', name:'Lincoln Medical Center', addr:'234 E 149th St, Bronx', phone:'718-579-5000', hours:'24/7 Emergency', tag:'er'},
+  {cat:'urgent', boro:'bronx', name:'NYC Health + Hospitals / Lincoln', addr:'234 E 149th St, Bronx', phone:'718-579-5000', hours:'24/7', tag:'er'},
+  {cat:'urgent', boro:'brooklyn', name:'Kings County Hospital', addr:'451 Clarkson Ave, Brooklyn', phone:'718-245-3131', hours:'24/7 Emergency', tag:'er'},
+  {cat:'urgent', boro:'brooklyn', name:'CityMD Urgent Care Flatbush', addr:'1416 Flatbush Ave, Brooklyn', phone:'718-940-0021', hours:'8AM–10PM', tag:'open'},
+  {cat:'urgent', boro:'manhattan', name:'NYC Health + Hospitals / Harlem', addr:'506 Lenox Ave, Manhattan', phone:'212-939-1000', hours:'24/7 Emergency', tag:'er'},
+  {cat:'urgent', boro:'manhattan', name:'NewYork-Presbyterian / Columbia', addr:'622 W 168th St, Manhattan', phone:'212-305-2500', hours:'24/7 Emergency', tag:'er'},
+  {cat:'urgent', boro:'queens', name:'NYC Health + Hospitals / Elmhurst', addr:'79-01 Broadway, Queens', phone:'718-334-4000', hours:'24/7 Emergency', tag:'er'},
+  {cat:'urgent', boro:'si', name:'Staten Island University Hospital', addr:'475 Seaview Ave, Staten Island', phone:'718-226-9000', hours:'24/7 Emergency', tag:'er'},
+
+  // CON EDISON
+  {cat:'coned', boro:'all', name:'Con Edison Emergency Hotline', addr:'Available 24/7 by phone', phone:'1-800-752-6633', hours:'24/7 — report outages', tag:'utility'},
+  {cat:'coned', boro:'bronx', name:'Con Edison Bronx Service Center', addr:'1690 Bruckner Blvd, Bronx', phone:'1-800-752-6633', hours:'Mon–Fri 8AM–5PM', tag:'utility'},
+  {cat:'coned', boro:'brooklyn', name:'Con Edison Brooklyn Office', addr:'65 Court St, Brooklyn', phone:'1-800-752-6633', hours:'Mon–Fri 8AM–5PM', tag:'utility'},
+  {cat:'coned', boro:'manhattan', name:'Con Edison Manhattan HQ', addr:'4 Irving Pl, Manhattan', phone:'1-800-752-6633', hours:'Mon–Fri 8AM–6PM', tag:'utility'},
+  {cat:'coned', boro:'queens', name:'Con Edison Queens Center', addr:'31-20 Hunters Point Ave, Queens', phone:'1-800-752-6633', hours:'Mon–Fri 8AM–5PM', tag:'utility'},
+  {cat:'coned', boro:'all', name:'Con Edison Online Outage Map', addr:'coned.com/outages', phone:'Text OUT to 269-3633', hours:'Live outage reporting', tag:'utility'},
+
+  // NATIONAL GRID (gas)
+  {cat:'ngrid', boro:'all', name:'National Grid Emergency Line', addr:'Available 24/7 — gas leaks/emergencies', phone:'1-718-643-4050', hours:'24/7', tag:'utility'},
+  {cat:'ngrid', boro:'brooklyn', name:'National Grid Brooklyn', addr:'Services: Flatbush, Bed-Stuy, Crown Hts', phone:'1-718-643-4050', hours:'24/7 emergency', tag:'utility'},
+  {cat:'ngrid', boro:'queens', name:'National Grid Queens', addr:'Services: Jamaica, Astoria, Flushing', phone:'1-718-643-4050', hours:'24/7 emergency', tag:'utility'},
+  {cat:'ngrid', boro:'si', name:'National Grid Staten Island', addr:'Services: All SI neighborhoods', phone:'1-718-643-4050', hours:'24/7 emergency', tag:'utility'},
+
+  // NYC DEP (water)
+  {cat:'dep', boro:'all', name:'NYC DEP Water Emergency', addr:'Available 24/7', phone:'718-337-4357', hours:'24/7 — report water emergencies', tag:'utility'},
+  {cat:'dep', boro:'all', name:'NYC 311', addr:'Report any utility issue citywide', phone:'311', hours:'24/7', tag:'utility'},
+
+  // COOLING CENTERS
+  {cat:'cooling', boro:'bronx', name:'Bronx Library Center', addr:'310 E Kingsbridge Rd, Bronx', phone:'718-579-4244', hours:'Mon–Sat 9AM–8PM', tag:'open'},
+  {cat:'cooling', boro:'bronx', name:'St. Mary\'s Rec Center', addr:'St. Ann\'s Ave, S. Bronx', phone:'Call 311', hours:'During outages', tag:'open'},
+  {cat:'cooling', boro:'brooklyn', name:'Brooklyn Public Library Central', addr:'10 Grand Army Plaza, Brooklyn', phone:'718-230-2100', hours:'Mon–Sat 9AM–8PM', tag:'open'},
+  {cat:'cooling', boro:'manhattan', name:'GW Bridge Library Branch', addr:'549 W 179th St, Manhattan', phone:'212-927-3533', hours:'Mon–Sat 10AM–6PM', tag:'open'},
+  {cat:'cooling', boro:'queens', name:'Queens Library — Jamaica', addr:'89-11 Merrick Blvd, Queens', phone:'718-990-0700', hours:'Mon–Sat 10AM–8PM', tag:'open'},
+  {cat:'cooling', boro:'all', name:'NYC Cooling Centers (311)', addr:'Call for nearest open center', phone:'311', hours:'When heat emergency declared', tag:'open'},
+];
+
+const RES_CAT_LABELS = {
+  urgent: { icon:'🏥', label:'Urgent Care & Hospitals' },
+  coned:  { icon:'⚡', label:'Con Edison' },
+  ngrid:  { icon:'🔥', label:'National Grid (Gas)' },
+  dep:    { icon:'💧', label:'NYC DEP (Water)' },
+  cooling:{ icon:'❄️', label:'Cooling Centers & Shelters' },
+};
+
+let currentResBoro = 'all';
+
+function selectResBoro(boro, btn) {
+  document.querySelectorAll('.res-boro-tab').forEach(b => b.classList.remove('active'));
+  if (btn) btn.classList.add('active');
+  currentResBoro = boro;
+  renderResources();
+}
+
+function renderResources() {
+  const grid = document.getElementById('resources-grid');
+  if (!grid) return;
+
+  const filtered = currentResBoro === 'all'
+    ? RESOURCES
+    : RESOURCES.filter(r => r.boro === currentResBoro || r.boro === 'all');
+
+  const cats = ['urgent','coned','ngrid','dep','cooling'];
+  grid.innerHTML = cats.map(cat => {
+    const items = filtered.filter(r => r.cat === cat);
+    if (!items.length) return '';
+    const { icon, label } = RES_CAT_LABELS[cat];
+    return `
+      <div class="res-cat-header">
+        <span class="res-cat-icon">${icon}</span>
+        <span class="res-cat-title">${label}</span>
+        <span class="res-cat-count">${items.length} locations</span>
+      </div>
+      <div class="res-grid">
+        ${items.map(r => `
+          <div class="res-card">
+            <span class="res-tag ${r.tag}">${r.tag === 'er' ? '24/7 ER' : r.tag === 'utility' ? 'Utility' : 'Open'}</span>
+            <div class="res-name">${r.name}</div>
+            <div class="res-addr">${r.addr}</div>
+            <div class="res-phone"><a href="tel:${r.phone.replace(/\D/g,'')}" style="color:var(--red);text-decoration:none">${r.phone}</a></div>
+            <div class="res-hours">${r.hours}</div>
+          </div>`).join('')}
+      </div>`;
+  }).join('');
+}
+
+// ══════════════════════════════════════════
+// ALERTS + PROFILE
+// ══════════════════════════════════════════
+
+function markAllRead() {
+  document.querySelectorAll('.alert-item').forEach(a => a.classList.remove('unread'));
+  document.querySelectorAll('.alert-unread-dot').forEach(d => d.style.opacity='0');
+}
+
+function profileSection(sec, el) {
+  document.querySelectorAll('.pn-item').forEach(i => i.classList.remove('active'));
+  el.classList.add('active');
+  ['settings','reports','language','notifications'].forEach(s => {
+    const el2 = document.getElementById('ps-'+s);
+    if (el2) el2.style.display = s === sec ? 'block' : 'none';
+  });
+}
+
+function selectLang(el) {
+  el.closest('.lang-grid').querySelectorAll('.lang-opt').forEach(o => o.classList.remove('sel'));
+  el.classList.add('sel');
+}
+
+// mobile chat
+function showChannels() { document.querySelector('.chat-channels')?.classList.add('mobile-open'); }
+function hideChannels() { document.querySelector('.chat-channels')?.classList.remove('mobile-open'); }
+
+// ══════════════════════════════════════════
+// INIT
+// ══════════════════════════════════════════
+document.addEventListener('DOMContentLoaded', () => {
+  // Map
+  renderFeed('all');
+  renderMapPins('all');
+
+  // Chat
+  const bronxEl = document.querySelector('.channel-item[data-channel="bronx"]');
+  loadChannel(bronxEl, 'bronx');
+
+  // Mutual Aid — add category tabs dynamically
+  const filtersEl = document.querySelector('.aid-filters');
+  if (filtersEl) {
+    const catTabsHtml = `
+      <div class="aid-cat-tabs" style="display:flex;border-bottom:var(--rule);overflow-x:auto;flex-shrink:0">
+        <button class="aid-cat-tab active" data-cat="all" onclick="selectAidCat('all',this)" style="font-size:11px;letter-spacing:0.14em;text-transform:uppercase;color:rgba(237,233,224,0.5);padding:10px 16px;border-right:var(--rule);cursor:crosshair;white-space:nowrap;flex-shrink:0;background:none;border-top:none;border-bottom:2px solid var(--red);border-left:none;font-family:'DM Mono',monospace;color:var(--paper)">All</button>
+        ${AID_CATEGORIES.map(c => `<button class="aid-cat-tab" data-cat="${c.id}" onclick="selectAidCat('${c.id}',this)" style="font-size:11px;letter-spacing:0.14em;text-transform:uppercase;color:rgba(237,233,224,0.5);padding:10px 16px;border-right:var(--rule);cursor:crosshair;white-space:nowrap;flex-shrink:0;background:none;border-top:none;border-bottom:2px solid transparent;border-left:none;font-family:'DM Mono',monospace;transition:color 0.15s">${c.label}</button>`).join('')}
+      </div>`;
+    filtersEl.insertAdjacentHTML('beforebegin', catTabsHtml);
+  }
+  renderAid();
+
+  // Resources
+  renderResources();
+});
+
+// pulse OUT badges
+setInterval(() => {
+  document.querySelectorAll('.bOUT').forEach(b => {
+    b.style.opacity='0.5'; setTimeout(() => b.style.opacity='1', 500);
+  });
+}, 9000);
 </script>
 <script>
 // ── TAB SWITCHING ──

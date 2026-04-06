@@ -1526,7 +1526,7 @@ body { top: 0 !important; }
         loading="lazy"
         allowfullscreen
         referrerpolicy="no-referrer-when-downgrade"
-        src="https://maps.google.com/maps?q=South+Bronx,+New+York,+NY&t=m&z=14&output=embed&iwloc=near">
+        src="https://maps.google.com/maps?q=New+York+City,+NY&t=m&z=11&output=embed&iwloc=near">
       </iframe>
 
       <div class="map-tint"></div>
@@ -1555,16 +1555,20 @@ body { top: 0 !important; }
 
   <!-- NEIGHBORHOOD TABS — overlaid top of map -->
   <div class="map-tab-bar">
-    <button class="map-tab active" onclick="jumpMap('South+Bronx,+New+York,+NY',this)">S. Bronx</button>
-    <button class="map-tab" onclick="jumpMap('Bedford-Stuyvesant,+Brooklyn,+NY',this)">Bed-Stuy</button>
-    <button class="map-tab" onclick="jumpMap('Crown+Heights,+Brooklyn,+NY',this)">Crown Hts</button>
-    <button class="map-tab" onclick="jumpMap('Bushwick,+Brooklyn,+NY',this)">Bushwick</button>
-    <button class="map-tab" onclick="jumpMap('Harlem,+Manhattan,+NY',this)">Harlem</button>
-    <button class="map-tab" onclick="jumpMap('Washington+Heights,+Manhattan,+NY',this)">Wash. Hts</button>
-    <button class="map-tab" onclick="jumpMap('Jamaica,+Queens,+NY',this)">Jamaica</button>
-    <button class="map-tab" onclick="jumpMap('Red+Hook,+Brooklyn,+NY',this)">Red Hook</button>
-    <button class="map-tab" onclick="jumpMap('East+Flatbush,+Brooklyn,+NY',this)">E. Flatbush</button>
-    <button class="map-tab" onclick="jumpMap('Mott+Haven,+Bronx,+NY',this)">Mott Haven</button>
+    <button class="map-tab active" onclick="jumpMap('New+York+City,+NY&z=11',this)">All NYC</button>
+    <button class="map-tab" onclick="jumpMap('South+Bronx,+New+York,+NY&z=14',this)">S. Bronx</button>
+    <button class="map-tab" onclick="jumpMap('Bedford-Stuyvesant,+Brooklyn,+NY&z=14',this)">Bed-Stuy</button>
+    <button class="map-tab" onclick="jumpMap('Crown+Heights,+Brooklyn,+NY&z=14',this)">Crown Hts</button>
+    <button class="map-tab" onclick="jumpMap('Bushwick,+Brooklyn,+NY&z=14',this)">Bushwick</button>
+    <button class="map-tab" onclick="jumpMap('Harlem,+Manhattan,+NY&z=14',this)">Harlem</button>
+    <button class="map-tab" onclick="jumpMap('Washington+Heights,+Manhattan,+NY&z=14',this)">Wash. Hts</button>
+    <button class="map-tab" onclick="jumpMap('Jamaica,+Queens,+NY&z=14',this)">Jamaica</button>
+    <button class="map-tab" onclick="jumpMap('Red+Hook,+Brooklyn,+NY&z=14',this)">Red Hook</button>
+    <button class="map-tab" onclick="jumpMap('East+Flatbush,+Brooklyn,+NY&z=14',this)">E. Flatbush</button>
+    <button class="map-tab" onclick="jumpMap('Mott+Haven,+Bronx,+NY&z=14',this)">Mott Haven</button>
+    <button class="map-tab" onclick="jumpMap('Inwood,+Manhattan,+NY&z=14',this)">Inwood</button>
+    <button class="map-tab" onclick="jumpMap('Astoria,+Queens,+NY&z=14',this)">Astoria</button>
+    <button class="map-tab" onclick="jumpMap('Staten+Island,+NY&z=13',this)">Staten Island</button>
   </div>
 
   <!-- WORDMARK + CTA — overlaid bottom-left of map -->
@@ -1765,7 +1769,7 @@ body { top: 0 !important; }
       </div>
       <button class="submit" onclick="submitReport(event)">Submit Report →</button>
       <p style="font-size:11px;color:rgba(237,233,224,0.4);margin-top:12px;line-height:1.6;letter-spacing:0.06em">
-        📱 <strong style="color:rgba(237,233,224,0.6)">Get SMS alerts:</strong> Text <span style="color:#d42b20">START</span> to <span style="color:#d42b20">917-WT-NOW1</span> — reports are anonymous by default
+        📱 <strong style="color:rgba(237,233,224,0.6)">Get SMS alerts:</strong> <a href="sms:+19178669651" style="color:#d42b20;text-decoration:none">Text START to +1 (917) 866-9651</a> — reports are anonymous by default
       </p>
     </div>
     <div class="report-right reveal" style="transition-delay:.1s">
@@ -1807,11 +1811,11 @@ body { top: 0 !important; }
     </div>
   </div>
   <div class="access-cell reveal" style="transition-delay:.14s">
-    <div class="ac-icon">📞</div>
+    <div class="ac-icon">✉️</div>
     <div>
-      <p class="ac-title">Via Phone</p>
-      <p class="ac-val">1-800-WATCH-TWR</p>
-      <p class="ac-desc">Multilingual operators. Available 24/7 during active outages.</p>
+      <p class="ac-title">Via Email</p>
+      <p class="ac-val"><a href="mailto:alerts@watchtower-nyc.app" style="color:var(--red);text-decoration:none">alerts@watchtower-nyc.app</a></p>
+      <p class="ac-desc">Sign up for email alerts. Outage reports and restoration notifications.</p>
     </div>
   </div>
 </div>
@@ -1850,7 +1854,11 @@ function jumpMap(q, btn) {
   document.querySelectorAll('.map-tab').forEach(b => b.classList.remove('active'));
   btn.classList.add('active');
   const iframe = document.getElementById('gmap');
-  iframe.src = `https://maps.google.com/maps?q=${q}&t=m&z=14&output=embed&iwloc=near`;
+  // q may already contain z= parameter
+  const url = q.includes('z=')
+    ? `https://maps.google.com/maps?q=${q}&t=m&output=embed&iwloc=near`
+    : `https://maps.google.com/maps?q=${q}&t=m&z=14&output=embed&iwloc=near`;
+  iframe.src = url;
   const ts = document.getElementById('map-ts');
   ts.textContent = 'Loading...';
   iframe.onload = () => { ts.textContent = 'Last updated just now'; };
