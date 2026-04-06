@@ -699,7 +699,7 @@ button, a, [onclick] { touch-action: manipulation; }
 input, select, textarea { font-size: 16px !important; } /* prevent iOS zoom on focus */
 .chat-input { font-size: 16px !important; }
 
-/* ── GOOGLE TRANSLATE ── */
+
 #google_translate_element {
   position: fixed;
   top: 14px;
@@ -1046,9 +1046,168 @@ function toggleCheck(row) {
 render();
 </script>
 
-<!-- GOOGLE TRANSLATE -->
-<div id="google_translate_element"></div>
-<script type="text/javascript">
+
+
+
+<style>
+/* ── TRANSLATE/ACCESS WIDGET ── */
+#wt-access-widget {
+  position: fixed;
+  top: 12px; right: 12px; z-index: 5000;
+}
+
+#wt-access-toggle {
+  display: flex; align-items: center; gap: 6px;
+  background: rgba(8,8,8,0.92);
+  border: 1px solid rgba(237,233,224,0.2);
+  color: rgba(237,233,224,0.8);
+  padding: 6px 12px;
+  font-family: 'DM Mono', monospace;
+  font-size: 11px; letter-spacing: 0.14em;
+  cursor: pointer;
+  backdrop-filter: blur(8px);
+  transition: border-color 0.15s, color 0.15s;
+  font-weight: normal;
+}
+
+#wt-access-toggle:hover { border-color: rgba(237,233,224,0.45); color: #ede9e0; }
+.wt-access-icon { font-size: 13px; }
+
+.wt-access-panel {
+  display: none; position: absolute;
+  top: calc(100% + 8px); right: 0; width: 240px;
+  background: rgba(8,8,8,0.97);
+  border: 1px solid rgba(237,233,224,0.2);
+  backdrop-filter: blur(12px);
+}
+
+.wt-access-panel.open { display: block; }
+
+.wt-ap-section { padding: 14px 16px; border-bottom: 1px solid rgba(237,233,224,0.1); }
+
+.wt-ap-label {
+  font-size: 9px; letter-spacing: 0.24em; text-transform: uppercase;
+  color: rgba(237,233,224,0.4); margin-bottom: 10px; font-family: 'DM Mono', monospace;
+}
+
+.wt-ap-row {
+  display: flex; align-items: center; justify-content: space-between;
+  gap: 10px; margin-bottom: 8px;
+  font-size: 12px; color: rgba(237,233,224,0.7); font-family: 'DM Mono', monospace;
+}
+.wt-ap-row:last-child { margin-bottom: 0; }
+
+.wt-ap-link { color: #d42b20 !important; font-size: 11px; text-decoration: none; letter-spacing: 0.06em; }
+.wt-ap-link:hover { text-decoration: underline; }
+
+.wt-sw { position: relative; width: 32px; height: 16px; cursor: pointer; flex-shrink: 0; }
+.wt-sw input { opacity: 0; width: 0; height: 0; position: absolute; }
+.wt-sw-t { position: absolute; inset: 0; background: rgba(237,233,224,0.07); border: 1px solid rgba(237,233,224,0.14); transition: all 0.2s; }
+.wt-sw-d { position: absolute; top: 2px; left: 2px; width: 10px; height: 10px; background: rgba(237,233,224,0.35); transition: all 0.2s; }
+.wt-sw input:checked ~ .wt-sw-t { background: rgba(212,43,32,0.25); border-color: #d42b20; }
+.wt-sw input:checked ~ .wt-sw-d { transform: translateX(16px); background: #d42b20; }
+
+#wt-access-widget #google_translate_element { width: 100%; }
+#wt-access-widget .goog-te-gadget-simple {
+  background: rgba(237,233,224,0.04) !important;
+  border: 1px solid rgba(237,233,224,0.15) !important;
+  padding: 5px 8px !important; width: 100% !important;
+  box-sizing: border-box !important;
+}
+#wt-access-widget .goog-te-gadget-simple a,
+#wt-access-widget .goog-te-gadget-simple span {
+  color: rgba(237,233,224,0.75) !important;
+  font-family: 'DM Mono', monospace !important;
+  font-size: 11px !important; letter-spacing: 0.1em !important;
+  text-decoration: none !important;
+}
+.goog-te-banner-frame { display: none !important; }
+body { top: 0 !important; }
+.skiptranslate iframe { display: none !important; }
+
+body.large-text { font-size: 118% !important; }
+body.high-contrast { background: #000 !important; filter: contrast(1.3); }
+
+@media (max-width: 767px) {
+  #wt-access-widget { top: 58px; right: 8px; }
+  .wt-access-panel { width: 220px; }
+  #wt-access-toggle { padding: 5px 10px; font-size: 10px; }
+}
+
+</style>
+<!-- ── TRANSLATE + ACCESSIBILITY WIDGET ── -->
+<div id="wt-access-widget">
+  <button id="wt-access-toggle" onclick="toggleAccessWidget()" title="Language & Accessibility">
+    <span class="wt-access-icon">🌐</span>
+    <span class="wt-access-label">EN</span>
+  </button>
+  <div id="wt-access-panel" class="wt-access-panel">
+    <div class="wt-ap-section">
+      <div class="wt-ap-label">Language</div>
+      <div id="google_translate_element"></div>
+    </div>
+    <div class="wt-ap-section">
+      <div class="wt-ap-label">Accessibility</div>
+      <div class="wt-ap-row">
+        <span>Large Text</span>
+        <label class="wt-sw"><input type="checkbox" onchange="toggleLargeText(this)"><span class="wt-sw-t"></span><span class="wt-sw-d"></span></label>
+      </div>
+      <div class="wt-ap-row">
+        <span>High Contrast</span>
+        <label class="wt-sw"><input type="checkbox" onchange="toggleHighContrast(this)"><span class="wt-sw-t"></span><span class="wt-sw-d"></span></label>
+      </div>
+    </div>
+    <div class="wt-ap-section" style="border-bottom:none">
+      <div class="wt-ap-label">Quick Access</div>
+      <div class="wt-ap-row" style="flex-direction:column;align-items:flex-start;gap:3px">
+        <span>SMS Hotline</span>
+        <a href="sms:+19178669651" class="wt-ap-link">Text START to 917-WT-NOW1</a>
+      </div>
+      <div class="wt-ap-row" style="flex-direction:column;align-items:flex-start;gap:3px;margin-top:8px">
+        <span>Call-In</span>
+        <a href="tel:+18009282897" class="wt-ap-link">1-800-WATCH-TWR</a>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+function toggleAccessWidget() {
+  document.getElementById('wt-access-panel').classList.toggle('open');
+}
+
+document.addEventListener('click', function(e) {
+  const w = document.getElementById('wt-access-widget');
+  if (w && !w.contains(e.target)) {
+    document.getElementById('wt-access-panel').classList.remove('open');
+  }
+});
+
+function toggleLargeText(cb) {
+  document.body.classList.toggle('large-text', cb.checked);
+  try { localStorage.setItem('wt_large_text', cb.checked); } catch(e) {}
+}
+
+function toggleHighContrast(cb) {
+  document.body.classList.toggle('high-contrast', cb.checked);
+  try { localStorage.setItem('wt_high_contrast', cb.checked); } catch(e) {}
+}
+
+window.addEventListener('load', function() {
+  try {
+    if (localStorage.getItem('wt_large_text') === 'true') {
+      document.body.classList.add('large-text');
+      const cb = document.querySelector('[onchange*="toggleLargeText"]');
+      if (cb) cb.checked = true;
+    }
+    if (localStorage.getItem('wt_high_contrast') === 'true') {
+      document.body.classList.add('high-contrast');
+      const cb = document.querySelector('[onchange*="toggleHighContrast"]');
+      if (cb) cb.checked = true;
+    }
+  } catch(e) {}
+});
+
 function googleTranslateElementInit() {
   new google.translate.TranslateElement({
     pageLanguage: 'en',
@@ -1057,8 +1216,9 @@ function googleTranslateElementInit() {
     autoDisplay: false
   }, 'google_translate_element');
 }
+
 </script>
-<script type="text/javascript" src="//translate.google.com/translate_a/element.js?cb=googleTranslateElementInit"></script>
+<script src="//translate.google.com/translate_a/element.js?cb=googleTranslateElementInit"></script>
 
 </body>
 </html>

@@ -1224,7 +1224,7 @@ input, select, textarea { font-size: 16px !important; } /* prevent iOS zoom on f
 }
 
 
-/* ── GOOGLE TRANSLATE ── */
+
 #google_translate_element {
   position: fixed;
   top: 14px;
@@ -1326,6 +1326,107 @@ body { top: 0 !important; }
   .type-break-inner { font-size: 26px; }
 }
 
+
+/* ── HOMEPAGE FEED — matches app style ── */
+.hero-feed {
+  position: absolute;
+  top: 80px; right: 0; bottom: 0;
+  width: 300px;
+  border-left: var(--rule);
+  background: rgba(8,8,8,0.88);
+  backdrop-filter: blur(12px);
+  z-index: 5;
+  display: flex; flex-direction: column;
+  overflow: hidden;
+}
+
+.feed-head {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 12px 18px; border-bottom: var(--rule); flex-shrink: 0;
+}
+
+.feed-lbl {
+  font-size: 11px; letter-spacing: 0.2em; text-transform: uppercase;
+  color: rgba(237,233,224,0.5); font-family: 'DM Mono', monospace;
+}
+
+.feed-live {
+  display: flex; align-items: center; gap: 6px;
+  font-size: 10px; letter-spacing: 0.14em; text-transform: uppercase;
+  color: #ff3b2f;
+}
+
+.feed-live::before {
+  content: ''; width: 5px; height: 5px;
+  background: #ff3b2f; border-radius: 50%;
+  animation: blink 1.4s ease-in-out infinite;
+}
+
+/* FEED ROWS — scrollable */
+.hero-feed .feed-rows {
+  flex: 1; overflow-y: auto; min-height: 0;
+}
+
+.hero-feed .feed-rows::-webkit-scrollbar { width: 2px; }
+.hero-feed .feed-rows::-webkit-scrollbar-thumb { background: #222; }
+
+/* each row — compact 2-col layout */
+.hero-feed .f-row {
+  display: grid;
+  grid-template-columns: 1fr 52px;
+  align-items: start;
+  gap: 8px;
+  padding: 10px 18px;
+  border-bottom: var(--rule);
+  cursor: crosshair; transition: background 0.12s;
+}
+
+.hero-feed .f-row:hover { background: rgba(237,233,224,0.03); }
+
+.hero-feed .f-zone {
+  font-size: 12px; color: rgba(237,233,224,0.78); line-height: 1.3;
+}
+
+.hero-feed .f-zone small {
+  display: block; font-size: 10px;
+  color: rgba(237,233,224,0.45); margin-top: 2px; letter-spacing: 0.06em;
+}
+
+.hero-feed .f-badge {
+  font-size: 10px; letter-spacing: 0.08em; text-transform: uppercase;
+  padding: 3px 7px; text-align: center; flex-shrink: 0; margin-top: 2px;
+}
+
+.feed-footer {
+  padding: 10px 18px; border-top: var(--rule); flex-shrink: 0;
+  display: flex; justify-content: space-between;
+}
+
+.feed-footer a {
+  font-size: 11px; letter-spacing: 0.14em; text-transform: uppercase;
+  color: rgba(237,233,224,0.45); text-decoration: none; transition: color 0.15s;
+  font-family: 'DM Mono', monospace;
+}
+
+.feed-footer a:hover { color: #ede9e0; }
+
+/* mobile: feed as bottom strip */
+@media (max-width: 767px) {
+  .hero-feed {
+    top: auto !important;
+    bottom: 0; left: 0; right: 0;
+    width: 100% !important;
+    height: 210px;
+    border-left: none;
+    border-top: var(--rule);
+  }
+  .hero-wordmark-row {
+    bottom: 210px !important;
+    right: 0 !important;
+  }
+  .map-tab-bar { right: 0 !important; }
+}
+
 </style>
 </head>
 <body>
@@ -1339,11 +1440,11 @@ body { top: 0 !important; }
   <ul class="nav-links">
     <li><a href="#how">How It Works</a></li>
     <li><a href="#features">Features</a></li>
-    <li><a href="#report">Report</a></li>
+    <li><a href="index.html">Get Alerts</a></li>
   </ul>
   <div class="nav-right">
     <span class="nav-status">4 Active Outages</span>
-    <a href="app.html" class="nav-cta">Open App →</a>
+    <a href="loading.html" class="nav-cta">Open App →</a>
   </div>
 </nav>
 
@@ -1438,13 +1539,13 @@ body { top: 0 !important; }
     <div class="hero-right-text">
       <p class="hero-desc">Know when your power and water go out — before your phone does. Community-verified, real-time status for every NYC neighborhood.</p>
       <div class="hero-ctas">
-        <a href="#report" class="btn-fill">Report an Outage</a>
-        <a href="app.html" class="btn-ghost-hero">→ Open App</a>
+        <a href="index.html" class="btn-fill">Get Alerts →</a>
+        <a href="loading.html" class="btn-ghost-hero">→ Open App</a>
       </div>
     </div>
   </div>
 
-  <!-- LIVE FEED — overlaid right sidebar -->
+    <!-- LIVE FEED SIDEBAR -->
   <div class="hero-feed">
     <div class="feed-head">
       <span class="feed-lbl">Live Status</span>
@@ -1459,13 +1560,17 @@ body { top: 0 !important; }
       <div class="f-row"><div class="f-zone">Bed-Stuy — Malcolm X Blvd<small>2 hr ago · Power</small></div><span class="f-badge bON">On</span></div>
       <div class="f-row"><div class="f-zone">S. Bronx — Grand Concourse<small>3 hr ago · Water</small></div><span class="f-badge bPART">Partial</span></div>
       <div class="f-row"><div class="f-zone">Washington Hts — 181st<small>3 hr ago · Power</small></div><span class="f-badge bOUT">Out</span></div>
-      <div class="f-row"><div class="f-zone">Jamaica, Queens — Sutphin<small>4 hr ago · Water</small></div><span class="f-badge bON">On</span></div>
+      <div class="f-row"><div class="f-zone">Jamaica, Queens<small>4 hr ago · Water</small></div><span class="f-badge bON">On</span></div>
       <div class="f-row"><div class="f-zone">Mott Haven — 3rd Ave<small>5 hr ago · Power</small></div><span class="f-badge bOUT">Out</span></div>
       <div class="f-row"><div class="f-zone">Red Hook — Van Brunt<small>6 hr ago · Water</small></div><span class="f-badge bON">On</span></div>
       <div class="f-row"><div class="f-zone">Flatbush — Church Ave<small>6 hr ago · Power</small></div><span class="f-badge bPART">Partial</span></div>
+      <div class="f-row"><div class="f-zone">East New York — Pitkin<small>7 hr ago · Power</small></div><span class="f-badge bOUT">Out</span></div>
+      <div class="f-row"><div class="f-zone">Soundview — Bruckner<small>8 hr ago · Water</small></div><span class="f-badge bON">On</span></div>
+      <div class="f-row"><div class="f-zone">Inwood — Dyckman St<small>9 hr ago · Power</small></div><span class="f-badge bPART">Partial</span></div>
+      <div class="f-row"><div class="f-zone">Canarsie — Rockaway Pkwy<small>10 hr ago · Water</small></div><span class="f-badge bON">On</span></div>
     </div>
     <div class="feed-footer">
-      <a href="app.html">View all →</a>
+      <a href="loading.html">View all →</a>
       <a href="#report">+ Report</a>
     </div>
   </div>
@@ -1622,6 +1727,9 @@ body { top: 0 !important; }
         <button class="tog">✓ Back — Restored</button>
       </div>
       <button class="submit">Submit Report →</button>
+      <p style="font-size:11px;color:rgba(237,233,224,0.4);margin-top:12px;line-height:1.6;letter-spacing:0.06em">
+        📱 <strong style="color:rgba(237,233,224,0.6)">Get SMS alerts:</strong> Text <span style="color:#d42b20">START</span> to <span style="color:#d42b20">917-WT-NOW1</span> — reports are anonymous by default
+      </p>
     </div>
     <div class="report-right reveal" style="transition-delay:.1s">
       <div class="stat-b">
@@ -1678,9 +1786,9 @@ body { top: 0 !important; }
     <h4>Product</h4>
     <ul>
       <li><a href="#how">How It Works</a></li>
-      <li><a href="app.html">Status Map</a></li>
+      <li><a href="loading.html">Status Map</a></li>
       <li><a href="#report">Report Outage</a></li>
-      <li><a href="app.html">Mutual Aid Grid</a></li>
+      <li><a href="loading.html">Mutual Aid Grid</a></li>
     </ul>
   </div>
   <div class="ft-col">
@@ -1692,7 +1800,7 @@ body { top: 0 !important; }
       <li><a href="#">Accessibility</a></li>
     </ul>
   </div>
-  <a href="app.html" class="btn-fill" style="align-self:flex-end">Open App →</a>
+  <a href="loading.html" class="btn-fill" style="align-self:flex-end">Open App →</a>
 </footer>
 <div class="ft-bottom">
   <p>WatchTower™ — NYC Community Utility Network</p>
@@ -1746,9 +1854,168 @@ function closeMobileNav() {
 }
 </script>
 
-<!-- GOOGLE TRANSLATE -->
-<div id="google_translate_element"></div>
-<script type="text/javascript">
+
+
+
+<style>
+/* ── TRANSLATE/ACCESS WIDGET ── */
+#wt-access-widget {
+  position: fixed;
+  top: 12px; right: 12px; z-index: 5000;
+}
+
+#wt-access-toggle {
+  display: flex; align-items: center; gap: 6px;
+  background: rgba(8,8,8,0.92);
+  border: 1px solid rgba(237,233,224,0.2);
+  color: rgba(237,233,224,0.8);
+  padding: 6px 12px;
+  font-family: 'DM Mono', monospace;
+  font-size: 11px; letter-spacing: 0.14em;
+  cursor: pointer;
+  backdrop-filter: blur(8px);
+  transition: border-color 0.15s, color 0.15s;
+  font-weight: normal;
+}
+
+#wt-access-toggle:hover { border-color: rgba(237,233,224,0.45); color: #ede9e0; }
+.wt-access-icon { font-size: 13px; }
+
+.wt-access-panel {
+  display: none; position: absolute;
+  top: calc(100% + 8px); right: 0; width: 240px;
+  background: rgba(8,8,8,0.97);
+  border: 1px solid rgba(237,233,224,0.2);
+  backdrop-filter: blur(12px);
+}
+
+.wt-access-panel.open { display: block; }
+
+.wt-ap-section { padding: 14px 16px; border-bottom: 1px solid rgba(237,233,224,0.1); }
+
+.wt-ap-label {
+  font-size: 9px; letter-spacing: 0.24em; text-transform: uppercase;
+  color: rgba(237,233,224,0.4); margin-bottom: 10px; font-family: 'DM Mono', monospace;
+}
+
+.wt-ap-row {
+  display: flex; align-items: center; justify-content: space-between;
+  gap: 10px; margin-bottom: 8px;
+  font-size: 12px; color: rgba(237,233,224,0.7); font-family: 'DM Mono', monospace;
+}
+.wt-ap-row:last-child { margin-bottom: 0; }
+
+.wt-ap-link { color: #d42b20 !important; font-size: 11px; text-decoration: none; letter-spacing: 0.06em; }
+.wt-ap-link:hover { text-decoration: underline; }
+
+.wt-sw { position: relative; width: 32px; height: 16px; cursor: pointer; flex-shrink: 0; }
+.wt-sw input { opacity: 0; width: 0; height: 0; position: absolute; }
+.wt-sw-t { position: absolute; inset: 0; background: rgba(237,233,224,0.07); border: 1px solid rgba(237,233,224,0.14); transition: all 0.2s; }
+.wt-sw-d { position: absolute; top: 2px; left: 2px; width: 10px; height: 10px; background: rgba(237,233,224,0.35); transition: all 0.2s; }
+.wt-sw input:checked ~ .wt-sw-t { background: rgba(212,43,32,0.25); border-color: #d42b20; }
+.wt-sw input:checked ~ .wt-sw-d { transform: translateX(16px); background: #d42b20; }
+
+#wt-access-widget #google_translate_element { width: 100%; }
+#wt-access-widget .goog-te-gadget-simple {
+  background: rgba(237,233,224,0.04) !important;
+  border: 1px solid rgba(237,233,224,0.15) !important;
+  padding: 5px 8px !important; width: 100% !important;
+  box-sizing: border-box !important;
+}
+#wt-access-widget .goog-te-gadget-simple a,
+#wt-access-widget .goog-te-gadget-simple span {
+  color: rgba(237,233,224,0.75) !important;
+  font-family: 'DM Mono', monospace !important;
+  font-size: 11px !important; letter-spacing: 0.1em !important;
+  text-decoration: none !important;
+}
+.goog-te-banner-frame { display: none !important; }
+body { top: 0 !important; }
+.skiptranslate iframe { display: none !important; }
+
+body.large-text { font-size: 118% !important; }
+body.high-contrast { background: #000 !important; filter: contrast(1.3); }
+
+@media (max-width: 767px) {
+  #wt-access-widget { top: 58px; right: 8px; }
+  .wt-access-panel { width: 220px; }
+  #wt-access-toggle { padding: 5px 10px; font-size: 10px; }
+}
+
+</style>
+<!-- ── TRANSLATE + ACCESSIBILITY WIDGET ── -->
+<div id="wt-access-widget">
+  <button id="wt-access-toggle" onclick="toggleAccessWidget()" title="Language & Accessibility">
+    <span class="wt-access-icon">🌐</span>
+    <span class="wt-access-label">EN</span>
+  </button>
+  <div id="wt-access-panel" class="wt-access-panel">
+    <div class="wt-ap-section">
+      <div class="wt-ap-label">Language</div>
+      <div id="google_translate_element"></div>
+    </div>
+    <div class="wt-ap-section">
+      <div class="wt-ap-label">Accessibility</div>
+      <div class="wt-ap-row">
+        <span>Large Text</span>
+        <label class="wt-sw"><input type="checkbox" onchange="toggleLargeText(this)"><span class="wt-sw-t"></span><span class="wt-sw-d"></span></label>
+      </div>
+      <div class="wt-ap-row">
+        <span>High Contrast</span>
+        <label class="wt-sw"><input type="checkbox" onchange="toggleHighContrast(this)"><span class="wt-sw-t"></span><span class="wt-sw-d"></span></label>
+      </div>
+    </div>
+    <div class="wt-ap-section" style="border-bottom:none">
+      <div class="wt-ap-label">Quick Access</div>
+      <div class="wt-ap-row" style="flex-direction:column;align-items:flex-start;gap:3px">
+        <span>SMS Hotline</span>
+        <a href="sms:+19178669651" class="wt-ap-link">Text START to 917-WT-NOW1</a>
+      </div>
+      <div class="wt-ap-row" style="flex-direction:column;align-items:flex-start;gap:3px;margin-top:8px">
+        <span>Call-In</span>
+        <a href="tel:+18009282897" class="wt-ap-link">1-800-WATCH-TWR</a>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+function toggleAccessWidget() {
+  document.getElementById('wt-access-panel').classList.toggle('open');
+}
+
+document.addEventListener('click', function(e) {
+  const w = document.getElementById('wt-access-widget');
+  if (w && !w.contains(e.target)) {
+    document.getElementById('wt-access-panel').classList.remove('open');
+  }
+});
+
+function toggleLargeText(cb) {
+  document.body.classList.toggle('large-text', cb.checked);
+  try { localStorage.setItem('wt_large_text', cb.checked); } catch(e) {}
+}
+
+function toggleHighContrast(cb) {
+  document.body.classList.toggle('high-contrast', cb.checked);
+  try { localStorage.setItem('wt_high_contrast', cb.checked); } catch(e) {}
+}
+
+window.addEventListener('load', function() {
+  try {
+    if (localStorage.getItem('wt_large_text') === 'true') {
+      document.body.classList.add('large-text');
+      const cb = document.querySelector('[onchange*="toggleLargeText"]');
+      if (cb) cb.checked = true;
+    }
+    if (localStorage.getItem('wt_high_contrast') === 'true') {
+      document.body.classList.add('high-contrast');
+      const cb = document.querySelector('[onchange*="toggleHighContrast"]');
+      if (cb) cb.checked = true;
+    }
+  } catch(e) {}
+});
+
 function googleTranslateElementInit() {
   new google.translate.TranslateElement({
     pageLanguage: 'en',
@@ -1757,8 +2024,9 @@ function googleTranslateElementInit() {
     autoDisplay: false
   }, 'google_translate_element');
 }
+
 </script>
-<script type="text/javascript" src="//translate.google.com/translate_a/element.js?cb=googleTranslateElementInit"></script>
+<script src="//translate.google.com/translate_a/element.js?cb=googleTranslateElementInit"></script>
 
 </body>
 </html>
