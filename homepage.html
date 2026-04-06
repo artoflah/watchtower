@@ -415,7 +415,7 @@ nav {
 /* LIVE FEED — fixed right sidebar overlaid on map */
 .hero-feed {
   position: absolute;
-  top: 0; right: 0; bottom: 0;
+  top: 80px; right: 0; bottom: 0;
   width: 300px;
   border-left: var(--rule);
   background: rgba(8,8,8,0.82);
@@ -1223,6 +1223,109 @@ input, select, textarea { font-size: 16px !important; } /* prevent iOS zoom on f
   opacity: 1 !important;
 }
 
+
+/* ── GOOGLE TRANSLATE ── */
+#google_translate_element {
+  position: fixed;
+  top: 14px;
+  right: 220px;
+  z-index: 600;
+}
+
+#google_translate_element select {
+  background: rgba(8,8,8,0.95);
+  border: 1px solid rgba(237,233,224,0.2);
+  color: rgba(237,233,224,0.7);
+  font-family: 'DM Mono', monospace;
+  font-size: 10px;
+  letter-spacing: 0.12em;
+  padding: 5px 8px;
+  cursor: pointer;
+  outline: none;
+  appearance: none;
+  -webkit-appearance: none;
+}
+
+#google_translate_element .goog-te-gadget-simple {
+  background: transparent !important;
+  border: none !important;
+  font-size: 10px !important;
+}
+
+.goog-te-banner-frame { display: none !important; }
+body { top: 0 !important; }
+.skiptranslate { display: none !important; }
+
+@media (max-width: 767px) {
+  #google_translate_element {
+    top: 58px;
+    right: 8px;
+    z-index: 498;
+  }
+  #google_translate_element select { font-size: 11px; padding: 5px 8px; }
+}
+
+
+/* ── MOBILE OVERFLOW FIXES ── */
+@media (max-width: 767px) {
+  /* prevent any text from running off screen */
+  * { max-width: 100%; }
+  
+  /* hero wordmark scale down more aggressively */
+  .hero-wordmark { font-size: clamp(52px, 14vw, 88px) !important; }
+  
+  /* type break — don't let it overflow */
+  .type-break { padding: 0 16px; overflow: hidden; }
+  .type-break-inner { white-space: normal; font-size: clamp(28px, 7vw, 52px); }
+  
+  /* feat title */
+  .feat-title { font-size: 38px; }
+  
+  /* how title */
+  .how-title { font-size: 18px; }
+  
+  /* report h2 */
+  .report-left h2 { font-size: 52px; }
+  
+  /* stats */
+  .stat-n { font-size: 52px; }
+  
+  /* manifesto */
+  .man-text { word-break: break-word; }
+  
+  /* access */
+  .ac-val { font-size: 11px; word-break: break-all; }
+  
+  /* nav hero section */
+  .hero-wordmark-row { padding: 0 14px 14px; }
+  .hero-desc { font-size: 14px; }
+
+  /* footer */  
+  .ft-brand { font-size: 36px; }
+  
+  /* sec headers */
+  .sec-head { overflow: hidden; }
+  .sec-title { font-size: 10px; letter-spacing: 0.12em; white-space: normal; }
+
+  /* feed rows */
+  .f-zone { font-size: 12px; }
+  .f-zone small { font-size: 10px; }
+
+  /* how grid */  
+  .how-body { font-size: 13px; }
+  
+  /* feat body */
+  .feat-body { font-size: 13px; }
+}
+
+@media (max-width: 390px) {
+  .hero-wordmark { font-size: 48px !important; }
+  .feat-title { font-size: 32px; }
+  .report-left h2 { font-size: 44px; }
+  .stat-n { font-size: 44px; }
+  .type-break-inner { font-size: 26px; }
+}
+
 </style>
 </head>
 <body>
@@ -1642,5 +1745,20 @@ function closeMobileNav() {
   document.getElementById('nav-hamburger').classList.remove('open');
 }
 </script>
+
+<!-- GOOGLE TRANSLATE -->
+<div id="google_translate_element"></div>
+<script type="text/javascript">
+function googleTranslateElementInit() {
+  new google.translate.TranslateElement({
+    pageLanguage: 'en',
+    includedLanguages: 'es,zh-CN,ht,bn,ru,ar,fr,ko,pt,pl,ur',
+    layout: google.translate.TranslateElement.InlineLayout.SIMPLE,
+    autoDisplay: false
+  }, 'google_translate_element');
+}
+</script>
+<script type="text/javascript" src="//translate.google.com/translate_a/element.js?cb=googleTranslateElementInit"></script>
+
 </body>
 </html>

@@ -698,6 +698,48 @@ body::after {
 button, a, [onclick] { touch-action: manipulation; }
 input, select, textarea { font-size: 16px !important; } /* prevent iOS zoom on focus */
 .chat-input { font-size: 16px !important; }
+
+/* ── GOOGLE TRANSLATE ── */
+#google_translate_element {
+  position: fixed;
+  top: 14px;
+  right: 220px;
+  z-index: 600;
+}
+
+#google_translate_element select {
+  background: rgba(8,8,8,0.95);
+  border: 1px solid rgba(237,233,224,0.2);
+  color: rgba(237,233,224,0.7);
+  font-family: 'DM Mono', monospace;
+  font-size: 10px;
+  letter-spacing: 0.12em;
+  padding: 5px 8px;
+  cursor: pointer;
+  outline: none;
+  appearance: none;
+  -webkit-appearance: none;
+}
+
+#google_translate_element .goog-te-gadget-simple {
+  background: transparent !important;
+  border: none !important;
+  font-size: 10px !important;
+}
+
+.goog-te-banner-frame { display: none !important; }
+body { top: 0 !important; }
+.skiptranslate { display: none !important; }
+
+@media (max-width: 767px) {
+  #google_translate_element {
+    top: 58px;
+    right: 8px;
+    z-index: 498;
+  }
+  #google_translate_element select { font-size: 11px; padding: 5px 8px; }
+}
+
 </style>
 </head>
 <body>
@@ -1003,5 +1045,20 @@ function toggleCheck(row) {
 
 render();
 </script>
+
+<!-- GOOGLE TRANSLATE -->
+<div id="google_translate_element"></div>
+<script type="text/javascript">
+function googleTranslateElementInit() {
+  new google.translate.TranslateElement({
+    pageLanguage: 'en',
+    includedLanguages: 'es,zh-CN,ht,bn,ru,ar,fr,ko,pt,pl,ur',
+    layout: google.translate.TranslateElement.InlineLayout.SIMPLE,
+    autoDisplay: false
+  }, 'google_translate_element');
+}
+</script>
+<script type="text/javascript" src="//translate.google.com/translate_a/element.js?cb=googleTranslateElementInit"></script>
+
 </body>
 </html>
