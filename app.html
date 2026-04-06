@@ -1346,32 +1346,34 @@ const STATUS_CLASS = { out:'bOUT', part:'bPART', on:'bON' };
 let currentNeighborhood = 'all';
 
 function renderMapPins(hood) {
-  const svg = document.getElementById('pin-svg');
-  const labels = document.getElementById('pin-labels');
-  if (!svg || !labels) return;
+  if (!leafletMap) return;
+  leafletMarkers.forEach(m => leafletMap.removeLayer(m));
+  leafletMarkers = [];
 
   const hoods = BOROUGH_HOODS[hood];
   const filtered = hoods ? OUTAGES.filter(o => hoods.includes(o.boro)) : OUTAGES;
 
-  // SVG circles
-  svg.innerHTML = filtered.map(o => {
-    const x = lngToX(o.lng);
-    const y = latToY(o.lat);
+  filtered.forEach(o => {
     const col = STATUS_COLOR[o.status];
-    const r = o.status === 'out' ? 1.2 : 0.9;
-    return `<circle cx="${x}" cy="${y}" r="${r}" fill="${col}" stroke="rgba(8,8,8,0.6)" stroke-width="0.3" opacity="0.9"/>
-            <circle cx="${x}" cy="${y}" r="${r * 2.2}" fill="${col}" opacity="0.15"/>`;
-  }).join('');
-
-  // Labels
-  labels.innerHTML = filtered.map(o => {
-    const x = lngToX(o.lng);
-    const y = latToY(o.lat);
-    return `<div class="pin-label ${o.status}" style="left:${x}%;top:${y}%">
-      ${o.type === 'Power' ? '⚡' : '💧'} ${o.status.toUpperCase()} · ${o.label}
-    </div>`;
-  }).join('');
+    const emoji = o.type === 'Power' ? '⚡' : '💧';
+    const marker = L.circleMarker([o.lat, o.lng], {
+      radius: o.status === 'out' ? 11 : o.status === 'part' ? 9 : 7,
+      fillColor: col,
+      color: '#111',
+      weight: 2,
+      opacity: 1,
+      fillOpacity: 1,
+    });
+    marker.bindPopup(
+      `<div class="wt-popup-title wt-popup-status-${o.status}">${emoji} ${STATUS_LABEL[o.status]} — ${o.label}</div>` +
+      `<div class="wt-popup-meta">${o.area} · ${o.borough || o.boro} · ${o.type} · ${o.ago} ago</div>`,
+      { maxWidth: 240, closeButton: true }
+    );
+    marker.addTo(leafletMap);
+    leafletMarkers.push(marker);
+  });
 }
+
 
 function renderFeed(hood) {
   const rows = document.getElementById('map-feed-rows');
@@ -1426,8 +1428,9 @@ function initLeafletMap() {
     subdomains: 'abc'
   }).addTo(leafletMap);
 
-  renderMapPins('all');
   renderFeed('all');
+  // Wait a tick for tiles to load then render pins
+  setTimeout(() => renderMapPins('all'), 300);
 }
 
 function selectNeighborhood(hood, btn) {
@@ -1435,36 +1438,15 @@ function selectNeighborhood(hood, btn) {
   if (btn) btn.classList.add('active');
   currentNeighborhood = hood;
 
-  // Update map iframe
-  const mapQueries = {
-    all: 'New+York+City,+NY&z=11',
-    bronx: 'South+Bronx,+New+York,+NY&z=14',
-    bedstuy: 'Bedford-Stuyvesant,+Brooklyn,+NY&z=14',
-    crownhts: 'Crown+Heights,+Brooklyn,+NY&z=14',
-    bushwick: 'Bushwick,+Brooklyn,+NY&z=14',
-    harlem: 'Harlem,+Manhattan,+NY&z=14',
-    washhts: 'Washington+Heights,+Manhattan,+NY&z=14',
-    jamaica: 'Jamaica,+Queens,+NY&z=14',
-    redhook: 'Red+Hook,+Brooklyn,+NY&z=14',
-    eflatbush: 'East+Flatbush,+Brooklyn,+NY&z=14',
-    motthaven: 'Mott+Haven,+Bronx,+NY&z=14',
-    inwood: 'Inwood,+Manhattan,+NY&z=14',
-    astoria: 'Astoria,+Queens,+NY&z=14',
-  };
-
-  const q = mapQueries[hood] || 'New+York+City,+NY&z=11';
-  const iframe = document.getElementById('gmap');
-  if (iframe) {
-    iframe.src = `https://maps.google.com/maps?q=${q}&t=m&output=embed&iwloc=near`;
+  if (leafletMap) {
+    const view = HOOD_VIEWS[hood] || HOOD_VIEWS.all;
+    leafletMap.flyTo([view.lat, view.lng], view.zoom, { duration: 0.8 });
   }
 
   renderFeed(hood);
   renderMapPins(hood);
-
-  const ts = document.getElementById('map-ts');
-  if (ts) ts.textContent = 'Loading...';
-  setTimeout(() => { if (ts) ts.textContent = 'Last updated just now'; }, 1200);
 }
+
 
 // ══════════════════════════════════════════
 // CHAT DATA — unique per channel
