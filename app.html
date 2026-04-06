@@ -882,8 +882,8 @@ body.high-contrast { background: #000 !important; filter: contrast(1.3); }
 
 .wt-popup-meta { color: rgba(237,233,224,0.5); font-size: 10px; margin-top: 3px; }
 
-/* Stadia dark tiles — no filter needed */
-.leaflet-tile { filter: brightness(0.92) contrast(1.05); }
+/* Invert OSM tiles to dark map style */
+.leaflet-tile { filter: invert(100%) hue-rotate(180deg) brightness(0.85) contrast(0.9) saturate(0.4); }
 
 /* Attribution */
 .leaflet-control-attribution {
@@ -1071,10 +1071,11 @@ function initLeafletMap() {
     attributionControl: true,
   });
 
-  // Stadia Alidade Smooth Dark — free, no API key, close to Google Maps dark
-  L.tileLayer('https://tiles.stadiamaps.com/tiles/alidade_smooth_dark/{z}/{x}/{y}{r}.png', {
-    attribution: '© <a href="https://stadiamaps.com/">Stadia Maps</a> © <a href="https://www.openstreetmap.org/">OSM</a>',
-    maxZoom: 20
+  // OpenStreetMap — free, no API key, dark-filtered via CSS
+  L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+    attribution: '© <a href="https://www.openstreetmap.org/">OpenStreetMap</a> contributors',
+    maxZoom: 19,
+    subdomains: 'abc'
   }).addTo(leafletMap);
 
   // Initial render
