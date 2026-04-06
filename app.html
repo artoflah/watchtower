@@ -693,354 +693,7 @@ body { top: 0 !important; }
   .resources-header { padding: 16px; flex-direction: column; align-items: flex-start; gap: 8px; }
 }
 
-</style>
-</head>
-<body>
-<div class="shell">
 
-  <!-- TOP NAV -->
-  <nav class="topnav">
-    <a href="homepage.html" class="tn-logo">
-      <img src="Untitled-2.png" alt="WatchTower" class="tn-logo-img">
-      <div class="tn-logo-type">WATCHTOWER<sup>™</sup></div>
-    </a>
-    <ul class="tn-tabs">
-      <li class="tn-tab active" onclick="switchTab(0,this)"><span class="tn-tab-icon">🗺</span> Map</li>
-      <li class="tn-tab" onclick="switchTab(1,this)"><span class="tn-tab-icon">💬</span> Chat <span class="tn-badge">3</span></li>
-      <li class="tn-tab" onclick="switchTab(2,this)"><span class="tn-tab-icon">🤝</span> Mutual Aid</li>
-      <li class="tn-tab" onclick="switchTab(3,this)"><span class="tn-tab-icon">🔔</span> Alerts <span class="tn-badge">5</span></li>
-      <li class="tn-tab" onclick="switchTab(4,this)"><span class="tn-tab-icon">👤</span> Profile</li>
-      <li class="tn-tab" onclick="switchTab(5,this)"><span class="tn-tab-icon">🏥</span> Resources</li>
-    </ul>
-    <div class="tn-right">
-      <span class="tn-status">4 Active Outages</span>
-    </div>
-  </nav>
-
-  <!-- TICKER -->
-  <div class="ticker">
-    <div class="ticker-track">
-      <span class="t-item">⚡ OUT — Bronx, 138th &amp; Willis · 4 min ago</span>
-      <span class="t-item">&nbsp;·&nbsp;</span>
-      <span class="t-item">💧 RESTORED — Crown Heights · 12 min ago</span>
-      <span class="t-item">&nbsp;·&nbsp;</span>
-      <span class="t-item">⚡ PARTIAL — East Flatbush, Ave D · 31 min ago</span>
-      <span class="t-item">&nbsp;·&nbsp;</span>
-      <span class="t-item">💧 OUT — Bushwick, Knickerbocker · 1 hr ago</span>
-      <span class="t-item">&nbsp;·&nbsp;</span>
-      <span class="t-item">⚡ RESTORED — Harlem, W 125th · 2 hr ago</span>
-      <span class="t-item">&nbsp;·&nbsp;</span>
-      <span class="t-item">⚡ OUT — Bronx, 138th &amp; Willis · 4 min ago</span>
-      <span class="t-item">&nbsp;·&nbsp;</span>
-      <span class="t-item">💧 RESTORED — Crown Heights · 12 min ago</span>
-      <span class="t-item">&nbsp;·&nbsp;</span>
-      <span class="t-item">⚡ PARTIAL — East Flatbush, Ave D · 31 min ago</span>
-      <span class="t-item">&nbsp;·&nbsp;</span>
-      <span class="t-item">💧 OUT — Bushwick, Knickerbocker · 1 hr ago</span>
-      <span class="t-item">&nbsp;·&nbsp;</span>
-      <span class="t-item">⚡ RESTORED — Harlem, W 125th · 2 hr ago</span>
-    </div>
-  </div>
-
-  <!-- VIEWS -->
-  <div class="views">
-
-    <!-- ══ VIEW 1: MAP ══ -->
-    <div class="view active" id="v0">
-      <div class="v-map">
-
-        <!-- LIVE FEED SIDEBAR -->
-        <div class="map-sidebar">
-          <div class="ms-head">
-            <div class="ms-title" id="feed-title">LIVE FEED</div>
-            <div class="ms-sub" id="feed-sub">NYC · All Boroughs · Updated 2 min ago</div>
-          </div>
-          <div class="feed-rows" id="map-feed-rows">
-            <!-- populated by JS -->
-          </div>
-          <div class="ms-footer">
-            <button class="ms-report-btn" onclick="switchTab(1)">+ Report / Ask in Chat</button>
-          </div>
-        </div>
-
-        <!-- MAP AREA -->
-        <div class="map-main">
-          <div class="map-controls">
-            <span class="mc-label">Jump to</span>
-            <div class="hood-tabs">
-              <button class="hood-tab active" onclick="selectNeighborhood('all',this)">All NYC</button>
-              <button class="hood-tab" onclick="selectNeighborhood('bronx',this)">S. Bronx</button>
-              <button class="hood-tab" onclick="selectNeighborhood('bedstuy',this)">Bed-Stuy</button>
-              <button class="hood-tab" onclick="selectNeighborhood('crownhts',this)">Crown Hts</button>
-              <button class="hood-tab" onclick="selectNeighborhood('bushwick',this)">Bushwick</button>
-              <button class="hood-tab" onclick="selectNeighborhood('harlem',this)">Harlem</button>
-              <button class="hood-tab" onclick="selectNeighborhood('washhts',this)">Wash. Hts</button>
-              <button class="hood-tab" onclick="selectNeighborhood('jamaica',this)">Jamaica</button>
-              <button class="hood-tab" onclick="selectNeighborhood('redhook',this)">Red Hook</button>
-              <button class="hood-tab" onclick="selectNeighborhood('eflatbush',this)">E. Flatbush</button>
-              <button class="hood-tab" onclick="selectNeighborhood('motthaven',this)">Mott Haven</button>
-              <button class="hood-tab" onclick="selectNeighborhood('inwood',this)">Inwood</button>
-              <button class="hood-tab" onclick="selectNeighborhood('astoria',this)">Astoria</button>
-            </div>
-          </div>
-
-          <div class="gmap-wrap" id="gmap-wrap">
-            <iframe id="gmap" class="gmap-iframe" loading="lazy" allowfullscreen
-              referrerpolicy="no-referrer-when-downgrade"
-              src="https://maps.google.com/maps?q=New+York+City,+NY&t=m&z=11&output=embed&iwloc=near">
-            </iframe>
-            <div class="map-tint"></div>
-            <div class="map-xhair"><div class="map-xhair-dot"></div></div>
-            <!-- SVG overlay for coordinate-accurate pins -->
-            <svg id="pin-svg" class="pin-svg" viewBox="0 0 100 100" preserveAspectRatio="none">
-              <!-- pins rendered by JS as SVG circles -->
-            </svg>
-            <!-- pin labels layer -->
-            <div id="pin-labels" class="pin-labels"></div>
-            <div class="map-ts" id="map-ts">Last updated 2 min ago</div>
-          </div>
-        </div>
-      </div>
-    </div>
-
-    <!-- ══ VIEW 2: CHAT
-
-    <!-- ══ VIEW 2: CHAT (AI-powered) ══ -->
-    <div class="view" id="v1">
-      <div class="v-chat">
-        <div class="chat-channels">
-          <div class="cc-head">
-            <span class="cc-head-title">CHAT</span>
-          </div>
-          <div class="cc-section-label">Outage Channels</div>
-          <div class="cc-list">
-            <div class="channel-item active" onclick="loadChannel(this,'bronx')" data-channel="bronx">
-              <div class="ch-dot ch-red"></div>
-              <div class="ch-info"><div class="ch-name">#bronx-138th</div><div class="ch-preview">anyone got updates on the timeline?</div></div>
-              <div class="ch-meta"><div class="ch-time">4m</div><div class="ch-unread">3</div></div>
-            </div>
-            <div class="channel-item" onclick="loadChannel(this,'bushwick')" data-channel="bushwick">
-              <div class="ch-dot ch-red"></div>
-              <div class="ch-info"><div class="ch-name">#bushwick-water</div><div class="ch-preview">DEP truck spotted on Flushing Ave</div></div>
-              <div class="ch-meta"><div class="ch-time">22m</div><div class="ch-unread">1</div></div>
-            </div>
-            <div class="channel-item" onclick="loadChannel(this,'eflatbush')" data-channel="eflatbush">
-              <div class="ch-dot ch-yellow"></div>
-              <div class="ch-info"><div class="ch-name">#eflatbush-partial</div><div class="ch-preview">my building is back but neighbors still out</div></div>
-              <div class="ch-meta"><div class="ch-time">1h</div></div>
-            </div>
-            <div class="channel-item" onclick="loadChannel(this,'washington')" data-channel="washington">
-              <div class="ch-dot ch-red"></div>
-              <div class="ch-info"><div class="ch-name">#wash-hts-181st</div><div class="ch-preview">Con Ed ETA is 8pm they said</div></div>
-              <div class="ch-meta"><div class="ch-time">3h</div></div>
-            </div>
-            <div class="cc-section-label" style="margin-top:4px">General</div>
-            <div class="channel-item" onclick="loadChannel(this,'general')" data-channel="general">
-              <div class="ch-dot ch-gray"></div>
-              <div class="ch-info"><div class="ch-name">#general-nyc</div><div class="ch-preview">PSA: fill your bathtubs now if water...</div></div>
-              <div class="ch-meta"><div class="ch-time">8m</div><div class="ch-unread">12</div></div>
-            </div>
-            <div class="channel-item" onclick="loadChannel(this,'mutual-aid')" data-channel="mutual-aid">
-              <div class="ch-dot ch-green"></div>
-              <div class="ch-info"><div class="ch-name">#mutual-aid-bronx</div><div class="ch-preview">ice available at 610 E 138th, apt 2B</div></div>
-              <div class="ch-meta"><div class="ch-time">15m</div></div>
-            </div>
-          </div>
-        </div>
-
-        <div class="chat-main">
-          <div class="chat-header">
-            <button class="chat-back-btn" onclick="showChannels()">← Channels</button>
-            <div class="chat-header-left">
-              <div class="chat-ch-dot"></div>
-              <div>
-                <div class="chat-ch-name" id="ch-name">#bronx-138th</div>
-                <div class="chat-ch-meta" id="ch-meta">Bronx · 138th &amp; Willis · 17 members · Power OUT</div>
-              </div>
-            </div>
-            <div class="chat-header-right">
-              <div class="ai-badge">AI Active</div>
-              <button class="chat-act-btn">+ Report</button>
-            </div>
-          </div>
-
-          <div class="messages" id="messages">
-          </div>
-
-          <div class="chat-input-wrap">
-            <input class="chat-input" id="chat-input" placeholder="Ask WatchTower or post an update..." onkeydown="handleKey(event)">
-            <button class="send-btn" id="send-btn" onclick="sendMessage()">Send →</button>
-          </div>
-        </div>
-      </div>
-    </div>
-
-    <!-- ══ VIEW 3: MUTUAL AID ══ -->
-    <div class="view" id="v2">
-      <div class="v-aid">
-        <div class="aid-header">
-          <div>
-            <div class="aid-title">MUTUAL<br><em>AID</em> GRID</div>
-            <div class="aid-sub">What your neighbors have · What they need · NYC</div>
-          </div>
-          <button class="aid-post-btn" onclick="document.getElementById('aid-form').classList.toggle('open')">+ Post a Resource</button>
-        </div>
-        <div class="aid-post-form" id="aid-form">
-          <div class="apf-title">POST A RESOURCE</div>
-          <div class="apf-grid">
-            <div class="apf-field"><label class="apf-label">Type</label><select class="apf-in"><option>Offering</option><option>Requesting</option><option>Service</option></select></div>
-            <div class="apf-field"><label class="apf-label">Category</label><select class="apf-in"><option>Power &amp; Charging</option><option>Water &amp; Food</option><option>Medical</option><option>Transport</option><option>Services</option><option>Shelter</option></select></div>
-            <div class="apf-field"><label class="apf-label">Title</label><input class="apf-in" placeholder="e.g. Ice Available"></div>
-            <div class="apf-field"><label class="apf-label">Description</label><input class="apf-in" placeholder="Details + address"></div>
-            <div class="apf-field"><label class="apf-label">Your Handle</label><input class="apf-in" placeholder="@username"></div>
-            <div class="apf-field"><label class="apf-label">Distance</label><input class="apf-in" placeholder="e.g. 0.3 mi"></div>
-          </div>
-          <button class="apf-submit">Post Resource →</button>
-        </div>
-        <div class="aid-filters">
-          <button class="aid-filter active" data-type="all" onclick="filterAid('all',this)">All</button>
-          <button class="aid-filter" data-type="offer" onclick="filterAid('offer',this)">Offering</button>
-          <button class="aid-filter" data-type="need" onclick="filterAid('need',this)">Requesting</button>
-          <button class="aid-filter" data-type="service" onclick="filterAid('service',this)">Services</button>
-        </div>
-        <div class="aid-controls-bar">
-          <div class="aid-showing">Showing <span id="aid-count">0</span> resources near you</div>
-          <button class="aid-shuffle-btn" onclick="shuffleAid()">⟳ Shuffle</button>
-        </div>
-        <div id="aid-grid"><!-- populated by JS --></div>
-      </div>
-    </div>
-
-    id="v3">
-      <div class="v-alerts">
-        <div class="alerts-header">
-          <div><div class="alerts-title">ALERTS &<br><em>NOTIFICATIONS</em></div><div class="alerts-sub">Your neighborhood · Zip 10451 · 5 unread</div></div>
-          <button class="mark-read-btn" onclick="markAllRead()">Mark All Read</button>
-        </div>
-        <div class="alert-list">
-          <div class="alert-item unread"><div class="alert-accent"></div><div class="alert-body"><div class="alert-top"><span class="alert-type-badge ab-out">⚡ Power Out</span><span class="alert-location">Bronx · 138th &amp; Willis Ave</span></div><div class="alert-detail">Confirmed by <strong>6 neighbors</strong>. ConEd ticket filed. Check chat for updates.</div></div><div class="alert-time-col"><span class="alert-time">4 min ago</span><div class="alert-unread-dot"></div></div></div>
-          <div class="alert-item unread warning"><div class="alert-accent"></div><div class="alert-body"><div class="alert-top"><span class="alert-type-badge ab-partial">~ Partial</span><span class="alert-location">East Flatbush · Ave D</span></div><div class="alert-detail">Partial outage — <strong>3 blocks affected</strong>. Check your building and report status.</div></div><div class="alert-time-col"><span class="alert-time">31 min ago</span><div class="alert-unread-dot"></div></div></div>
-          <div class="alert-item unread"><div class="alert-accent"></div><div class="alert-body"><div class="alert-top"><span class="alert-type-badge ab-out">💧 Water Out</span><span class="alert-location">Bushwick · Knickerbocker Ave</span></div><div class="alert-detail">NYC DEP notified. PSA: <strong>fill bathtubs now</strong> if water pressure drops.</div></div><div class="alert-time-col"><span class="alert-time">1 hr ago</span><div class="alert-unread-dot"></div></div></div>
-          <div class="alert-item success"><div class="alert-accent"></div><div class="alert-body"><div class="alert-top"><span class="alert-type-badge ab-restore">✓ Restored</span><span class="alert-location">Crown Heights · Nostrand Ave</span></div><div class="alert-detail">Water restored. Confirmed by <strong>4 neighbors</strong>. Run tap 2 min before use.</div></div><div class="alert-time-col"><span class="alert-time">12 min ago</span><div class="alert-unread-dot"></div></div></div>
-          <div class="alert-item success"><div class="alert-accent"></div><div class="alert-body"><div class="alert-top"><span class="alert-type-badge ab-restore">✓ Restored</span><span class="alert-location">Harlem · W 125th St</span></div><div class="alert-detail">Power restored. Confirmed by <strong>9 neighbors</strong>. Report if still flickering.</div></div><div class="alert-time-col"><span class="alert-time">2 hr ago</span><div class="alert-unread-dot"></div></div></div>
-          <div class="alert-item"><div class="alert-accent"></div><div class="alert-body"><div class="alert-top"><span class="alert-type-badge ab-info">ℹ Info</span><span class="alert-location">System · WatchTower</span></div><div class="alert-detail">Scheduled maintenance: Con Edison planned work on <strong>10451 grid</strong> this Saturday 2–6AM.</div></div><div class="alert-time-col"><span class="alert-time">Yesterday</span><div class="alert-unread-dot"></div></div></div>
-        </div>
-        <div class="notif-prefs">
-          <div class="np-title">NOTIFICATION SETTINGS</div>
-          <div class="np-grid">
-            <div class="np-cell"><div><div class="np-label">Power Outages</div><div class="np-desc">Confirmed in your area</div></div><label class="sw"><input type="checkbox" checked><div class="sw-t"></div><div class="sw-d"></div></label></div>
-            <div class="np-cell"><div><div class="np-label">Water Outages</div><div class="np-desc">Pressure and service</div></div><label class="sw"><input type="checkbox" checked><div class="sw-t"></div><div class="sw-d"></div></label></div>
-            <div class="np-cell"><div><div class="np-label">Restorations</div><div class="np-desc">When utilities come back</div></div><label class="sw"><input type="checkbox" checked><div class="sw-t"></div><div class="sw-d"></div></label></div>
-            <div class="np-cell"><div><div class="np-label">Mutual Aid</div><div class="np-desc">Resources near you</div></div><label class="sw"><input type="checkbox"><div class="sw-t"></div><div class="sw-d"></div></label></div>
-            <div class="np-cell"><div><div class="np-label">Maintenance</div><div class="np-desc">Planned utility work</div></div><label class="sw"><input type="checkbox" checked><div class="sw-t"></div><div class="sw-d"></div></label></div>
-            <div class="np-cell"><div><div class="np-label">Battery Saver</div><div class="np-desc">Reduce background activity</div></div><label class="sw"><input type="checkbox" checked><div class="sw-t"></div><div class="sw-d"></div></label></div>
-          </div>
-        </div>
-      </div>
-    </div>
-
-    <!-- ══ VIEW 5: PROFILE ══ -->
-    <div class="view" id="v4">
-      <div class="v-profile">
-        <div class="profile-left">
-          <div class="profile-avatar-wrap">
-            <div class="profile-avatar">MC</div>
-            <div class="profile-name">Your Name</div>
-            <div class="profile-handle">@user_10451 · Bronx</div>
-          </div>
-          <div class="profile-stats">
-            <div class="ps-cell"><div class="ps-n">24</div><div class="ps-l">Reports</div></div>
-            <div class="ps-cell"><div class="ps-n"><em>94</em>%</div><div class="ps-l">Verified</div></div>
-          </div>
-          <nav class="profile-nav">
-            <div class="pn-item active" onclick="profileSection('settings',this)">Settings<span class="pn-right">→</span></div>
-            <div class="pn-item" onclick="profileSection('reports',this)">My Reports<span class="pn-right">24</span></div>
-            <div class="pn-item" onclick="profileSection('language',this)">Language &amp; Access<span class="pn-right">→</span></div>
-            <div class="pn-item" onclick="profileSection('notifications',this)">Notifications<span class="pn-right">→</span></div>
-          </nav>
-        </div>
-        <div class="profile-main">
-          <div class="pm-sec" id="ps-settings">
-            <div class="pm-sec-title">Account Settings</div>
-            <div class="setting-row"><div><div class="sr-label">Zip Code</div><div class="sr-desc">Primary monitored area</div></div><input style="background:transparent;border:1px solid rgba(237,233,224,0.12);color:var(--paper);padding:7px 12px;font-family:'DM Mono',monospace;font-size:14px;outline:none;width:100px;cursor:crosshair;" value="10451" maxlength="5"></div>
-            <div class="setting-row"><div><div class="sr-label">Phone / SMS</div><div class="sr-desc">For text alerts during outages</div></div><input style="background:transparent;border:1px solid rgba(237,233,224,0.12);color:var(--paper);padding:7px 12px;font-family:'DM Mono',monospace;font-size:14px;outline:none;width:160px;cursor:crosshair;" placeholder="917-555-0100"></div>
-            <div class="setting-row"><div><div class="sr-label">Alert Radius</div><div class="sr-desc">How wide to cast notifications</div></div><select style="background:var(--ink);border:1px solid rgba(237,233,224,0.12);color:var(--paper);padding:7px 12px;font-family:'DM Mono',monospace;font-size:14px;outline:none;cursor:crosshair;appearance:none;"><option>My Block</option><option selected>Neighborhood</option><option>Borough-Wide</option></select></div>
-            <div class="setting-row"><div><div class="sr-label">Anonymous Reports</div><div class="sr-desc">Identity never shared</div></div><label class="sw"><input type="checkbox" checked><div class="sw-t"></div><div class="sw-d"></div></label></div>
-            <div class="setting-row"><div><div class="sr-label">Battery Saver</div><div class="sr-desc">Reduce background activity</div></div><label class="sw"><input type="checkbox" checked><div class="sw-t"></div><div class="sw-d"></div></label></div>
-            <div class="setting-row"><div><div class="sr-label">Offline Mode</div><div class="sr-desc">Queue reports when no signal</div></div><label class="sw"><input type="checkbox" checked><div class="sw-t"></div><div class="sw-d"></div></label></div>
-          </div>
-          <div class="pm-sec" id="ps-reports" style="display:none">
-            <div class="pm-sec-title">My Reports</div>
-            <div class="report-log">
-              <div class="rl-item"><div class="rl-dot" style="background:var(--red)"></div><span class="rl-loc">Bronx · 138th & Willis</span><span class="rl-type">⚡ Out</span><span class="rl-time">Today 6:10 AM</span></div>
-              <div class="rl-item"><div class="rl-dot" style="background:#2a9944"></div><span class="rl-loc">Bronx · 138th & Willis</span><span class="rl-type">⚡ Restored</span><span class="rl-time">Yesterday 11:30 PM</span></div>
-              <div class="rl-item"><div class="rl-dot" style="background:var(--red)"></div><span class="rl-loc">S. Bronx · Grand Concourse</span><span class="rl-type">💧 Low</span><span class="rl-time">3 days ago</span></div>
-              <div class="rl-item"><div class="rl-dot" style="background:#c8a020"></div><span class="rl-loc">Bronx · Willis Ave</span><span class="rl-type">⚡ Partial</span><span class="rl-time">1 week ago</span></div>
-            </div>
-          </div>
-          <div class="pm-sec" id="ps-language" style="display:none">
-            <div class="pm-sec-title">Language &amp; Accessibility</div>
-            <div style="margin-bottom:18px"><div class="pm-sec-title" style="margin-bottom:10px">Display Language</div><div class="lang-grid"><div class="lang-opt sel" onclick="selectLang(this)">🇺🇸 English</div><div class="lang-opt" onclick="selectLang(this)">🇪🇸 Español</div><div class="lang-opt" onclick="selectLang(this)">🇨🇳 中文</div><div class="lang-opt" onclick="selectLang(this)">🇭🇹 Kreyòl</div><div class="lang-opt" onclick="selectLang(this)">🇧🇩 বাংলা</div><div class="lang-opt" onclick="selectLang(this)">🇷🇺 Русский</div></div></div>
-            <div class="setting-row"><div><div class="sr-label">Large Text</div><div class="sr-desc">Increase font sizes app-wide</div></div><label class="sw"><input type="checkbox"><div class="sw-t"></div><div class="sw-d"></div></label></div>
-            <div class="setting-row"><div><div class="sr-label">High Contrast</div><div class="sr-desc">Boost color contrast for visibility</div></div><label class="sw"><input type="checkbox"><div class="sw-t"></div><div class="sw-d"></div></label></div>
-            <div class="setting-row"><div><div class="sr-label">SMS-Only Mode</div><div class="sr-desc">All alerts via text, no app needed</div></div><label class="sw"><input type="checkbox"><div class="sw-t"></div><div class="sw-d"></div></label></div>
-          </div>
-          <div class="pm-sec" id="ps-notifications" style="display:none">
-            <div class="pm-sec-title">Notification Preferences</div>
-            <div class="setting-row"><div><div class="sr-label">Power Outage Alerts</div><div class="sr-desc">Confirmed outages in your area</div></div><label class="sw"><input type="checkbox" checked><div class="sw-t"></div><div class="sw-d"></div></label></div>
-            <div class="setting-row"><div><div class="sr-label">Water Outage Alerts</div><div class="sr-desc">Pressure drops and outages</div></div><label class="sw"><input type="checkbox" checked><div class="sw-t"></div><div class="sw-d"></div></label></div>
-            <div class="setting-row"><div><div class="sr-label">Restoration Alerts</div><div class="sr-desc">When utilities come back on</div></div><label class="sw"><input type="checkbox" checked><div class="sw-t"></div><div class="sw-d"></div></label></div>
-            <div class="setting-row"><div><div class="sr-label">Mutual Aid Nearby</div><div class="sr-desc">Resources posted within 1 mile</div></div><label class="sw"><input type="checkbox"><div class="sw-t"></div><div class="sw-d"></div></label></div>
-            <div class="setting-row"><div><div class="sr-label">SMS Backup Alerts</div><div class="sr-desc">Text fallback when offline</div></div><label class="sw"><input type="checkbox" checked><div class="sw-t"></div><div class="sw-d"></div></label></div>
-          </div>
-        </div>
-      </div>
-    </div>
-
-
-    <!-- ══ VIEW 6: RESOURCES ══ -->
-    <div class="view" id="v5">
-      <div class="resources-view">
-        <div class="resources-header">
-          <div>
-            <div class="resources-title">NEARBY<br><em>HELP</em></div>
-            <div class="resources-sub">Urgent care · Con Edison · National Grid · Cooling centers · Shelters</div>
-          </div>
-        </div>
-        <div class="res-boro-tabs">
-          <button class="res-boro-tab active" onclick="selectResBoro('all',this)">All NYC</button>
-          <button class="res-boro-tab" onclick="selectResBoro('bronx',this)">Bronx</button>
-          <button class="res-boro-tab" onclick="selectResBoro('brooklyn',this)">Brooklyn</button>
-          <button class="res-boro-tab" onclick="selectResBoro('manhattan',this)">Manhattan</button>
-          <button class="res-boro-tab" onclick="selectResBoro('queens',this)">Queens</button>
-          <button class="res-boro-tab" onclick="selectResBoro('si',this)">Staten Island</button>
-        </div>
-        <div id="resources-grid"><!-- populated by JS --></div>
-      </div>
-    </div>
-
-  </div><!-- /views -->
-
-  <!-- BOTTOM TAB BAR -->
-  
-
-<div class="bottombar">
-    <div class="bot-tab active" onclick="switchTab(0,this)" data-b="0"><div class="bot-icon">🗺</div><div class="bot-label">Map</div></div>
-    <div class="bot-tab" onclick="switchTab(1,this)" data-b="1"><div class="bot-icon">💬<span class="bot-badge">3</span></div><div class="bot-label">Chat</div></div>
-    <div class="bot-tab" onclick="switchTab(2,this)" data-b="2"><div class="bot-icon">🤝</div><div class="bot-label">Aid</div></div>
-    <div class="bot-tab" onclick="switchTab(3,this)" data-b="3"><div class="bot-icon">🔔<span class="bot-badge">5</span></div><div class="bot-label">Alerts</div></div>
-    <div class="bot-tab" onclick="switchTab(4,this)" data-b="4"><div class="bot-icon">👤</div><div class="bot-label">Profile</div></div>
-  </div>
-
-</div>
-
-
-
-
-
-
-
-<style>
 /* ── TRANSLATE/ACCESS WIDGET ── */
 #wt-access-widget {
   position: fixed;
@@ -1172,311 +825,8 @@ body.high-contrast { background: #000 !important; filter: contrast(1.3); }
 
 
 
-</body>
-</html
 
 
-
-
-
-
-
-<style>
-/* ── TRANSLATE/ACCESS WIDGET ── */
-#wt-access-widget {
-  position: fixed;
-  top: 64px;
-  right: 14px;
-  z-index: 4999;
-}
-
-#wt-access-toggle {
-  display: flex; align-items: center; gap: 6px;
-  background: rgba(8,8,8,0.92);
-  border: 1px solid rgba(237,233,224,0.2);
-  color: rgba(237,233,224,0.8);
-  padding: 6px 12px;
-  font-family: 'DM Mono', monospace;
-  font-size: 11px; letter-spacing: 0.14em;
-  cursor: pointer;
-  backdrop-filter: blur(8px);
-  transition: border-color 0.15s, color 0.15s;
-  font-weight: normal;
-}
-
-#wt-access-toggle:hover { border-color: rgba(237,233,224,0.45); color: #ede9e0; }
-.wt-access-icon { font-size: 13px; }
-
-.wt-access-panel {
-  display: none; position: absolute;
-  top: calc(100% + 8px); right: 0; width: 240px;
-  background: rgba(8,8,8,0.97);
-  border: 1px solid rgba(237,233,224,0.2);
-  backdrop-filter: blur(12px);
-}
-
-.wt-access-panel.open { display: block; }
-
-.wt-ap-section { padding: 14px 16px; border-bottom: 1px solid rgba(237,233,224,0.1); }
-
-.wt-ap-label {
-  font-size: 9px; letter-spacing: 0.24em; text-transform: uppercase;
-  color: rgba(237,233,224,0.4); margin-bottom: 10px; font-family: 'DM Mono', monospace;
-}
-
-.wt-ap-row {
-  display: flex; align-items: center; justify-content: space-between;
-  gap: 10px; margin-bottom: 8px;
-  font-size: 12px; color: rgba(237,233,224,0.7); font-family: 'DM Mono', monospace;
-}
-.wt-ap-row:last-child { margin-bottom: 0; }
-
-.wt-ap-link { color: #d42b20 !important; font-size: 11px; text-decoration: none; letter-spacing: 0.06em; }
-.wt-ap-link:hover { text-decoration: underline; }
-
-.wt-sw { position: relative; width: 32px; height: 16px; cursor: pointer; flex-shrink: 0; }
-.wt-sw input { opacity: 0; width: 0; height: 0; position: absolute; }
-.wt-sw-t { position: absolute; inset: 0; background: rgba(237,233,224,0.07); border: 1px solid rgba(237,233,224,0.14); transition: all 0.2s; }
-.wt-sw-d { position: absolute; top: 2px; left: 2px; width: 10px; height: 10px; background: rgba(237,233,224,0.35); transition: all 0.2s; }
-.wt-sw input:checked ~ .wt-sw-t { background: rgba(212,43,32,0.25); border-color: #d42b20; }
-.wt-sw input:checked ~ .wt-sw-d { transform: translateX(16px); background: #d42b20; }
-
-#wt-access-widget #google_translate_element { width: 100%; }
-#wt-access-widget .goog-te-gadget-simple {
-  background: rgba(237,233,224,0.04) !important;
-  border: 1px solid rgba(237,233,224,0.15) !important;
-  padding: 5px 8px !important; width: 100% !important;
-  box-sizing: border-box !important;
-}
-#wt-access-widget .goog-te-gadget-simple a,
-#wt-access-widget .goog-te-gadget-simple span {
-  color: rgba(237,233,224,0.75) !important;
-  font-family: 'DM Mono', monospace !important;
-  font-size: 11px !important; letter-spacing: 0.1em !important;
-  text-decoration: none !important;
-}
-.goog-te-banner-frame { display: none !important; }
-body { top: 0 !important; }
-.skiptranslate iframe { display: none !important; }
-
-body.large-text { font-size: 118% !important; }
-body.high-contrast { background: #000 !important; filter: contrast(1.3); }
-
-@media (max-width: 767px) {
-  #wt-access-widget {
-  position: fixed;
-  top: 64px;
-  right: 14px;
-  z-index: 4999;
-}
-  .wt-access-panel { width: 220px; }
-  #wt-access-toggle { padding: 5px 10px; font-size: 10px; }
-}
-
-</style>
-<!-- ── TRANSLATE + ACCESSIBILITY WIDGET ── -->
-<div id="wt-access-widget">
-  <button id="wt-access-toggle" onclick="toggleAccessWidget()" title="Language & Accessibility">
-    <span class="wt-access-icon">🌐</span>
-    <span class="wt-access-label">EN</span>
-  </button>
-  <div id="wt-access-panel" class="wt-access-panel">
-    <div class="wt-ap-section">
-      <div class="wt-ap-label">Language</div>
-      <div id="google_translate_element"></div>
-    </div>
-    <div class="wt-ap-section">
-      <div class="wt-ap-label">Accessibility</div>
-      <div class="wt-ap-row">
-        <span>Large Text</span>
-        <label class="wt-sw"><input type="checkbox" onchange="toggleLargeText(this)"><span class="wt-sw-t"></span><span class="wt-sw-d"></span></label>
-      </div>
-      <div class="wt-ap-row">
-        <span>High Contrast</span>
-        <label class="wt-sw"><input type="checkbox" onchange="toggleHighContrast(this)"><span class="wt-sw-t"></span><span class="wt-sw-d"></span></label>
-      </div>
-    </div>
-    <div class="wt-ap-section" style="border-bottom:none">
-      <div class="wt-ap-label">Quick Access</div>
-      <div class="wt-ap-row" style="flex-direction:column;align-items:flex-start;gap:3px">
-        <span>SMS Hotline</span>
-        <a href="sms:+19178669651" class="wt-ap-link">Text START to 917-WT-NOW1</a>
-      </div>
-      <div class="wt-ap-row" style="flex-direction:column;align-items:flex-start;gap:3px;margin-top:8px">
-        <span>Call-In</span>
-        <a href="tel:+18009282897" class="wt-ap-link">1-800-WATCH-TWR</a>
-      </div>
-    </div>
-  </div>
-</div>
-
-
-
-
-</body>
-</html
-
-
-
-
-// ── TAB SWITCHING ──
-function switchTab(n) {
-  document.querySelectorAll('.view').forEach((v,i) => v.classList.toggle('active', i===n));
-  document.querySelectorAll('.tn-tab').forEach((t,i) => t.classList.toggle('active', i===n));
-  document.querySelectorAll('.bot-tab').forEach((t,i) => t.classList.toggle('active', i===n));
-}
-
-// ── MAP ──
-function jumpMap(q, btn) {
-  document.querySelectorAll('.hood-tab').forEach(b => b.classList.remove('active'));
-  btn.classList.add('active');
-  const iframe = document.getElementById('gmap');
-  iframe.src = `https://maps.google.com/maps?q=${q}&t=m&z=14&output=embed&iwloc=near`;
-  const ts = document.getElementById('map-ts');
-  ts.textContent = 'Loading...';
-  iframe.onload = () => { ts.textContent = 'Last updated just now'; };
-}
-
-// ── CHAT: per-channel conversation data ──
-const CHANNELS = {
-  'bronx': {
-    name: '#bronx-138th',
-    meta: 'Bronx · 138th & Willis · 17 members · Power OUT',
-    dot: 'ch-red',
-    msgs: [
-      {av:'WT', name:'WatchTower', cls:'wt verified is-alert', time:'6:14 AM', text:'⚡ Power outage confirmed — 138th St / Willis Ave (10451). Reported by 6 neighbors. Con Edison notified. Est. restoration: unknown. Ask me anything.'},
-      {av:'JR', name:'JRivera_10451', cls:'', time:'6:22 AM', text:'whole block on Willis is out since 5:45. Con Ed said 4-6 hr window smh'},
-      {av:'TW', name:'T_Washington', cls:'', time:'6:31 AM', text:'my building on 3rd Ave has power, just 138th to 140th that's dark. Transformer issue by the park'},
-      {av:'MG', name:'MG_Bronx', cls:'', time:'6:44 AM', text:'got a portable charger + extra batteries if anyone needs — I'm at 610 E 138th, dm me'},
-      {av:'AL', name:'A_Lopez', cls:'', time:'7:02 AM', text:'anyone know if the community center on 138th has a generator? elderly neighbor needs medical equipment'},
-      {av:'WT', name:'WatchTower', cls:'wt verified is-alert', time:'7:08 AM', text:'📌 St. Mary's Rec Center on St. Ann's Ave has power + generator — open to neighbors. Priority for medical devices. See Mutual Aid tab.'},
-      {av:'KC', name:'KChan_138', cls:'', time:'7:29 AM', text:'Con Ed crew just pulled up outside, two trucks. Working on the box at the corner 🤞'},
-      {av:'TW', name:'T_Washington', cls:'', time:'7:41 AM', text:'anyone got updates on the timeline? my food is gonna go bad'},
-    ]
-  },
-  'bushwick': {
-    name: '#bushwick-water',
-    meta: 'Bushwick · Knickerbocker Ave · 11 members · Water OUT',
-    dot: 'ch-red',
-    msgs: [
-      {av:'WT', name:'WatchTower', cls:'wt verified is-alert', time:'5:50 AM', text:'💧 Water outage confirmed — Knickerbocker Ave area, Bushwick. NYC DEP notified. Fill bathtubs and containers now as precaution.'},
-      {av:'NR', name:'NRamirez_BK', cls:'', time:'5:58 AM', text:'been out since like 5am, no pressure at all. called 311 already'},
-      {av:'DB', name:'D_Brooks', cls:'', time:'6:10 AM', text:'DEP truck spotted on Flushing Ave heading this way'},
-      {av:'YC', name:'Y_Chen_Bush', cls:'', time:'6:22 AM', text:'I have about 8 gallons of jugs I can share, apartment 4F on Knickerbocker. Knock or text first'},
-      {av:'WT', name:'WatchTower', cls:'wt verified is-alert', time:'6:45 AM', text:'📌 Boil-water advisory may follow when service resumes. Run cold water 2+ minutes before drinking after restoration. DEP crew on scene.'},
-      {av:'NR', name:'NRamirez_BK', cls:'', time:'7:15 AM', text:'pressure is coming back on my floor, very low tho. don't get excited yet'},
-      {av:'DB', name:'D_Brooks', cls:'', time:'7:28 AM', text:'same — trickle. better than nothing. keeping jugs full just in case'},
-    ]
-  },
-  'eflatbush': {
-    name: '#eflatbush-partial',
-    meta: 'E. Flatbush · Ave D · 8 members · Power PARTIAL',
-    dot: 'ch-yellow',
-    msgs: [
-      {av:'WT', name:'WatchTower', cls:'wt verified is-alert', time:'7:15 AM', text:'⚡ Partial outage — Ave D corridor, East Flatbush. Some buildings on power, others not. 3 blocks affected. Report your building status below.'},
-      {av:'CM', name:'C_Mensah', cls:'', time:'7:22 AM', text:'my building is back but neighbors on the same block still out. weird'},
-      {av:'TJ', name:'T_James_EF', cls:'', time:'7:30 AM', text:'1680 Ave D here — completely dark. been out since 6am'},
-      {av:'SK', name:'S_King_Ave', cls:'', time:'7:44 AM', text:'1650 Ave D back on. check your breakers first before calling Con Ed, some buildings tripped'},
-      {av:'CM', name:'C_Mensah', cls:'', time:'8:02 AM', text:'good call, checked ours and breaker was tripped on the 3rd floor hallway. reset it and lights came on'},
-      {av:'WT', name:'WatchTower', cls:'wt verified is-alert', time:'8:05 AM', text:'📌 Tip: partial outages often cause tripped breakers in buildings. Check your electrical panel before calling utility companies.'},
-      {av:'TJ', name:'T_James_EF', cls:'', time:'8:18 AM', text:'SAME! our super found the tripped breaker. we're back on. thanks for the tip 🙌'},
-    ]
-  },
-  'washington': {
-    name: '#wash-hts-181st',
-    meta: 'Washington Hts · 181st St · 6 members · Power OUT',
-    dot: 'ch-red',
-    msgs: [
-      {av:'WT', name:'WatchTower', cls:'wt verified is-alert', time:'4:30 AM', text:'⚡ Power outage confirmed — 181st St area, Washington Heights. Reported at 4:28 AM. Con Ed ETA: approximately 8:00 PM.'},
-      {av:'MP', name:'M_Perez_WH', cls:'', time:'4:45 AM', text:'this is crazy, been out since 4am. I have work at 7. no alarm, no coffee, nothing'},
-      {av:'LG', name:'L_Garcia_181', cls:'', time:'5:12 AM', text:'building manager says Con Ed gave 8pm estimate. whole day basically'},
-      {av:'DR', name:'D_Reyes_Hts', cls:'', time:'6:30 AM', text:'anyone know if the library on 179th has power? need to charge my work laptop'},
-      {av:'WT', name:'WatchTower', cls:'wt verified is-alert', time:'6:45 AM', text:'📌 George Washington Branch Library (549 W 179th St) confirmed open and powered. Multiple outlets available. Bring your charger.'},
-      {av:'MP', name:'M_Perez_WH', cls:'', time:'7:00 AM', text:'lifesaver, heading there now. thanks watchtower'},
-      {av:'LG', name:'L_Garcia_181', cls:'', time:'9:15 AM', text:'Con Ed ETA is 8pm they said, but the crew on our block looks close. fingers crossed it's sooner'},
-    ]
-  },
-  'general': {
-    name: '#general-nyc',
-    meta: 'All NYC Neighborhoods · 342 members',
-    dot: 'ch-gray',
-    msgs: [
-      {av:'WT', name:'WatchTower', cls:'wt verified is-alert', time:'6:00 AM', text:'📡 Active outages as of 6AM: Power OUT in Bronx (138th/Willis), Washington Hts (181st). Water OUT in Bushwick (Knickerbocker). Partial power E. Flatbush (Ave D). Stay updated.'},
-      {av:'RS', name:'R_Santos', cls:'', time:'6:14 AM', text:'PSA: fill your bathtubs now if you're in Bushwick or surrounding areas — water pressure dropping fast'},
-      {av:'AT', name:'A_Torres_NYC', cls:'', time:'6:32 AM', text:'reminder: St. Mary's Rec Center in the Bronx has generator + charging. Open to neighbors during outage.'},
-      {av:'JL', name:'J_Lee_BK', cls:'', time:'7:05 AM', text:'Crown Heights water is back on. Was out for about 3hrs. Run your tap for 2 mins first before drinking'},
-      {av:'WT', name:'WatchTower', cls:'wt verified is-alert', time:'7:10 AM', text:'✓ Crown Heights water restoration confirmed by 4 neighbors. If you see utilities change in your area, tap Report in the app.'},
-      {av:'MR', name:'M_Rivera_NYC', cls:'', time:'7:45 AM', text:'Harlem W125th power also restored. What a morning. Stay safe everyone'},
-      {av:'RS', name:'R_Santos', cls:'', time:'8:02 AM', text:'if anyone has elderly neighbors without power, St. Mary's Bronx and George Washington Library in WH are both powered and accessible'},
-    ]
-  },
-  'mutual-aid': {
-    name: '#mutual-aid-bronx',
-    meta: 'Bronx Mutual Aid · 58 members',
-    dot: 'ch-green',
-    msgs: [
-      {av:'MG', name:'MG_Bronx', cls:'', time:'6:44 AM', text:'🧊 Ice available — 2 bags, free. 610 E 138th, apt 2B. Text before coming, going fast'},
-      {av:'CR', name:'C_Rivera_BX', cls:'', time:'6:52 AM', text:'🔌 I have 2 extra USB battery banks fully charged. 550 Willis Ave. Come by, no charge'},
-      {av:'WT', name:'WatchTower', cls:'wt verified is-alert', time:'7:08 AM', text:'📌 St. Mary's Rec Center, St. Ann's Ave — power + generator + multiple charging outlets. Open to ALL neighbors. No signup required.'},
-      {av:'AL', name:'A_Lopez', cls:'', time:'7:15 AM', text:'🏥 Still looking for generator access for elderly neighbor with medical equipment. Any help appreciated — DM me'},
-      {av:'JR', name:'JRivera_10451', cls:'', time:'7:22 AM', text:'@A_Lopez St Mary's can help — they have a medical priority setup. Tell them you were referred by WatchTower chat'},
-      {av:'BM', name:'B_Morales_BX', cls:'', time:'7:35 AM', text:'🚗 Offering free rides to St Mary's or the shelter on St Ann's for anyone who can't walk. Old or disabled neighbors priority. Reply here'},
-      {av:'TW', name:'T_Washington', cls:'', time:'7:50 AM', text:'🥫 Also have canned food + bottled water I can share, first floor 595 E 138th. Knock anytime'},
-    ]
-  }
-};
-
-let currentChannelKey = 'bronx';
-let chatHistory = [];
-
-const channelContexts = {
-  bronx: 'You are WatchTower AI assistant in #bronx-138th. POWER OUTAGE on 138th St/Willis Ave, South Bronx (10451) since ~5:45AM. Con Ed gave 4-6hr window. St. Mary's Rec Center on St. Ann's Ave has generator power open to neighbors. Neighbor MG_Bronx has portable charger at 610 E 138th. Elderly resident needs medical equipment power (A_Lopez). Be direct and community-focused.',
-  bushwick: 'You are WatchTower AI in #bushwick-water. WATER OUTAGE on Knickerbocker Ave, Bushwick since ~5AM. DEP crew on scene. Boil-water advisory likely after restoration. Y_Chen has 8 gallons to share at apt 4F. Be practical about water conservation.',
-  eflatbush: 'You are WatchTower AI in #eflatbush-partial. PARTIAL POWER OUTAGE on Ave D, East Flatbush. Some buildings restored, some still out. Key insight: check electrical panel breakers first before calling Con Ed — several tripped breakers found in building panels.',
-  washington: 'You are WatchTower AI in #wash-hts-181st. POWER OUTAGE on 181st St, Washington Heights since ~4AM. Con Ed ETA 8PM. George Washington Branch Library (549 W 179th St) is open and powered with outlets. Long outage — focus on practical help for a full-day situation.',
-  general: 'You are WatchTower AI in #general-nyc. Multiple active outages across NYC: Power OUT in Bronx 138th/Willis, Washington Hts 181st. Water OUT in Bushwick Knickerbocker. Partial E Flatbush Ave D. Crown Heights water and Harlem W125th power both restored. Provide citywide perspective and coordinate resources.',
-  'mutual-aid': 'You are WatchTower AI in #mutual-aid-bronx. Resources available: ice at 610 E 138th, USB banks at 550 Willis Ave, St Mary's Rec Center has power/generator/charging (priority medical), free rides offered by B_Morales, canned food/water at 595 E 138th. Help connect neighbors with resources.'
-};
-
-function loadChannel(el, channelKey) {
-  document.querySelectorAll('.channel-item').forEach(c => c.classList.remove('active'));
-  if (el) el.classList.add('active');
-  if (el) el.querySelector('.ch-unread')?.remove();
-  
-  currentChannelKey = channelKey;
-  chatHistory = [];
-  
-  const ch = CHANNELS[channelKey];
-  if (!ch) return;
-  
-  const nameEl = document.getElementById('ch-name');
-  const metaEl = document.getElementById('ch-meta');
-  const inputEl = document.querySelector('.chat-input');
-  
-  if (nameEl) nameEl.textContent = ch.name;
-  if (metaEl) metaEl.textContent = ch.meta;
-  if (inputEl) inputEl.placeholder = `Ask WatchTower or post in ${ch.name}...`;
-  
-  const msgs = document.getElementById('messages');
-  if (!msgs) return;
-  
-  msgs.innerHTML = '<div class="msg-date-div">Today</div>';
-  
-  // render all messages for this channel
-  ch.msgs.forEach(m => appendStaticMsg(m));
-  
-  // add typing indicator
-  const typing = document.createElement('div');
-  typing.id = 'typing-indicator';
-  typing.className = 'typing-wrap';
-  typing.style.display = 'none';
-  typing.innerHTML = '<div class="msg-av wt-av">WT</div><div class="typing-dots"><span></span><span></span><span></span></div>';
-  msgs.appendChild(typing);
-  
-  msgs.scrollTop = msgs.scrollHeight;
-  hideChannels();
-}
->
 <script>
 function toggleAccessWidget() {
   document.getElementById('wt-access-panel').classList.toggle('open');
@@ -2191,4 +1541,356 @@ setInterval(() => {
 }, 9000);
 </script>
 </body>
-</html>
+</html
+
+
+
+
+
+
+
+<style>
+</style>
+</head>
+<body>
+<div class="shell">
+
+  <!-- TOP NAV -->
+  <nav class="topnav">
+    <a href="homepage.html" class="tn-logo">
+      <img src="Untitled-2.png" alt="WatchTower" class="tn-logo-img">
+      <div class="tn-logo-type">WATCHTOWER<sup>™</sup></div>
+    </a>
+    <ul class="tn-tabs">
+      <li class="tn-tab active" onclick="switchTab(0,this)"><span class="tn-tab-icon">🗺</span> Map</li>
+      <li class="tn-tab" onclick="switchTab(1,this)"><span class="tn-tab-icon">💬</span> Chat <span class="tn-badge">3</span></li>
+      <li class="tn-tab" onclick="switchTab(2,this)"><span class="tn-tab-icon">🤝</span> Mutual Aid</li>
+      <li class="tn-tab" onclick="switchTab(3,this)"><span class="tn-tab-icon">🔔</span> Alerts <span class="tn-badge">5</span></li>
+      <li class="tn-tab" onclick="switchTab(4,this)"><span class="tn-tab-icon">👤</span> Profile</li>
+      <li class="tn-tab" onclick="switchTab(5,this)"><span class="tn-tab-icon">🏥</span> Resources</li>
+    </ul>
+    <div class="tn-right">
+      <span class="tn-status">4 Active Outages</span>
+    </div>
+  </nav>
+
+  <!-- TICKER -->
+  <div class="ticker">
+    <div class="ticker-track">
+      <span class="t-item">⚡ OUT — Bronx, 138th &amp; Willis · 4 min ago</span>
+      <span class="t-item">&nbsp;·&nbsp;</span>
+      <span class="t-item">💧 RESTORED — Crown Heights · 12 min ago</span>
+      <span class="t-item">&nbsp;·&nbsp;</span>
+      <span class="t-item">⚡ PARTIAL — East Flatbush, Ave D · 31 min ago</span>
+      <span class="t-item">&nbsp;·&nbsp;</span>
+      <span class="t-item">💧 OUT — Bushwick, Knickerbocker · 1 hr ago</span>
+      <span class="t-item">&nbsp;·&nbsp;</span>
+      <span class="t-item">⚡ RESTORED — Harlem, W 125th · 2 hr ago</span>
+      <span class="t-item">&nbsp;·&nbsp;</span>
+      <span class="t-item">⚡ OUT — Bronx, 138th &amp; Willis · 4 min ago</span>
+      <span class="t-item">&nbsp;·&nbsp;</span>
+      <span class="t-item">💧 RESTORED — Crown Heights · 12 min ago</span>
+      <span class="t-item">&nbsp;·&nbsp;</span>
+      <span class="t-item">⚡ PARTIAL — East Flatbush, Ave D · 31 min ago</span>
+      <span class="t-item">&nbsp;·&nbsp;</span>
+      <span class="t-item">💧 OUT — Bushwick, Knickerbocker · 1 hr ago</span>
+      <span class="t-item">&nbsp;·&nbsp;</span>
+      <span class="t-item">⚡ RESTORED — Harlem, W 125th · 2 hr ago</span>
+    </div>
+  </div>
+
+  <!-- VIEWS -->
+  <div class="views">
+
+    <!-- ══ VIEW 1: MAP ══ -->
+    <div class="view active" id="v0">
+      <div class="v-map">
+
+        <!-- LIVE FEED SIDEBAR -->
+        <div class="map-sidebar">
+          <div class="ms-head">
+            <div class="ms-title" id="feed-title">LIVE FEED</div>
+            <div class="ms-sub" id="feed-sub">NYC · All Boroughs · Updated 2 min ago</div>
+          </div>
+          <div class="feed-rows" id="map-feed-rows">
+            <!-- populated by JS -->
+          </div>
+          <div class="ms-footer">
+            <button class="ms-report-btn" onclick="switchTab(1)">+ Report / Ask in Chat</button>
+          </div>
+        </div>
+
+        <!-- MAP AREA -->
+        <div class="map-main">
+          <div class="map-controls">
+            <span class="mc-label">Jump to</span>
+            <div class="hood-tabs">
+              <button class="hood-tab active" onclick="selectNeighborhood('all',this)">All NYC</button>
+              <button class="hood-tab" onclick="selectNeighborhood('bronx',this)">S. Bronx</button>
+              <button class="hood-tab" onclick="selectNeighborhood('bedstuy',this)">Bed-Stuy</button>
+              <button class="hood-tab" onclick="selectNeighborhood('crownhts',this)">Crown Hts</button>
+              <button class="hood-tab" onclick="selectNeighborhood('bushwick',this)">Bushwick</button>
+              <button class="hood-tab" onclick="selectNeighborhood('harlem',this)">Harlem</button>
+              <button class="hood-tab" onclick="selectNeighborhood('washhts',this)">Wash. Hts</button>
+              <button class="hood-tab" onclick="selectNeighborhood('jamaica',this)">Jamaica</button>
+              <button class="hood-tab" onclick="selectNeighborhood('redhook',this)">Red Hook</button>
+              <button class="hood-tab" onclick="selectNeighborhood('eflatbush',this)">E. Flatbush</button>
+              <button class="hood-tab" onclick="selectNeighborhood('motthaven',this)">Mott Haven</button>
+              <button class="hood-tab" onclick="selectNeighborhood('inwood',this)">Inwood</button>
+              <button class="hood-tab" onclick="selectNeighborhood('astoria',this)">Astoria</button>
+            </div>
+          </div>
+
+          <div class="gmap-wrap" id="gmap-wrap">
+            <iframe id="gmap" class="gmap-iframe" loading="lazy" allowfullscreen
+              referrerpolicy="no-referrer-when-downgrade"
+              src="https://maps.google.com/maps?q=New+York+City,+NY&t=m&z=11&output=embed&iwloc=near">
+            </iframe>
+            <div class="map-tint"></div>
+            <div class="map-xhair"><div class="map-xhair-dot"></div></div>
+            <!-- SVG overlay for coordinate-accurate pins -->
+            <svg id="pin-svg" class="pin-svg" viewBox="0 0 100 100" preserveAspectRatio="none">
+              <!-- pins rendered by JS as SVG circles -->
+            </svg>
+            <!-- pin labels layer -->
+            <div id="pin-labels" class="pin-labels"></div>
+            <div class="map-ts" id="map-ts">Last updated 2 min ago</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ══ VIEW 2: CHAT
+
+    <!-- ══ VIEW 2: CHAT (AI-powered) ══ -->
+    <div class="view" id="v1">
+      <div class="v-chat">
+        <div class="chat-channels">
+          <div class="cc-head">
+            <span class="cc-head-title">CHAT</span>
+          </div>
+          <div class="cc-section-label">Outage Channels</div>
+          <div class="cc-list">
+            <div class="channel-item active" onclick="loadChannel(this,'bronx')" data-channel="bronx">
+              <div class="ch-dot ch-red"></div>
+              <div class="ch-info"><div class="ch-name">#bronx-138th</div><div class="ch-preview">anyone got updates on the timeline?</div></div>
+              <div class="ch-meta"><div class="ch-time">4m</div><div class="ch-unread">3</div></div>
+            </div>
+            <div class="channel-item" onclick="loadChannel(this,'bushwick')" data-channel="bushwick">
+              <div class="ch-dot ch-red"></div>
+              <div class="ch-info"><div class="ch-name">#bushwick-water</div><div class="ch-preview">DEP truck spotted on Flushing Ave</div></div>
+              <div class="ch-meta"><div class="ch-time">22m</div><div class="ch-unread">1</div></div>
+            </div>
+            <div class="channel-item" onclick="loadChannel(this,'eflatbush')" data-channel="eflatbush">
+              <div class="ch-dot ch-yellow"></div>
+              <div class="ch-info"><div class="ch-name">#eflatbush-partial</div><div class="ch-preview">my building is back but neighbors still out</div></div>
+              <div class="ch-meta"><div class="ch-time">1h</div></div>
+            </div>
+            <div class="channel-item" onclick="loadChannel(this,'washington')" data-channel="washington">
+              <div class="ch-dot ch-red"></div>
+              <div class="ch-info"><div class="ch-name">#wash-hts-181st</div><div class="ch-preview">Con Ed ETA is 8pm they said</div></div>
+              <div class="ch-meta"><div class="ch-time">3h</div></div>
+            </div>
+            <div class="cc-section-label" style="margin-top:4px">General</div>
+            <div class="channel-item" onclick="loadChannel(this,'general')" data-channel="general">
+              <div class="ch-dot ch-gray"></div>
+              <div class="ch-info"><div class="ch-name">#general-nyc</div><div class="ch-preview">PSA: fill your bathtubs now if water...</div></div>
+              <div class="ch-meta"><div class="ch-time">8m</div><div class="ch-unread">12</div></div>
+            </div>
+            <div class="channel-item" onclick="loadChannel(this,'mutual-aid')" data-channel="mutual-aid">
+              <div class="ch-dot ch-green"></div>
+              <div class="ch-info"><div class="ch-name">#mutual-aid-bronx</div><div class="ch-preview">ice available at 610 E 138th, apt 2B</div></div>
+              <div class="ch-meta"><div class="ch-time">15m</div></div>
+            </div>
+          </div>
+        </div>
+
+        <div class="chat-main">
+          <div class="chat-header">
+            <button class="chat-back-btn" onclick="showChannels()">← Channels</button>
+            <div class="chat-header-left">
+              <div class="chat-ch-dot"></div>
+              <div>
+                <div class="chat-ch-name" id="ch-name">#bronx-138th</div>
+                <div class="chat-ch-meta" id="ch-meta">Bronx · 138th &amp; Willis · 17 members · Power OUT</div>
+              </div>
+            </div>
+            <div class="chat-header-right">
+              <div class="ai-badge">AI Active</div>
+              <button class="chat-act-btn">+ Report</button>
+            </div>
+          </div>
+
+          <div class="messages" id="messages">
+          </div>
+
+          <div class="chat-input-wrap">
+            <input class="chat-input" id="chat-input" placeholder="Ask WatchTower or post an update..." onkeydown="handleKey(event)">
+            <button class="send-btn" id="send-btn" onclick="sendMessage()">Send →</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ══ VIEW 3: MUTUAL AID ══ -->
+    <div class="view" id="v2">
+      <div class="v-aid">
+        <div class="aid-header">
+          <div>
+            <div class="aid-title">MUTUAL<br><em>AID</em> GRID</div>
+            <div class="aid-sub">What your neighbors have · What they need · NYC</div>
+          </div>
+          <button class="aid-post-btn" onclick="document.getElementById('aid-form').classList.toggle('open')">+ Post a Resource</button>
+        </div>
+        <div class="aid-post-form" id="aid-form">
+          <div class="apf-title">POST A RESOURCE</div>
+          <div class="apf-grid">
+            <div class="apf-field"><label class="apf-label">Type</label><select class="apf-in"><option>Offering</option><option>Requesting</option><option>Service</option></select></div>
+            <div class="apf-field"><label class="apf-label">Category</label><select class="apf-in"><option>Power &amp; Charging</option><option>Water &amp; Food</option><option>Medical</option><option>Transport</option><option>Services</option><option>Shelter</option></select></div>
+            <div class="apf-field"><label class="apf-label">Title</label><input class="apf-in" placeholder="e.g. Ice Available"></div>
+            <div class="apf-field"><label class="apf-label">Description</label><input class="apf-in" placeholder="Details + address"></div>
+            <div class="apf-field"><label class="apf-label">Your Handle</label><input class="apf-in" placeholder="@username"></div>
+            <div class="apf-field"><label class="apf-label">Distance</label><input class="apf-in" placeholder="e.g. 0.3 mi"></div>
+          </div>
+          <button class="apf-submit">Post Resource →</button>
+        </div>
+        <div class="aid-filters">
+          <button class="aid-filter active" data-type="all" onclick="filterAid('all',this)">All</button>
+          <button class="aid-filter" data-type="offer" onclick="filterAid('offer',this)">Offering</button>
+          <button class="aid-filter" data-type="need" onclick="filterAid('need',this)">Requesting</button>
+          <button class="aid-filter" data-type="service" onclick="filterAid('service',this)">Services</button>
+        </div>
+        <div class="aid-controls-bar">
+          <div class="aid-showing">Showing <span id="aid-count">0</span> resources near you</div>
+          <button class="aid-shuffle-btn" onclick="shuffleAid()">⟳ Shuffle</button>
+        </div>
+        <div id="aid-grid"><!-- populated by JS --></div>
+      </div>
+    </div>
+
+    id="v3">
+      <div class="v-alerts">
+        <div class="alerts-header">
+          <div><div class="alerts-title">ALERTS &<br><em>NOTIFICATIONS</em></div><div class="alerts-sub">Your neighborhood · Zip 10451 · 5 unread</div></div>
+          <button class="mark-read-btn" onclick="markAllRead()">Mark All Read</button>
+        </div>
+        <div class="alert-list">
+          <div class="alert-item unread"><div class="alert-accent"></div><div class="alert-body"><div class="alert-top"><span class="alert-type-badge ab-out">⚡ Power Out</span><span class="alert-location">Bronx · 138th &amp; Willis Ave</span></div><div class="alert-detail">Confirmed by <strong>6 neighbors</strong>. ConEd ticket filed. Check chat for updates.</div></div><div class="alert-time-col"><span class="alert-time">4 min ago</span><div class="alert-unread-dot"></div></div></div>
+          <div class="alert-item unread warning"><div class="alert-accent"></div><div class="alert-body"><div class="alert-top"><span class="alert-type-badge ab-partial">~ Partial</span><span class="alert-location">East Flatbush · Ave D</span></div><div class="alert-detail">Partial outage — <strong>3 blocks affected</strong>. Check your building and report status.</div></div><div class="alert-time-col"><span class="alert-time">31 min ago</span><div class="alert-unread-dot"></div></div></div>
+          <div class="alert-item unread"><div class="alert-accent"></div><div class="alert-body"><div class="alert-top"><span class="alert-type-badge ab-out">💧 Water Out</span><span class="alert-location">Bushwick · Knickerbocker Ave</span></div><div class="alert-detail">NYC DEP notified. PSA: <strong>fill bathtubs now</strong> if water pressure drops.</div></div><div class="alert-time-col"><span class="alert-time">1 hr ago</span><div class="alert-unread-dot"></div></div></div>
+          <div class="alert-item success"><div class="alert-accent"></div><div class="alert-body"><div class="alert-top"><span class="alert-type-badge ab-restore">✓ Restored</span><span class="alert-location">Crown Heights · Nostrand Ave</span></div><div class="alert-detail">Water restored. Confirmed by <strong>4 neighbors</strong>. Run tap 2 min before use.</div></div><div class="alert-time-col"><span class="alert-time">12 min ago</span><div class="alert-unread-dot"></div></div></div>
+          <div class="alert-item success"><div class="alert-accent"></div><div class="alert-body"><div class="alert-top"><span class="alert-type-badge ab-restore">✓ Restored</span><span class="alert-location">Harlem · W 125th St</span></div><div class="alert-detail">Power restored. Confirmed by <strong>9 neighbors</strong>. Report if still flickering.</div></div><div class="alert-time-col"><span class="alert-time">2 hr ago</span><div class="alert-unread-dot"></div></div></div>
+          <div class="alert-item"><div class="alert-accent"></div><div class="alert-body"><div class="alert-top"><span class="alert-type-badge ab-info">ℹ Info</span><span class="alert-location">System · WatchTower</span></div><div class="alert-detail">Scheduled maintenance: Con Edison planned work on <strong>10451 grid</strong> this Saturday 2–6AM.</div></div><div class="alert-time-col"><span class="alert-time">Yesterday</span><div class="alert-unread-dot"></div></div></div>
+        </div>
+        <div class="notif-prefs">
+          <div class="np-title">NOTIFICATION SETTINGS</div>
+          <div class="np-grid">
+            <div class="np-cell"><div><div class="np-label">Power Outages</div><div class="np-desc">Confirmed in your area</div></div><label class="sw"><input type="checkbox" checked><div class="sw-t"></div><div class="sw-d"></div></label></div>
+            <div class="np-cell"><div><div class="np-label">Water Outages</div><div class="np-desc">Pressure and service</div></div><label class="sw"><input type="checkbox" checked><div class="sw-t"></div><div class="sw-d"></div></label></div>
+            <div class="np-cell"><div><div class="np-label">Restorations</div><div class="np-desc">When utilities come back</div></div><label class="sw"><input type="checkbox" checked><div class="sw-t"></div><div class="sw-d"></div></label></div>
+            <div class="np-cell"><div><div class="np-label">Mutual Aid</div><div class="np-desc">Resources near you</div></div><label class="sw"><input type="checkbox"><div class="sw-t"></div><div class="sw-d"></div></label></div>
+            <div class="np-cell"><div><div class="np-label">Maintenance</div><div class="np-desc">Planned utility work</div></div><label class="sw"><input type="checkbox" checked><div class="sw-t"></div><div class="sw-d"></div></label></div>
+            <div class="np-cell"><div><div class="np-label">Battery Saver</div><div class="np-desc">Reduce background activity</div></div><label class="sw"><input type="checkbox" checked><div class="sw-t"></div><div class="sw-d"></div></label></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ══ VIEW 5: PROFILE ══ -->
+    <div class="view" id="v4">
+      <div class="v-profile">
+        <div class="profile-left">
+          <div class="profile-avatar-wrap">
+            <div class="profile-avatar">MC</div>
+            <div class="profile-name">Your Name</div>
+            <div class="profile-handle">@user_10451 · Bronx</div>
+          </div>
+          <div class="profile-stats">
+            <div class="ps-cell"><div class="ps-n">24</div><div class="ps-l">Reports</div></div>
+            <div class="ps-cell"><div class="ps-n"><em>94</em>%</div><div class="ps-l">Verified</div></div>
+          </div>
+          <nav class="profile-nav">
+            <div class="pn-item active" onclick="profileSection('settings',this)">Settings<span class="pn-right">→</span></div>
+            <div class="pn-item" onclick="profileSection('reports',this)">My Reports<span class="pn-right">24</span></div>
+            <div class="pn-item" onclick="profileSection('language',this)">Language &amp; Access<span class="pn-right">→</span></div>
+            <div class="pn-item" onclick="profileSection('notifications',this)">Notifications<span class="pn-right">→</span></div>
+          </nav>
+        </div>
+        <div class="profile-main">
+          <div class="pm-sec" id="ps-settings">
+            <div class="pm-sec-title">Account Settings</div>
+            <div class="setting-row"><div><div class="sr-label">Zip Code</div><div class="sr-desc">Primary monitored area</div></div><input style="background:transparent;border:1px solid rgba(237,233,224,0.12);color:var(--paper);padding:7px 12px;font-family:'DM Mono',monospace;font-size:14px;outline:none;width:100px;cursor:crosshair;" value="10451" maxlength="5"></div>
+            <div class="setting-row"><div><div class="sr-label">Phone / SMS</div><div class="sr-desc">For text alerts during outages</div></div><input style="background:transparent;border:1px solid rgba(237,233,224,0.12);color:var(--paper);padding:7px 12px;font-family:'DM Mono',monospace;font-size:14px;outline:none;width:160px;cursor:crosshair;" placeholder="917-555-0100"></div>
+            <div class="setting-row"><div><div class="sr-label">Alert Radius</div><div class="sr-desc">How wide to cast notifications</div></div><select style="background:var(--ink);border:1px solid rgba(237,233,224,0.12);color:var(--paper);padding:7px 12px;font-family:'DM Mono',monospace;font-size:14px;outline:none;cursor:crosshair;appearance:none;"><option>My Block</option><option selected>Neighborhood</option><option>Borough-Wide</option></select></div>
+            <div class="setting-row"><div><div class="sr-label">Anonymous Reports</div><div class="sr-desc">Identity never shared</div></div><label class="sw"><input type="checkbox" checked><div class="sw-t"></div><div class="sw-d"></div></label></div>
+            <div class="setting-row"><div><div class="sr-label">Battery Saver</div><div class="sr-desc">Reduce background activity</div></div><label class="sw"><input type="checkbox" checked><div class="sw-t"></div><div class="sw-d"></div></label></div>
+            <div class="setting-row"><div><div class="sr-label">Offline Mode</div><div class="sr-desc">Queue reports when no signal</div></div><label class="sw"><input type="checkbox" checked><div class="sw-t"></div><div class="sw-d"></div></label></div>
+          </div>
+          <div class="pm-sec" id="ps-reports" style="display:none">
+            <div class="pm-sec-title">My Reports</div>
+            <div class="report-log">
+              <div class="rl-item"><div class="rl-dot" style="background:var(--red)"></div><span class="rl-loc">Bronx · 138th & Willis</span><span class="rl-type">⚡ Out</span><span class="rl-time">Today 6:10 AM</span></div>
+              <div class="rl-item"><div class="rl-dot" style="background:#2a9944"></div><span class="rl-loc">Bronx · 138th & Willis</span><span class="rl-type">⚡ Restored</span><span class="rl-time">Yesterday 11:30 PM</span></div>
+              <div class="rl-item"><div class="rl-dot" style="background:var(--red)"></div><span class="rl-loc">S. Bronx · Grand Concourse</span><span class="rl-type">💧 Low</span><span class="rl-time">3 days ago</span></div>
+              <div class="rl-item"><div class="rl-dot" style="background:#c8a020"></div><span class="rl-loc">Bronx · Willis Ave</span><span class="rl-type">⚡ Partial</span><span class="rl-time">1 week ago</span></div>
+            </div>
+          </div>
+          <div class="pm-sec" id="ps-language" style="display:none">
+            <div class="pm-sec-title">Language &amp; Accessibility</div>
+            <div style="margin-bottom:18px"><div class="pm-sec-title" style="margin-bottom:10px">Display Language</div><div class="lang-grid"><div class="lang-opt sel" onclick="selectLang(this)">🇺🇸 English</div><div class="lang-opt" onclick="selectLang(this)">🇪🇸 Español</div><div class="lang-opt" onclick="selectLang(this)">🇨🇳 中文</div><div class="lang-opt" onclick="selectLang(this)">🇭🇹 Kreyòl</div><div class="lang-opt" onclick="selectLang(this)">🇧🇩 বাংলা</div><div class="lang-opt" onclick="selectLang(this)">🇷🇺 Русский</div></div></div>
+            <div class="setting-row"><div><div class="sr-label">Large Text</div><div class="sr-desc">Increase font sizes app-wide</div></div><label class="sw"><input type="checkbox"><div class="sw-t"></div><div class="sw-d"></div></label></div>
+            <div class="setting-row"><div><div class="sr-label">High Contrast</div><div class="sr-desc">Boost color contrast for visibility</div></div><label class="sw"><input type="checkbox"><div class="sw-t"></div><div class="sw-d"></div></label></div>
+            <div class="setting-row"><div><div class="sr-label">SMS-Only Mode</div><div class="sr-desc">All alerts via text, no app needed</div></div><label class="sw"><input type="checkbox"><div class="sw-t"></div><div class="sw-d"></div></label></div>
+          </div>
+          <div class="pm-sec" id="ps-notifications" style="display:none">
+            <div class="pm-sec-title">Notification Preferences</div>
+            <div class="setting-row"><div><div class="sr-label">Power Outage Alerts</div><div class="sr-desc">Confirmed outages in your area</div></div><label class="sw"><input type="checkbox" checked><div class="sw-t"></div><div class="sw-d"></div></label></div>
+            <div class="setting-row"><div><div class="sr-label">Water Outage Alerts</div><div class="sr-desc">Pressure drops and outages</div></div><label class="sw"><input type="checkbox" checked><div class="sw-t"></div><div class="sw-d"></div></label></div>
+            <div class="setting-row"><div><div class="sr-label">Restoration Alerts</div><div class="sr-desc">When utilities come back on</div></div><label class="sw"><input type="checkbox" checked><div class="sw-t"></div><div class="sw-d"></div></label></div>
+            <div class="setting-row"><div><div class="sr-label">Mutual Aid Nearby</div><div class="sr-desc">Resources posted within 1 mile</div></div><label class="sw"><input type="checkbox"><div class="sw-t"></div><div class="sw-d"></div></label></div>
+            <div class="setting-row"><div><div class="sr-label">SMS Backup Alerts</div><div class="sr-desc">Text fallback when offline</div></div><label class="sw"><input type="checkbox" checked><div class="sw-t"></div><div class="sw-d"></div></label></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+
+    <!-- ══ VIEW 6: RESOURCES ══ -->
+    <div class="view" id="v5">
+      <div class="resources-view">
+        <div class="resources-header">
+          <div>
+            <div class="resources-title">NEARBY<br><em>HELP</em></div>
+            <div class="resources-sub">Urgent care · Con Edison · National Grid · Cooling centers · Shelters</div>
+          </div>
+        </div>
+        <div class="res-boro-tabs">
+          <button class="res-boro-tab active" onclick="selectResBoro('all',this)">All NYC</button>
+          <button class="res-boro-tab" onclick="selectResBoro('bronx',this)">Bronx</button>
+          <button class="res-boro-tab" onclick="selectResBoro('brooklyn',this)">Brooklyn</button>
+          <button class="res-boro-tab" onclick="selectResBoro('manhattan',this)">Manhattan</button>
+          <button class="res-boro-tab" onclick="selectResBoro('queens',this)">Queens</button>
+          <button class="res-boro-tab" onclick="selectResBoro('si',this)">Staten Island</button>
+        </div>
+        <div id="resources-grid"><!-- populated by JS --></div>
+      </div>
+    </div>
+
+  </div><!-- /views -->
+
+  <!-- BOTTOM TAB BAR -->
+  
+
+<div class="bottombar">
+    <div class="bot-tab active" onclick="switchTab(0,this)" data-b="0"><div class="bot-icon">🗺</div><div class="bot-label">Map</div></div>
+    <div class="bot-tab" onclick="switchTab(1,this)" data-b="1"><div class="bot-icon">💬<span class="bot-badge">3</span></div><div class="bot-label">Chat</div></div>
+    <div class="bot-tab" onclick="switchTab(2,this)" data-b="2"><div class="bot-icon">🤝</div><div class="bot-label">Aid</div></div>
+    <div class="bot-tab" onclick="switchTab(3,this)" data-b="3"><div class="bot-icon">🔔<span class="bot-badge">5</span></div><div class="bot-label">Alerts</div></div>
+    <div class="bot-tab" onclick="switchTab(4,this)" data-b="4"><div class="bot-icon">👤</div><div class="bot-label">Profile</div></div>
+  </div>
+
+</div>
+
+
+
+
