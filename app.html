@@ -136,6 +136,7 @@ body::after {
   overflow: hidden;
   height: 100%;
   min-height: 0;
+  isolation: isolate;
 }
 
 .view {
@@ -146,8 +147,10 @@ body::after {
   transform: translateX(16px);
   transition: opacity 0.3s ease, transform 0.3s ease;
   overflow-y: auto;
+  overflow-x: hidden;
+  visibility: hidden;
 }
-.view.active { opacity: 1; pointer-events: all; transform: translateX(0); }
+.view.active { opacity: 1; pointer-events: all; transform: translateX(0); visibility: visible; }
 .view.exiting { opacity: 0; transform: translateX(-16px); pointer-events: none; }
 
 /* ── BOTTOM BAR ── */
