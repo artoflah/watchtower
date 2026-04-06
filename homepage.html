@@ -438,7 +438,7 @@ nav {
   background: linear-gradient(to top, rgba(8,8,8,0.85) 0%, rgba(8,8,8,0.4) 60%, transparent 100%);
 }
 
-.hero-wordmark-row.map-hovered { opacity: 0; pointer-events: none; }
+
 
 .hero-wordmark {
   font-family: 'Bebas Neue', sans-serif;
@@ -1240,12 +1240,14 @@ input, select, textarea { font-size: 16px !important; } /* prevent iOS zoom on f
 }
 
 
-/* wordmark only hides when the user intentionally hovers the map area */
+/* wordmark click behavior */
 #hero-wordmark-only {
   transition: opacity 0.35s ease;
+  opacity: 1;
 }
-#hero-wordmark-only.map-hovered {
+#hero-wordmark-only.map-engaged {
   opacity: 0;
+  pointer-events: none;
 }
 
 
@@ -1739,16 +1741,6 @@ body { top: 0 !important; }
     font-size: 10px;
   }
 }
-
-/* ── HERO WORDMARK HOVER FIX ── */
-#hero-wordmark-only {
-  opacity: 1;
-  transition: opacity 0.35s ease;
-}
-#hero-wordmark-only.is-hidden {
-  opacity: 0;
-}
-
 </style>
 </head>
 <body>
@@ -2467,23 +2459,35 @@ async function submitReport(e) {
 
 
 <script>
-(function () {
-  const heroMap = document.getElementById('leaflet-map');
-  const heroWordmark = document.getElementById('hero-wordmark-only');
-  if (!heroMap || !heroWordmark) return;
+document.addEventListener('DOMContentLoaded', () => {
+  const mapMain = document.querySelector('.hero-map-main');
+  const wordmark = document.getElementById('hero-wordmark-only');
+  const wordmarkRow = document.querySelector('.hero-wordmark-row');
+  const heroFeed = document.querySelector('.hero-feed');
 
-  const canHover = window.matchMedia('(hover: hover)').matches;
-  if (!canHover) return;
+  if (!mapMain || !wordmark) return;
 
-  heroMap.addEventListener('mouseenter', () => {
-    heroWordmark.classList.add('is-hidden');
+  mapMain.addEventListener('click', (e) => {
+    const clickedControls = e.target.closest('.hero-wordmark-row, .hero-feed');
+    if (clickedControls) return;
+    wordmark.classList.add('map-engaged');
   });
 
-  heroMap.addEventListener('mouseleave', () => {
-    heroWordmark.classList.remove('is-hidden');
+  [wordmarkRow, heroFeed].forEach((el) => {
+    if (!el) return;
+    el.addEventListener('click', (e) => {
+      e.stopPropagation();
+      wordmark.classList.remove('map-engaged');
+    });
   });
-})();
+
+  document.addEventListener('click', (e) => {
+    const insideHeroMap = e.target.closest('.hero-map-main');
+    if (!insideHeroMap) {
+      wordmark.classList.remove('map-engaged');
+    }
+  });
+});
 </script>
-
 </body>
 </html>
