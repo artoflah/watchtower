@@ -1,34 +1,20 @@
 {
   "rewrites": [
-    {
-      "source": "/",
-      "destination": "/homepage.html"
-    },
-    {
-      "source": "/onboarding",
-      "destination": "/index.html"
-    },
-    {
-      "source": "/app",
-      "destination": "/app.html"
-    },
-    {
-      "source": "/loading",
-      "destination": "/loading.html"
-    },
-    {
-      "source": "/homepage",
-      "destination": "/homepage.html"
-    }
+    { "source": "/api/notify", "destination": "/api/notify.js" },
+    { "source": "/", "destination": "/homepage.html" },
+    { "source": "/onboarding", "destination": "/index.html" },
+    { "source": "/app", "destination": "/app.html" },
+    { "source": "/loading", "destination": "/loading.html" },
+    { "source": "/homepage", "destination": "/homepage.html" }
   ],
   "headers": [
     {
       "source": "/(.*)",
       "headers": [
-        {
-          "key": "Cache-Control",
-          "value": "no-store"
-        }
+        { "key": "Cache-Control", "value": "no-store" },
+        { "key": "Access-Control-Allow-Origin", "value": "*" },
+        { "key": "Access-Control-Allow-Methods", "value": "GET, POST, OPTIONS" },
+        { "key": "Access-Control-Allow-Headers", "value": "Content-Type" }
       ]
     }
   ]
