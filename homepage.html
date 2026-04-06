@@ -1240,16 +1240,12 @@ input, select, textarea { font-size: 16px !important; } /* prevent iOS zoom on f
 }
 
 
-/* only the wordmark text fades on map hover, not the buttons */
+/* wordmark only hides when the user intentionally hovers the map area */
 #hero-wordmark-only {
-  transition: opacity 0.5s ease;
+  transition: opacity 0.35s ease;
 }
 #hero-wordmark-only.map-hovered {
   opacity: 0;
-}
-/* make sure the CTA row never fades */
-.hero-wordmark-row.map-hovered {
-  opacity: 1 !important;
 }
 
 
@@ -1743,6 +1739,16 @@ body { top: 0 !important; }
     font-size: 10px;
   }
 }
+
+/* ── HERO WORDMARK HOVER FIX ── */
+#hero-wordmark-only {
+  opacity: 1;
+  transition: opacity 0.35s ease;
+}
+#hero-wordmark-only.is-hidden {
+  opacity: 0;
+}
+
 </style>
 </head>
 <body>
@@ -2457,6 +2463,26 @@ async function submitReport(e) {
     btn.disabled = false;
   }
 }
+</script>
+
+
+<script>
+(function () {
+  const heroMap = document.getElementById('leaflet-map');
+  const heroWordmark = document.getElementById('hero-wordmark-only');
+  if (!heroMap || !heroWordmark) return;
+
+  const canHover = window.matchMedia('(hover: hover)').matches;
+  if (!canHover) return;
+
+  heroMap.addEventListener('mouseenter', () => {
+    heroWordmark.classList.add('is-hidden');
+  });
+
+  heroMap.addEventListener('mouseleave', () => {
+    heroWordmark.classList.remove('is-hidden');
+  });
+})();
 </script>
 
 </body>
