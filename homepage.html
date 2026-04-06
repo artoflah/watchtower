@@ -4,6 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>WATCHTOWER — NYC Utility Grid</title>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Mono:ital,wght@0,300;0,400;0,500;1,400&family=Barlow+Condensed:wght@200;300;400;600;700;900&display=swap" rel="stylesheet">
@@ -13,8 +14,8 @@
 :root {
   --ink:    #080808;
   --paper:  #ede9e0;
-  --red:    #d42b20;
-  --red2:   #ff3b2f;
+  --red:    #2f6bff;
+  --red2:   #67b2ff;
   --mid:    #888;
   --dim:    #1e1e1e;
   --faint:  rgba(237,233,224,0.04);
@@ -1464,6 +1465,284 @@ body { top: 0 !important; }
 }
 }
 
+
+
+/* ── 2026 HOMEPAGE HERO MAP REFRESH ── */
+:root {
+  --brand: #2f6bff;
+  --brand2: #67b2ff;
+  --status-out: #ff5c5c;
+  --status-part: #d4a820;
+  --status-on: #2a9944;
+}
+
+@keyframes pulse {
+  0%,100%{box-shadow:0 0 0 0 rgba(47,107,255,0.42)}
+  50%{box-shadow:0 0 0 8px rgba(47,107,255,0)}
+}
+
+.ticker-wrap, .ticker {
+  background: linear-gradient(90deg, var(--brand), var(--brand2));
+}
+
+.btn-fill:hover,
+.nav-cta:hover,
+.submit:hover,
+.ms-report-btn:hover,
+.aid-post-btn:hover,
+.hero-report-link:hover {
+  background: var(--brand) !important;
+  color: var(--paper) !important;
+}
+
+.bOUT { background: var(--status-out); color: var(--paper); }
+.bPART { background: rgba(212,168,32,0.2); color: var(--status-part); border: 1px solid rgba(212,168,32,0.35); }
+.bON { border: 1px solid rgba(237,233,224,0.15); color: rgba(237,233,224,0.55); }
+
+.hero {
+  padding-top: 78px;
+  min-height: 720px;
+  height: 100vh;
+}
+
+.hero-shell {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  grid-template-columns: minmax(0,1fr) 300px;
+}
+
+.hero-map-main {
+  position: relative;
+  min-width: 0;
+  overflow: hidden;
+  border-right: var(--rule);
+}
+
+.hero-map-controls {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 20;
+  background: rgba(8,8,8,0.88);
+  backdrop-filter: blur(12px);
+}
+
+#leaflet-map {
+  position: absolute;
+  inset: 0;
+  min-height: 100%;
+}
+
+.leaflet-tile { filter: invert(100%) hue-rotate(180deg) brightness(0.85) contrast(0.9) saturate(0.4); }
+.leaflet-popup-content-wrapper { background: rgba(8,8,8,0.95) !important; border: 1px solid rgba(237,233,224,0.2) !important; border-radius: 0 !important; box-shadow: none !important; color: #ede9e0 !important; font-family: 'DM Mono', monospace !important; font-size: 11px !important; }
+.leaflet-popup-tip { background: rgba(8,8,8,0.95) !important; }
+.leaflet-popup-content { margin: 10px 14px !important; line-height: 1.6 !important; }
+.leaflet-popup-close-button { color: rgba(237,233,224,0.5) !important; }
+.wt-popup-title { font-size: 12px; font-weight: bold; letter-spacing: 0.1em; text-transform: uppercase; margin-bottom: 4px; }
+.wt-popup-status-out { color: var(--status-out); }
+.wt-popup-status-part { color: var(--status-part); }
+.wt-popup-status-on { color: var(--status-on); }
+.wt-popup-meta { color: rgba(237,233,224,0.5); font-size: 10px; margin-top: 3px; }
+.leaflet-control-attribution { background: rgba(8,8,8,0.7) !important; color: rgba(237,233,224,0.3) !important; font-size: 9px !important; }
+.leaflet-control-zoom a { background: rgba(8,8,8,0.9) !important; border-color: rgba(237,233,224,0.15) !important; color: rgba(237,233,224,0.7) !important; }
+
+.hero-map-gradient {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  z-index: 5;
+  background:
+    linear-gradient(to top, rgba(8,8,8,0.9) 0%, rgba(8,8,8,0.35) 34%, rgba(8,8,8,0.05) 65%),
+    linear-gradient(to right, rgba(8,8,8,0.15) 0%, transparent 30%);
+}
+
+.hero-wordmark-row {
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 12;
+  padding: 0 40px 36px;
+  background: none;
+}
+
+.hero-wordmark .wm-outline em,
+.type-break-inner span,
+.feat-tag,
+.ac-val,
+.wt-ap-link,
+.report-sub a,
+.hero-report-link,
+.feed-live,
+.nav-status,
+.tn-status,
+.live-dot,
+.live-dot::before {
+  color: var(--brand2);
+}
+
+.hero-wordmark .wm-outline em { -webkit-text-stroke: 0; }
+.map-xhair::before, .map-xhair::after, .map-xhair-dot { background: var(--brand); }
+.hood-tab.active, .map-tab.active { border-bottom-color: var(--brand); }
+.sw input:checked ~ .sw-t, .wt-sw input:checked ~ .wt-sw-t { background: rgba(47,107,255,0.18); border-color: var(--brand); }
+.sw input:checked ~ .sw-d, .wt-sw input:checked ~ .wt-sw-d { background: var(--brand); }
+.tog:hover, .tog.on { border-color: var(--brand); background: rgba(47,107,255,0.08); }
+.submit, .hero-report-link { background: var(--brand); }
+
+.hero-feed {
+  position: relative;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  width: 300px;
+  border-left: var(--rule);
+  background: rgba(8,8,8,0.96);
+  backdrop-filter: blur(12px);
+  z-index: 10;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.ms-head {
+  padding: 16px 20px 12px;
+  border-bottom: var(--rule);
+  flex-shrink: 0;
+}
+.ms-title {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 28px;
+  line-height: 1;
+  color: var(--paper);
+}
+.ms-sub {
+  font-size: 11px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: rgba(237,233,224,0.5);
+  margin-top: 2px;
+}
+.hero-feed .feed-rows {
+  flex: 1;
+  overflow-y: auto;
+  min-height: 0;
+}
+.hero-feed .f-row {
+  display: grid;
+  grid-template-columns: 1fr 52px;
+  align-items: center;
+  gap: 6px;
+  padding: 10px 18px;
+  border-bottom: var(--rule);
+  cursor: crosshair;
+  transition: background 0.12s;
+}
+.hero-feed .f-row:hover { background: var(--faint); }
+.hero-feed .f-zone {
+  font-size: 12px;
+  color: rgba(237,233,224,0.78);
+  line-height: 1.3;
+}
+.hero-feed .f-zone small {
+  display: block;
+  font-size: 10px;
+  color: rgba(237,233,224,0.45);
+  margin-top: 1px;
+  letter-spacing: 0.06em;
+}
+.hero-feed .f-badge {
+  font-size: 9px;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  padding: 3px 6px;
+  text-align: center;
+  white-space: nowrap;
+}
+.ms-footer {
+  padding: 12px 20px;
+  border-top: var(--rule);
+  flex-shrink: 0;
+}
+.ms-report-btn {
+  width: 100%;
+  padding: 10px;
+  background: var(--brand);
+  color: var(--paper);
+  border: none;
+  font-family: 'DM Mono', monospace;
+  font-size: 11px;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  cursor: crosshair;
+  transition: background 0.15s;
+  text-decoration: none;
+  display: block;
+  text-align: center;
+}
+
+.map-ts {
+  bottom: 14px;
+  right: 18px;
+  z-index: 14;
+  font-size: 11px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: rgba(237,233,224,0.65);
+  background: rgba(8,8,8,0.7);
+  padding: 4px 10px;
+}
+
+@media (max-width: 1023px) {
+  .hero-shell { grid-template-columns: minmax(0,1fr) 260px; }
+  .hero-feed { width: 260px; }
+  .hero-wordmark-row { padding: 0 28px 28px; }
+}
+
+@media (max-width: 767px) {
+  .hero {
+    height: auto;
+    min-height: 0;
+    padding-top: 74px;
+  }
+  .hero-shell {
+    position: relative;
+    grid-template-columns: 1fr;
+    grid-template-rows: minmax(460px, 72vh) 220px;
+  }
+  .hero-map-main {
+    min-height: 460px;
+    border-right: none;
+    border-bottom: var(--rule);
+  }
+  .hero-feed {
+    width: 100%;
+    border-left: none;
+  }
+  .hero-wordmark-row {
+    padding: 0 16px 18px;
+  }
+  .hero-wordmark { font-size: clamp(62px, 17vw, 96px); }
+  .hero-right-text {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 12px;
+    max-width: 100%;
+  }
+  .hero-desc {
+    max-width: 100%;
+    font-size: 15px;
+  }
+  .hero-ctas {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+  .map-ts {
+    right: 12px;
+    bottom: 12px;
+    font-size: 10px;
+  }
+}
 </style>
 </head>
 <body>
@@ -1512,110 +1791,48 @@ body { top: 0 !important; }
 
 <!-- HERO -->
 <section class="hero" id="home">
-
-  <!-- FULL-BLEED MAP (fills entire hero) -->
-  <div class="hero-map-section">
-    <div class="hero-map-wrap" id="hero-map"
-         onmouseenter="document.getElementById('hero-wordmark-only').classList.add('map-hovered')"
-         onmouseleave="document.getElementById('hero-wordmark-only').classList.remove('map-hovered')">
-
-      <!-- live map iframe -->
-      <iframe
-        id="gmap"
-        class="gmap-iframe"
-        loading="lazy"
-        allowfullscreen
-        referrerpolicy="no-referrer-when-downgrade"
-        src="https://maps.google.com/maps?q=New+York+City,+NY&t=m&z=11&output=embed&iwloc=near">
-      </iframe>
-
-      <div class="map-tint"></div>
-      <div class="map-xhair"><div class="map-xhair-dot"></div></div>
-
-      <!-- outage pins -->
-      <div class="map-pins">
-        <div class="pin" style="top:32%;left:28%">
-          <div class="pin-dot p-out"></div><span class="pin-lbl">⚡ OUT · 138th</span>
-        </div>
-        <div class="pin" style="top:50%;left:50%">
-          <div class="pin-dot p-par"></div><span class="pin-lbl">~ PARTIAL</span>
-        </div>
-        <div class="pin" style="top:62%;left:22%">
-          <div class="pin-dot p-on"></div><span class="pin-lbl">✓ ON</span>
-        </div>
-        <div class="pin" style="top:42%;left:62%">
-          <div class="pin-dot p-out"></div><span class="pin-lbl">💧 OUT</span>
+  <div class="hero-shell">
+    <div class="hero-map-main">
+      <div class="map-controls hero-map-controls">
+        <span class="mc-label">Jump to</span>
+        <div class="hood-tabs">
+          <button class="hood-tab active" onclick="selectNeighborhood('all',this)">All NYC</button>
+          <button class="hood-tab" onclick="selectNeighborhood('manhattan',this)">Manhattan</button>
+          <button class="hood-tab" onclick="selectNeighborhood('brooklyn',this)">Brooklyn</button>
+          <button class="hood-tab" onclick="selectNeighborhood('bronx',this)">The Bronx</button>
+          <button class="hood-tab" onclick="selectNeighborhood('queens',this)">Queens</button>
+          <button class="hood-tab" onclick="selectNeighborhood('statenisland',this)">Staten Island</button>
         </div>
       </div>
-
-      <div class="map-hover-label">Explore the grid</div>
-      <div class="map-ts" id="map-ts">Last updated 2 min ago</div>
-    </div>
-  </div>
-
-  <!-- NEIGHBORHOOD TABS — overlaid top of map -->
-  <div class="map-tab-bar">
-    <button class="map-tab active" onclick="jumpMap('New+York+City,+NY&z=11',this)">All NYC</button>
-    <button class="map-tab" onclick="jumpMap('South+Bronx,+New+York,+NY&z=14',this)">S. Bronx</button>
-    <button class="map-tab" onclick="jumpMap('Bedford-Stuyvesant,+Brooklyn,+NY&z=14',this)">Bed-Stuy</button>
-    <button class="map-tab" onclick="jumpMap('Crown+Heights,+Brooklyn,+NY&z=14',this)">Crown Hts</button>
-    <button class="map-tab" onclick="jumpMap('Bushwick,+Brooklyn,+NY&z=14',this)">Bushwick</button>
-    <button class="map-tab" onclick="jumpMap('Harlem,+Manhattan,+NY&z=14',this)">Harlem</button>
-    <button class="map-tab" onclick="jumpMap('Washington+Heights,+Manhattan,+NY&z=14',this)">Wash. Hts</button>
-    <button class="map-tab" onclick="jumpMap('Jamaica,+Queens,+NY&z=14',this)">Jamaica</button>
-    <button class="map-tab" onclick="jumpMap('Red+Hook,+Brooklyn,+NY&z=14',this)">Red Hook</button>
-    <button class="map-tab" onclick="jumpMap('East+Flatbush,+Brooklyn,+NY&z=14',this)">E. Flatbush</button>
-    <button class="map-tab" onclick="jumpMap('Mott+Haven,+Bronx,+NY&z=14',this)">Mott Haven</button>
-    <button class="map-tab" onclick="jumpMap('Inwood,+Manhattan,+NY&z=14',this)">Inwood</button>
-    <button class="map-tab" onclick="jumpMap('Astoria,+Queens,+NY&z=14',this)">Astoria</button>
-    <button class="map-tab" onclick="jumpMap('Staten+Island,+NY&z=13',this)">Staten Island</button>
-  </div>
-
-  <!-- WORDMARK + CTA — overlaid bottom-left of map -->
-  <div class="hero-wordmark-row" id="wordmark-row">
-    <div class="hero-wordmark" id="hero-wordmark-only">
-      WATCH<br>
-      <span class="wm-outline">T<em>OW</em>ER</span>
-    </div>
-    <div class="hero-right-text">
-      <p class="hero-desc">Know when your power and water go out — before your phone does. Community-verified, real-time status for every NYC neighborhood.</p>
-      <div class="hero-ctas">
-        <a href="onboarding.html" class="btn-fill">Get Alerts →</a>
-        <a href="loading.html" class="btn-ghost-hero">→ Open App</a>
+      <div id="leaflet-map"></div>
+      <div class="hero-map-gradient"></div>
+      <div class="hero-wordmark-row">
+        <div class="hero-wordmark" id="hero-wordmark-only">
+          WATCH<br>
+          <span class="wm-outline">T<em>OW</em>ER</span>
+        </div>
+        <div class="hero-right-text">
+          <p class="hero-desc">Know when your power and water go out — before your phone does. Community-verified, real-time utility status across all five boroughs.</p>
+          <div class="hero-ctas">
+            <a href="onboarding.html" class="btn-fill">Get Alerts →</a>
+            <a href="loading.html" class="btn-ghost-hero">→ Open App</a>
+          </div>
+        </div>
       </div>
+      <div class="map-ts" id="map-ts">NYC · All Boroughs · Updated 2 min ago</div>
     </div>
-  </div>
 
-    <!-- LIVE FEED SIDEBAR -->
-  <div class="hero-feed">
-    <div class="feed-head">
-      <span class="feed-lbl">Live Status</span>
-      <span class="feed-live">Live</span>
-    </div>
-    <div class="feed-rows">
-      <div class="f-row"><div class="f-zone">Bronx — 138th / Willis<small>4 min ago · Power</small></div><span class="f-badge bOUT">Out</span></div>
-      <div class="f-row"><div class="f-zone">Crown Heights — Nostrand<small>12 min ago · Water</small></div><span class="f-badge bON">On</span></div>
-      <div class="f-row"><div class="f-zone">East Flatbush — Ave D<small>31 min ago · Power</small></div><span class="f-badge bPART">Partial</span></div>
-      <div class="f-row"><div class="f-zone">Bushwick — Knickerbocker<small>1 hr ago · Water</small></div><span class="f-badge bOUT">Out</span></div>
-      <div class="f-row"><div class="f-zone">Harlem — W 125th St<small>2 hr ago · Power</small></div><span class="f-badge bON">On</span></div>
-      <div class="f-row"><div class="f-zone">Bed-Stuy — Malcolm X Blvd<small>2 hr ago · Power</small></div><span class="f-badge bON">On</span></div>
-      <div class="f-row"><div class="f-zone">S. Bronx — Grand Concourse<small>3 hr ago · Water</small></div><span class="f-badge bPART">Partial</span></div>
-      <div class="f-row"><div class="f-zone">Washington Hts — 181st<small>3 hr ago · Power</small></div><span class="f-badge bOUT">Out</span></div>
-      <div class="f-row"><div class="f-zone">Jamaica, Queens<small>4 hr ago · Water</small></div><span class="f-badge bON">On</span></div>
-      <div class="f-row"><div class="f-zone">Mott Haven — 3rd Ave<small>5 hr ago · Power</small></div><span class="f-badge bOUT">Out</span></div>
-      <div class="f-row"><div class="f-zone">Red Hook — Van Brunt<small>6 hr ago · Water</small></div><span class="f-badge bON">On</span></div>
-      <div class="f-row"><div class="f-zone">Flatbush — Church Ave<small>6 hr ago · Power</small></div><span class="f-badge bPART">Partial</span></div>
-      <div class="f-row"><div class="f-zone">East New York — Pitkin<small>7 hr ago · Power</small></div><span class="f-badge bOUT">Out</span></div>
-      <div class="f-row"><div class="f-zone">Soundview — Bruckner<small>8 hr ago · Water</small></div><span class="f-badge bON">On</span></div>
-      <div class="f-row"><div class="f-zone">Inwood — Dyckman St<small>9 hr ago · Power</small></div><span class="f-badge bPART">Partial</span></div>
-      <div class="f-row"><div class="f-zone">Canarsie — Rockaway Pkwy<small>10 hr ago · Water</small></div><span class="f-badge bON">On</span></div>
-    </div>
-    <div class="feed-footer">
-      <a href="loading.html">View all →</a>
-      <a href="#report">+ Report</a>
-    </div>
+    <aside class="hero-feed">
+      <div class="ms-head">
+        <div class="ms-title" id="feed-title">LIVE FEED</div>
+        <div class="ms-sub" id="feed-sub">NYC · All Boroughs · 62 reports</div>
+      </div>
+      <div class="feed-rows" id="map-feed-rows"></div>
+      <div class="ms-footer">
+        <a href="#report" class="ms-report-btn hero-report-link">+ Report Status</a>
+      </div>
+    </aside>
   </div>
-
 </section>
 
 <!-- MANIFESTO -->
@@ -1848,20 +2065,147 @@ body { top: 0 !important; }
   <p>Community-powered. Verification-verified. Always on.</p>
 </div>
 
+<script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js"></script>
 <script>
-// map jump
-function jumpMap(q, btn) {
-  document.querySelectorAll('.map-tab').forEach(b => b.classList.remove('active'));
-  btn.classList.add('active');
-  const iframe = document.getElementById('gmap');
-  // q may already contain z= parameter
-  const url = q.includes('z=')
-    ? `https://maps.google.com/maps?q=${q}&t=m&output=embed&iwloc=near`
-    : `https://maps.google.com/maps?q=${q}&t=m&z=14&output=embed&iwloc=near`;
-  iframe.src = url;
+const OUTAGES = [
+  { id:'bx01', lat:40.8061, lng:-73.9175, boro:'bronx', borough:'Bronx', label:'138th St & Willis Ave', area:'Mott Haven', type:'Power', status:'out', ago:'4 min' },
+  { id:'bx02', lat:40.8167, lng:-73.9284, boro:'bronx', borough:'Bronx', label:'Grand Concourse & 161st', area:'Concourse', type:'Water', status:'part', ago:'3 hr' },
+  { id:'bx03', lat:40.8448, lng:-73.8648, boro:'bronx', borough:'Bronx', label:'Pelham Pkwy & White Plains', area:'Pelham Bay', type:'Power', status:'on', ago:'8 hr' },
+  { id:'bx04', lat:40.8290, lng:-73.9209, boro:'bronx', borough:'Bronx', label:'Fordham Rd & Valentine Ave', area:'Fordham', type:'Water', status:'on', ago:'1 hr' },
+  { id:'bx05', lat:40.8501, lng:-73.9108, boro:'bronx', borough:'Bronx', label:'E 180th St & Bronx Park', area:'Bronx Park', type:'Power', status:'out', ago:'2 hr' },
+  { id:'bk01', lat:40.6944, lng:-73.9213, boro:'brooklyn', borough:'Brooklyn', label:'Knickerbocker Ave & Halsey', area:'Bushwick', type:'Water', status:'out', ago:'1 hr' },
+  { id:'bk02', lat:40.6912, lng:-73.9180, boro:'brooklyn', borough:'Brooklyn', label:'Myrtle Ave & Broadway', area:'Bushwick', type:'Power', status:'part', ago:'2 hr' },
+  { id:'bk03', lat:40.6782, lng:-73.9442, boro:'brooklyn', borough:'Brooklyn', label:'Malcolm X Blvd & Fulton', area:'Bed-Stuy', type:'Power', status:'on', ago:'2 hr' },
+  { id:'bk04', lat:40.6681, lng:-73.9496, boro:'brooklyn', borough:'Brooklyn', label:'Nostrand Ave & Eastern Pkwy', area:'Crown Heights', type:'Water', status:'on', ago:'12 min' },
+  { id:'bk05', lat:40.6501, lng:-73.9496, boro:'brooklyn', borough:'Brooklyn', label:'Flatbush Ave & Ave D', area:'East Flatbush', type:'Power', status:'part', ago:'31 min' },
+  { id:'bk06', lat:40.6745, lng:-74.0164, boro:'brooklyn', borough:'Brooklyn', label:'Van Brunt St & Commerce', area:'Red Hook', type:'Water', status:'on', ago:'6 hr' },
+  { id:'mn01', lat:40.8116, lng:-73.9465, boro:'manhattan', borough:'Manhattan', label:'W 125th St & Malcolm X Blvd', area:'Harlem', type:'Power', status:'on', ago:'2 hr' },
+  { id:'mn02', lat:40.8448, lng:-73.9393, boro:'manhattan', borough:'Manhattan', label:'W 181st St & Broadway', area:'Washington Heights', type:'Power', status:'out', ago:'3 hr' },
+  { id:'mn03', lat:40.8679, lng:-73.9219, boro:'manhattan', borough:'Manhattan', label:'Dyckman St & Broadway', area:'Inwood', type:'Power', status:'part', ago:'9 hr' },
+  { id:'mn04', lat:40.7831, lng:-73.9712, boro:'manhattan', borough:'Manhattan', label:'W 96th St & West End Ave', area:'Upper West Side', type:'Water', status:'on', ago:'5 hr' },
+  { id:'qn01', lat:40.6943, lng:-73.8010, boro:'queens', borough:'Queens', label:'Sutphin Blvd & Jamaica Ave', area:'Jamaica', type:'Water', status:'on', ago:'4 hr' },
+  { id:'qn02', lat:40.7728, lng:-73.9301, boro:'queens', borough:'Queens', label:'31st St & Ditmars Blvd', area:'Astoria', type:'Power', status:'part', ago:'2 hr' },
+  { id:'qn03', lat:40.7282, lng:-73.8796, boro:'queens', borough:'Queens', label:'Myrtle Ave & Fresh Pond Rd', area:'Ridgewood', type:'Water', status:'out', ago:'6 hr' },
+  { id:'qn04', lat:40.7580, lng:-73.8301, boro:'queens', borough:'Queens', label:'Jamaica Ave & 168th St', area:'Jamaica', type:'Power', status:'out', ago:'1 hr' },
+  { id:'si01', lat:40.6501, lng:-74.0966, boro:'statenisland', borough:'Staten Island', label:'Bay St & Victory Blvd', area:'St. George', type:'Power', status:'on', ago:'10 hr' },
+  { id:'si02', lat:40.6226, lng:-74.1052, boro:'statenisland', borough:'Staten Island', label:'Richmond Ave & Forest Ave', area:'Willowbrook', type:'Water', status:'part', ago:'7 hr' },
+  { id:'si03', lat:40.5795, lng:-74.1502, boro:'statenisland', borough:'Staten Island', label:'Hylan Blvd & New Dorp Lane', area:'New Dorp', type:'Power', status:'out', ago:'2 hr' }
+];
+
+const BOROUGH_HOODS = {
+  all: null,
+  manhattan: ['manhattan'],
+  brooklyn: ['brooklyn'],
+  bronx: ['bronx'],
+  queens: ['queens'],
+  statenisland: ['statenisland']
+};
+
+const HOOD_VIEWS = {
+  all: { lat: 40.7128, lng: -73.9800, zoom: 11 },
+  manhattan: { lat: 40.7831, lng: -73.9712, zoom: 12 },
+  brooklyn: { lat: 40.6782, lng: -73.9442, zoom: 12 },
+  bronx: { lat: 40.8448, lng: -73.8648, zoom: 12 },
+  queens: { lat: 40.7282, lng: -73.8010, zoom: 11 },
+  statenisland: { lat: 40.5795, lng: -74.1502, zoom: 11 }
+};
+
+const STATUS_COLOR = { out:'#ff5c5c', part:'#d4a820', on:'#2a9944' };
+const STATUS_LABEL = { out:'OUT', part:'PART', on:'ON' };
+const STATUS_CLASS = { out:'bOUT', part:'bPART', on:'bON' };
+
+let leafletMap = null;
+let leafletMarkers = [];
+
+function renderMapPins(hood) {
+  if (!leafletMap) return;
+  leafletMarkers.forEach(m => leafletMap.removeLayer(m));
+  leafletMarkers = [];
+  const hoods = BOROUGH_HOODS[hood];
+  const filtered = hoods ? OUTAGES.filter(o => hoods.includes(o.boro)) : OUTAGES;
+
+  filtered.forEach(o => {
+    const marker = L.circleMarker([o.lat, o.lng], {
+      radius: o.status === 'out' ? 10 : o.status === 'part' ? 8 : 6,
+      fillColor: STATUS_COLOR[o.status],
+      color: '#111',
+      weight: 2,
+      opacity: 1,
+      fillOpacity: 1,
+    });
+    const emoji = o.type === 'Power' ? '⚡' : '💧';
+    marker.bindPopup(
+      `<div class="wt-popup-title wt-popup-status-${o.status}">${emoji} ${STATUS_LABEL[o.status]} — ${o.label}</div>` +
+      `<div class="wt-popup-meta">${o.area} · ${o.borough} · ${o.type} · ${o.ago} ago</div>`,
+      { maxWidth: 240, closeButton: true }
+    );
+    marker.addTo(leafletMap);
+    leafletMarkers.push(marker);
+  });
+}
+
+function renderFeed(hood) {
+  const rows = document.getElementById('map-feed-rows');
+  const title = document.getElementById('feed-title');
+  const sub = document.getElementById('feed-sub');
+  if (!rows) return;
+
+  const hoods = BOROUGH_HOODS[hood];
+  const filtered = hoods ? OUTAGES.filter(o => hoods.includes(o.boro)) : OUTAGES;
+  const order = { out:0, part:1, on:2 };
+  const sorted = [...filtered].sort((a,b) => order[a.status] - order[b.status]);
+
+  if (title) title.textContent = hood === 'all' ? 'LIVE FEED' : (filtered[0]?.borough || 'LIVE FEED').toUpperCase();
+  if (sub) sub.textContent = hood === 'all'
+    ? `NYC · All Boroughs · ${filtered.length} reports`
+    : `${filtered[0]?.borough || ''} · ${filtered.length} reports · Updated 2 min ago`;
+
+  rows.innerHTML = sorted.map(o => `
+    <div class="f-row">
+      <div class="f-zone">${o.borough} — ${o.label}<small>${o.ago} ago · ${o.type}</small></div>
+      <span class="f-badge ${STATUS_CLASS[o.status]}">${STATUS_LABEL[o.status]}</span>
+    </div>`).join('');
+}
+
+function initLeafletMap() {
+  if (leafletMap || typeof L === 'undefined') return;
+  const el = document.getElementById('leaflet-map');
+  if (!el) return;
+
+  leafletMap = L.map('leaflet-map', {
+    center: [40.7128, -73.9800],
+    zoom: 11,
+    zoomControl: true,
+    attributionControl: true,
+    scrollWheelZoom: false
+  });
+
+  L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+    attribution: '© <a href="https://www.openstreetmap.org/">OpenStreetMap</a>',
+    maxZoom: 19,
+    subdomains: 'abc'
+  }).addTo(leafletMap);
+
+  renderFeed('all');
+  setTimeout(() => renderMapPins('all'), 250);
+}
+
+function selectNeighborhood(hood, btn) {
+  document.querySelectorAll('.hood-tab').forEach(b => b.classList.remove('active'));
+  if (btn) btn.classList.add('active');
+
+  if (leafletMap) {
+    const view = HOOD_VIEWS[hood] || HOOD_VIEWS.all;
+    leafletMap.flyTo([view.lat, view.lng], view.zoom, { duration: 0.8 });
+  }
+
+  renderFeed(hood);
+  renderMapPins(hood);
+
   const ts = document.getElementById('map-ts');
-  ts.textContent = 'Loading...';
-  iframe.onload = () => { ts.textContent = 'Last updated just now'; };
+  if (ts) {
+    ts.textContent = hood === 'all' ? 'NYC · All Boroughs · Updated 2 min ago' : `${(OUTAGES.find(o => o.boro === hood)?.borough) || 'NYC'} · Updated just now`;
+  }
 }
 
 // report toggle
@@ -1877,6 +2221,10 @@ const obs = new IntersectionObserver(entries => {
   entries.forEach(e => { if (e.isIntersecting) e.target.classList.add('vis'); });
 }, { threshold: 0.07 });
 document.querySelectorAll('.reveal').forEach(el => obs.observe(el));
+
+window.addEventListener('DOMContentLoaded', () => {
+  initLeafletMap();
+});
 
 // pulse out badges
 setInterval(() => {
