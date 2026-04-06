@@ -889,40 +889,29 @@ body { top: 0 !important; }
           <div class="apf-title">POST A RESOURCE</div>
           <div class="apf-grid">
             <div class="apf-field"><label class="apf-label">Type</label><select class="apf-in"><option>Offering</option><option>Requesting</option><option>Service</option></select></div>
-            <div class="apf-field"><label class="apf-label">Category</label><select class="apf-in"><option>Ice / Cold Storage</option><option>Charging Station</option><option>Generator Access</option><option>Water / Jugs</option><option>Childcare</option><option>Medical</option><option>Plumbing</option><option>Electrical</option><option>Food</option><option>Other</option></select></div>
-            <div class="apf-field"><label class="apf-label">Zip / Cross Street</label><input class="apf-in" type="text" placeholder="e.g. 10451 · 138th & Willis"></div>
+            <div class="apf-field"><label class="apf-label">Category</label><select class="apf-in"><option>Power &amp; Charging</option><option>Water &amp; Food</option><option>Medical</option><option>Transport</option><option>Services</option><option>Shelter</option></select></div>
+            <div class="apf-field"><label class="apf-label">Title</label><input class="apf-in" placeholder="e.g. Ice Available"></div>
+            <div class="apf-field"><label class="apf-label">Description</label><input class="apf-in" placeholder="Details + address"></div>
+            <div class="apf-field"><label class="apf-label">Your Handle</label><input class="apf-in" placeholder="@username"></div>
+            <div class="apf-field"><label class="apf-label">Distance</label><input class="apf-in" placeholder="e.g. 0.3 mi"></div>
           </div>
-          <div class="apf-grid">
-            <div class="apf-field" style="grid-column:1/3"><label class="apf-label">Description</label><input class="apf-in" type="text" placeholder="e.g. Ice available — text before coming"></div>
-            <div class="apf-field"><label class="apf-label">Contact (optional)</label><input class="apf-in" type="text" placeholder="Phone or apt #"></div>
-          </div>
-          <button class="apf-submit" onclick="document.getElementById('aid-form').classList.remove('open')">Post Resource →</button>
+          <button class="apf-submit">Post Resource →</button>
         </div>
         <div class="aid-filters">
-          <button class="aid-filter active">All</button>
-          <button class="aid-filter">Offering</button>
-          <button class="aid-filter">Requesting</button>
-          <button class="aid-filter">Services</button>
-          <button class="aid-filter">🧊 Ice</button>
-          <button class="aid-filter">🔌 Charging</button>
-          <button class="aid-filter">⚡ Generator</button>
-          <button class="aid-filter">💧 Water</button>
-          <button class="aid-filter">🧒 Childcare</button>
-          <button class="aid-filter">🏥 Medical</button>
+          <button class="aid-filter active" data-type="all" onclick="filterAid('all',this)">All</button>
+          <button class="aid-filter" data-type="offer" onclick="filterAid('offer',this)">Offering</button>
+          <button class="aid-filter" data-type="need" onclick="filterAid('need',this)">Requesting</button>
+          <button class="aid-filter" data-type="service" onclick="filterAid('service',this)">Services</button>
         </div>
-        <div class="aid-grid">
-          <div class="aid-card"><div class="aid-card-top"><span class="aid-tag tag-offer">Offering</span><span class="aid-dist">0.3 mi</span></div><span class="aid-card-icon">🧊</span><div class="aid-card-title">Ice Available</div><div class="aid-card-desc">2 bags of ice, free. Bronx, 138th St. Text before coming.</div><div class="aid-card-meta"><span class="aid-card-user">Posted by <strong>MG_Bronx</strong> · 45min</span><button class="aid-contact-btn">Contact →</button></div></div>
-          <div class="aid-card"><div class="aid-card-top"><span class="aid-tag tag-offer">Offering</span><span class="aid-dist">0.5 mi</span></div><span class="aid-card-icon">🔌</span><div class="aid-card-title">Charging Station</div><div class="aid-card-desc">St. Mary's Rec Center, St. Ann's Ave — multiple outlets. Open to all neighbors.</div><div class="aid-card-meta"><span class="aid-card-user">Posted by <strong>WatchTower</strong> · 1hr</span><button class="aid-contact-btn">Directions →</button></div></div>
-          <div class="aid-card"><div class="aid-card-top"><span class="aid-tag tag-need">Requesting</span><span class="aid-dist">0.2 mi</span></div><span class="aid-card-icon">🏥</span><div class="aid-card-title">Medical Equipment Power</div><div class="aid-card-desc">Elderly neighbor needs to run medical equipment. Looking for generator access or powered shelter.</div><div class="aid-card-meta"><span class="aid-card-user">Posted by <strong>A_Lopez</strong> · 2hr</span><button class="aid-contact-btn">Respond →</button></div></div>
-          <div class="aid-card"><div class="aid-card-top"><span class="aid-tag tag-svc">Service</span><span class="aid-dist">1.1 mi</span></div><span class="aid-card-icon">🔧</span><div class="aid-card-title">Licensed Electrician</div><div class="aid-card-desc">Available for emergency checks after power returns. Bronx + N. Brooklyn only.</div><div class="aid-card-meta"><span class="aid-card-user">Posted by <strong>RElectric_BX</strong> · 3hr</span><button class="aid-contact-btn">Contact →</button></div></div>
-          <div class="aid-card"><div class="aid-card-top"><span class="aid-tag tag-offer">Offering</span><span class="aid-dist">0.8 mi</span></div><span class="aid-card-icon">🧒</span><div class="aid-card-title">Childcare Help</div><div class="aid-card-desc">Can watch 1-2 kids (ages 2-8) at my place — powered, AC. Washington Heights, free.</div><div class="aid-card-meta"><span class="aid-card-user">Posted by <strong>D_Reyes</strong> · 4hr</span><button class="aid-contact-btn">Contact →</button></div></div>
-          <div class="aid-card"><div class="aid-card-top"><span class="aid-tag tag-offer">Offering</span><span class="aid-dist">0.9 mi</span></div><span class="aid-card-icon">⚡</span><div class="aid-card-title">Generator Access</div><div class="aid-card-desc">Generator at Prospect Ave church — extension cords outside. Priority for medical devices.</div><div class="aid-card-meta"><span class="aid-card-user">Posted by <strong>ProspectAve_Ch</strong> · 8hr</span><button class="aid-contact-btn">Directions →</button></div></div>
+        <div class="aid-controls-bar">
+          <div class="aid-showing">Showing <span id="aid-count">0</span> resources near you</div>
+          <button class="aid-shuffle-btn" onclick="shuffleAid()">⟳ Shuffle</button>
         </div>
+        <div id="aid-grid"><!-- populated by JS --></div>
       </div>
     </div>
 
-    <!-- ══ VIEW 4: ALERTS ══ -->
-    <div class="view" id="v3">
+    id="v3">
       <div class="v-alerts">
         <div class="alerts-header">
           <div><div class="alerts-title">ALERTS &<br><em>NOTIFICATIONS</em></div><div class="alerts-sub">Your neighborhood · Zip 10451 · 5 unread</div></div>
@@ -1008,10 +997,7 @@ body { top: 0 !important; }
       </div>
     </div>
 
-  </div><!-- /views -->
 
-  <!-- BOTTOM TAB BAR -->
-  
     <!-- ══ VIEW 6: RESOURCES ══ -->
     <div class="view" id="v5">
       <div class="resources-view">
@@ -1032,6 +1018,11 @@ body { top: 0 !important; }
         <div id="resources-grid"><!-- populated by JS --></div>
       </div>
     </div>
+
+  </div><!-- /views -->
+
+  <!-- BOTTOM TAB BAR -->
+  
 
 <div class="bottombar">
     <div class="bot-tab active" onclick="switchTab(0,this)" data-b="0"><div class="bot-icon">🗺</div><div class="bot-label">Map</div></div>
@@ -1182,14 +1173,7 @@ body.high-contrast { background: #000 !important; filter: contrast(1.3); }
 
 
 </body>
-</html<div class="aid-controls-bar">
-        <div class="aid-showing">Showing <span id="aid-count">9</span> resources near you</div>
-        <button class="aid-shuffle-btn" onclick="shuffleAid()">⟳ Shuffle</button>
-      </div>
-      <div class="aid-grid" id="aid-grid">
-        <!-- Cards rendered by JS -->
-      </div>
-
+</html
 
 
 
@@ -1330,13 +1314,7 @@ body.high-contrast { background: #000 !important; filter: contrast(1.3); }
 
 
 </body>
-</html<div class="aid-controls-bar">
-        <div class="aid-showing">Showing <span id="aid-count">9</span> resources near you</div>
-        <button class="aid-shuffle-btn" onclick="shuffleAid()">⟳ Shuffle</button>
-      </div>
-      <div class="aid-grid" id="aid-grid">
-        <!-- Cards rendered by JS -->
-      </div>
+</html
 
 
 
