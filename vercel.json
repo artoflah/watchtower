@@ -5,6 +5,10 @@
       "destination": "/api/notify.js"
     },
     {
+      "source": "/api/inbound-sms",
+      "destination": "/api/inbound-sms.js"
+    },
+    {
       "source": "/",
       "destination": "/homepage.html"
     },
