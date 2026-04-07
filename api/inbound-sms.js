@@ -13,11 +13,11 @@ export default async function handler(req, res) {
   let reply = `WATCHTOWER: Thanks for reaching out. Reply WATCH to connect to outage alerts.`;
 
   if (incomingText === 'WATCH') {
-    reply = `WATCHTOWER: You’re connected to WATCHTOWER. Reply with your ZIP code to start getting outage updates for your area. Reply STOP to opt out.`;
+    reply = `WATCHTOWER: You're connected to WATCHTOWER. Reply with your ZIP code to start getting outage updates for your area. Reply STOP to opt out.`;
   }
 
   if (/^\d{5}$/.test(incomingText)) {
-    reply = `WATCHTOWER: ZIP ${incomingText} received. You’re now set up for local updates.`;
+    reply = `WATCHTOWER: ZIP ${incomingText} received. You're now set up for local updates.`;
   }
 
   res.setHeader('Content-Type', 'text/xml');
