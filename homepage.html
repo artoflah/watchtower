@@ -2038,10 +2038,18 @@ body { top: 0 !important; }
   </div>
   <div class="access-cell reveal" style="transition-delay:.14s">
     <div class="ac-icon">✉️</div>
-    <div>
+    <div style="width:100%">
       <p class="ac-title">Via Email</p>
-      <p class="ac-val"><a href="mailto:alerts@watchtower-nyc.app" style="color:var(--red);text-decoration:none">alerts@watchtower-nyc.app</a></p>
-      <p class="ac-desc">Sign up for email alerts. Outage reports and restoration notifications.</p>
+      <p class="ac-desc" style="margin-bottom:12px">Sign up for email alerts. Outage reports and restoration notifications.</p>
+      <form id="email-subscribe-form" onsubmit="handleEmailSubscribe(event)" style="display:flex;gap:8px;align-items:stretch;flex-wrap:wrap">
+        <input id="subscribe-email-input" type="email" placeholder="your@email.com" required
+          style="flex:1;min-width:160px;background:transparent;border:1px solid rgba(242,239,230,0.24);color:var(--paper);padding:9px 13px;font-family:'DM Mono',monospace;font-size:13px;letter-spacing:0.05em;outline:none">
+        <button type="submit" id="subscribe-btn"
+          style="background:var(--paper);color:var(--ink);border:none;padding:9px 18px;font-family:'DM Mono',monospace;font-size:12px;letter-spacing:0.18em;text-transform:uppercase;cursor:crosshair;white-space:nowrap">
+          Subscribe →
+        </button>
+      </form>
+      <p id="subscribe-msg" style="font-size:12px;letter-spacing:0.1em;margin-top:8px;display:none"></p>
     </div>
   </div>
 </div>
@@ -2499,6 +2507,43 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   });
 });
+</script>
+
+<script>
+async function handleEmailSubscribe(e) {
+  e.preventDefault();
+  const input = document.getElementById('subscribe-email-input');
+  const btn   = document.getElementById('subscribe-btn');
+  const msg   = document.getElementById('subscribe-msg');
+  const email = input.value.trim();
+  if (!email) return;
+
+  btn.textContent = 'Sending...';
+  btn.disabled = true;
+  msg.style.display = 'none';
+
+  try {
+    const res = await fetch('/api/notify', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ type: 'subscribe', email, zip: null, utility: 'power and water' })
+    });
+    const data = await res.json();
+    if (data.ok) {
+      msg.textContent = '✓ Check your inbox — you\'re on the list.';
+      msg.style.color = '#4ade80';
+      input.value = '';
+    } else {
+      throw new Error('Send failed');
+    }
+  } catch {
+    msg.textContent = 'Something went wrong. Try again.';
+    msg.style.color = 'rgba(242,239,230,0.6)';
+    btn.disabled = false;
+    btn.textContent = 'Subscribe →';
+  }
+  msg.style.display = 'block';
+}
 </script>
 </body>
 </html>

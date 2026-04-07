@@ -1,6 +1,6 @@
 // api/notify.js — WatchTower notifications
-// SMS via Twilio, Email via Courier
-// Vercel env vars: TWILIO_SID, TWILIO_AUTH, TWILIO_PHONE, COURIER_KEY
+// SMS via Twilio, Email via Resend
+// Vercel env vars: TWILIO_SID, TWILIO_AUTH, TWILIO_PHONE, RESEND_API_KEY, FROM_EMAIL
 
 export default async function handler(req, res) {
   if (req.method === 'OPTIONS') return res.status(200).end();
@@ -12,7 +12,8 @@ export default async function handler(req, res) {
   const TWILIO_SID   = process.env.TWILIO_SID;
   const TWILIO_AUTH  = process.env.TWILIO_AUTH;
   const TWILIO_PHONE = process.env.TWILIO_PHONE;
-  const COURIER_KEY  = process.env.COURIER_KEY;
+  const RESEND_KEY   = process.env.RESEND_API_KEY;
+  const FROM_EMAIL   = process.env.FROM_EMAIL || 'WATCHTOWER <alerts@watchtower-nyc.app>';
 
   const results = { sms: null, email: null };
 
@@ -42,26 +43,25 @@ export default async function handler(req, res) {
     }
   }
 
-  // ── Email via Courier ──
-  if (email && COURIER_KEY) {
+  // ── Email via Resend ──
+  if (email && RESEND_KEY) {
     try {
-      const { title, body } = buildMessage({ type, zip, utility, status, name });
-      const courierRes = await fetch('https://api.courier.com/send', {
+      const { subject, html } = buildEmail({ type, zip, utility, status, name });
+      const resendRes = await fetch('https://api.resend.com/emails', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          'Authorization': `Bearer ${COURIER_KEY}`
+          'Authorization': `Bearer ${RESEND_KEY}`
         },
         body: JSON.stringify({
-          message: {
-            to: { email },
-            content: { title, body },
-            data: { zip, utility, status, type, name }
-          }
+          from: FROM_EMAIL,
+          to: email,
+          subject,
+          html
         })
       });
-      const courierData = await courierRes.json();
-      results.email = courierData.requestId ? 'sent: ' + courierData.requestId : (courierData.message || 'failed');
+      const resendData = await resendRes.json();
+      results.email = resendData.id ? 'sent: ' + resendData.id : (resendData.message || JSON.stringify(resendData));
     } catch (err) {
       results.email = 'error: ' + err.message;
     }
@@ -84,24 +84,74 @@ function buildSMS({ type, zip, utility, status }) {
   return `WATCHTOWER: Update for zip ${z} — ${u} is ${status || 'being monitored'}. Map: watchtower-murex.vercel.app`;
 }
 
-function buildMessage({ type, zip, utility, status, name }) {
-  const u = utility || 'Utility';
+function buildEmail({ type, zip, utility, status, name }) {
+  const u = utility || 'power and water';
   const z = zip || 'your area';
-  const g = name ? `Hi ${name},` : 'Hi,';
-  const titles = {
-    welcome:        `WATCHTOWER — You're connected to the NYC grid`,
-    outage:         `⚡ ${u} OUT — ${z}`,
-    restored:       `✓ ${u} RESTORED — ${z}`,
-    report_confirm: `WATCHTOWER — Report received (${z})`
+  const greeting = name ? `Hi ${name},` : 'Hi,';
+
+  const templates = {
+    welcome: {
+      subject: `WATCHTOWER — You're connected to the NYC grid`,
+      body: `${greeting}<br><br>
+You're now monitoring <strong>zip ${z}</strong> for ${u} outages. We'll alert you the moment something changes in your neighborhood.<br><br>
+<a href="https://watchtower-murex.vercel.app" style="color:#2563eb">→ Open the live map</a><br><br>
+Stay safe,<br>
+<strong>WATCHTOWER</strong> — NYC Community Utility Network`
+    },
+    subscribe: {
+      subject: `WATCHTOWER — You're signed up for alerts`,
+      body: `${greeting}<br><br>
+You've subscribed to <strong>WATCHTOWER</strong> email alerts for NYC utility outages. You'll receive notifications when outages are confirmed or restored in your area.<br><br>
+<a href="https://watchtower-murex.vercel.app" style="color:#2563eb">→ Open the live map</a><br><br>
+Stay safe,<br>
+<strong>WATCHTOWER</strong> — NYC Community Utility Network`
+    },
+    outage: {
+      subject: `⚡ ${u.toUpperCase()} OUT — ${z}`,
+      body: `${greeting}<br><br>
+A <strong>${u} outage</strong> has been confirmed in zip <strong>${z}</strong>, reported by multiple neighbors. Con Ed / DEP has been notified.<br><br>
+We'll notify you the moment service is restored.<br><br>
+<a href="https://watchtower-murex.vercel.app" style="color:#2563eb">→ Live map</a><br><br>
+<strong>WATCHTOWER</strong>`
+    },
+    restored: {
+      subject: `✓ ${u.toUpperCase()} RESTORED — ${z}`,
+      body: `${greeting}<br><br>
+<strong>${u} service has been restored</strong> in zip ${z}, confirmed by neighbors.${u.toLowerCase().includes('water') ? '<br><br><em>Note: Run your cold tap for at least 2 minutes before drinking.</em>' : ''}<br><br>
+Stay safe. WatchTower is still monitoring your area.<br><br>
+<a href="https://watchtower-murex.vercel.app" style="color:#2563eb">→ Live map</a><br><br>
+<strong>WATCHTOWER</strong>`
+    },
+    report_confirm: {
+      subject: `WATCHTOWER — Report received (${z})`,
+      body: `${greeting}<br><br>
+Your report has been logged — <strong>${u} is ${status || 'being tracked'}</strong> at zip ${z}. Thank you for helping your neighbors.<br><br>
+<a href="https://watchtower-murex.vercel.app" style="color:#2563eb">→ Live map</a><br><br>
+<strong>WATCHTOWER</strong>`
+    }
   };
-  const bodies = {
-    welcome:        `${g}\n\nYou're now monitoring zip ${z} for ${u} outages. We'll alert you the moment something changes.\n\nVisit the live map: watchtower-murex.vercel.app`,
-    outage:         `${g}\n\nA ${u} outage has been confirmed in zip ${z}, reported by multiple neighbors. Con Ed / DEP has been notified.\n\nWe'll notify you the moment service is restored.\n\nLive map: watchtower-murex.vercel.app`,
-    restored:       `${g}\n\n${u} service has been restored in zip ${z}, confirmed by neighbors.${u === 'Water' ? '\n\nNote: Run your cold tap for at least 2 minutes before drinking.' : ''}\n\nStay safe. WatchTower is still monitoring your area.`,
-    report_confirm: `${g}\n\nYour report has been logged — ${u} is ${status || 'being tracked'} at zip ${z}. Thank you for helping your neighbors.\n\nLive map: watchtower-murex.vercel.app`
+
+  const t = templates[type] || {
+    subject: `WATCHTOWER — Update for ${z}`,
+    body: `${greeting}<br><br>Update for zip ${z}: ${u} is ${status || 'being monitored'}.<br><br><a href="https://watchtower-murex.vercel.app">watchtower-murex.vercel.app</a>`
   };
+
   return {
-    title: titles[type] || `WATCHTOWER — Update for ${z}`,
-    body:  bodies[type] || `${g}\n\nUpdate for zip ${z}: ${u} is ${status || 'being monitored'}.\n\nwatchtower-murex.vercel.app`
+    subject: t.subject,
+    html: `<!DOCTYPE html>
+<html>
+<head><meta charset="UTF-8"></head>
+<body style="background:#060606;color:#f2efe6;font-family:'Courier New',monospace;padding:40px 32px;max-width:560px;margin:0 auto;line-height:1.6">
+  <div style="border-bottom:1px solid rgba(242,239,230,0.2);padding-bottom:20px;margin-bottom:28px">
+    <span style="font-size:22px;font-weight:700;letter-spacing:0.25em">WATCHTOWER</span>
+    <span style="font-size:11px;color:rgba(242,239,230,0.5);display:block;letter-spacing:0.2em;margin-top:2px">NYC UTILITY GRID</span>
+  </div>
+  <div style="font-size:15px">${t.body}</div>
+  <div style="border-top:1px solid rgba(242,239,230,0.12);margin-top:36px;padding-top:16px;font-size:11px;color:rgba(242,239,230,0.4);letter-spacing:0.15em">
+    WATCHTOWER™ — NYC Community Utility Network<br>
+    Community-powered. Verification-verified. Always on.
+  </div>
+</body>
+</html>`
   };
 }
