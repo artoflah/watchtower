@@ -66,7 +66,7 @@ body::after {
 @keyframes ticker   { 0%{transform:translateX(0)} 100%{transform:translateX(-50%)} }
 @keyframes fadeUp   { from{opacity:0;transform:translateY(16px)} to{opacity:1;transform:none} }
 @keyframes fadeIn   { from{opacity:0;transform:translateY(8px)} to{opacity:1;transform:none} }
-@keyframes pulse    { 0%,100%{box-shadow:0 0 0 0 rgba(212,43,32,0.4)} 50%{box-shadow:0 0 0 8px rgba(212,43,32,0)} }
+@keyframes pulse    { 0%,100%{box-shadow:0 0 0 0 rgba(37,99,235,0.4)} 50%{box-shadow:0 0 0 8px rgba(37,99,235,0)} }
 @keyframes flicker  { 0%,97%{opacity:1} 98%{opacity:0.75} 100%{opacity:1} }
 @keyframes glitch   { 0%,100%{clip-path:inset(0 0 100% 0)} 8%{clip-path:inset(25% 0 65% 0)} 18%{clip-path:inset(75% 0 10% 0)} 28%{clip-path:inset(5% 0 88% 0)} 38%{clip-path:inset(55% 0 38% 0)} 48%{clip-path:inset(0 0 100% 0)} }
 @keyframes scanline { 0%{top:-3px} 100%{top:100%} }
@@ -178,7 +178,7 @@ nav, .topnav {
   width: 12px; height: 12px;
   background: var(--mid); transition: all 0.2s;
 }
-.sw input:checked ~ .sw-t { background: rgba(212,43,32,0.2); border-color: var(--red); }
+.sw input:checked ~ .sw-t { background: rgba(37,99,235,0.2); border-color: var(--red); }
 .sw input:checked ~ .sw-d { transform: translateX(18px); background: var(--red); }
 
 /* ─── SHARED: SECTION HEADER ─── */
@@ -323,28 +323,28 @@ nav, .topnav {
 
 /* ─── SHARED: FOOTER ─── */
 footer {
-  padding: 52px 40px 32px;
+  padding: 32px 40px 20px;
   display: grid; grid-template-columns: 1fr 1fr 1fr auto;
-  gap: 40px; align-items: end;
+  gap: 28px; align-items: end;
   position: relative; z-index: 1; border-top: var(--ruleB);
 }
 .ft-brand {
-  font-family: 'Bebas Neue', sans-serif; font-size: 52px; line-height: 0.92;
+  font-family: 'Bebas Neue', sans-serif; font-size: 36px; line-height: 0.92;
   color: rgba(242,239,230,0.88); letter-spacing: 0.06em;
 }
 .ft-col h4 {
-  font-size: 14px; letter-spacing: 0.18em; text-transform: uppercase;
-  color: rgba(242,239,230,0.8); margin-bottom: 14px;
+  font-size: 12px; letter-spacing: 0.18em; text-transform: uppercase;
+  color: rgba(242,239,230,0.8); margin-bottom: 10px;
 }
-.ft-col ul { list-style: none; display: flex; flex-direction: column; gap: 9px; }
-.ft-col ul a { font-size: 16px; color: rgba(242,239,230,0.8); text-decoration: none; transition: color 0.15s; }
+.ft-col ul { list-style: none; display: flex; flex-direction: column; gap: 7px; }
+.ft-col ul a { font-size: 13px; color: rgba(242,239,230,0.8); text-decoration: none; transition: color 0.15s; }
 .ft-col ul a:hover { color: var(--paper); }
 .ft-bottom {
-  border-top: var(--rule); padding: 18px 40px;
+  border-top: var(--rule); padding: 12px 40px;
   display: flex; justify-content: space-between;
   position: relative; z-index: 1;
 }
-.ft-bottom p { font-size: 14px; letter-spacing: 0.14em; text-transform: uppercase; color: rgba(242,239,230,0.92); }
+.ft-bottom p { font-size: 11px; letter-spacing: 0.12em; text-transform: uppercase; color: rgba(242,239,230,0.92); }
 
 
 
@@ -695,7 +695,7 @@ nav {
   pointer-events: none; user-select: none; transition: color 0.2s;
 }
 
-.how-cell:hover .how-ghost { color: rgba(212,43,32,0.07); }
+.how-cell:hover .how-ghost { color: rgba(37,99,235,0.07); }
 
 .how-icon {
   width: 32px; height: 32px; margin-bottom: 24px;
@@ -715,7 +715,7 @@ nav {
 
 /* ── FEATURES ── */
 .feat-grid {
-  display: grid; grid-template-columns: 1fr 1fr;
+  display: grid; grid-template-columns: repeat(4,1fr);
   position: relative; z-index: 1; border-bottom: var(--ruleB);
 }
 
@@ -724,8 +724,8 @@ nav {
   position: relative; overflow: hidden; transition: background 0.2s;
 }
 
-.feat-cell:nth-child(even) { border-right: none; }
-.feat-cell:nth-child(n+3) { border-bottom: none; }
+.feat-cell:nth-child(4n) { border-right: none; }
+.feat-cell:nth-child(n+5) { border-bottom: none; }
 .feat-cell:hover { background: rgba(242,239,230,0.06); }
 
 .feat-tag {
@@ -791,7 +791,7 @@ nav {
 }
 
 .tog:hover, .tog.on {
-  border-color: var(--red); color: var(--paper); background: rgba(212,43,32,0.07);
+  border-color: var(--red); color: var(--paper); background: rgba(37,99,235,0.07);
 }
 
 .submit {
@@ -907,8 +907,9 @@ img[alt="WatchTower"] { max-width: 34px; max-height: 34px; }
   .how-cell:nth-child(3) { border-top: var(--rule); }
 
   /* FEATURES */
-  .feat-grid { grid-template-columns: 1fr; }
-  .feat-cell { border-right: none !important; }
+  .feat-grid { grid-template-columns: 1fr 1fr; }
+  .feat-cell:nth-child(2n) { border-right: none; }
+  .feat-cell:nth-child(n+3) { border-top: var(--rule); }
 
   /* REPORT */
   .report-section { grid-template-columns: 1fr; }
@@ -963,7 +964,7 @@ img[alt="WatchTower"] { max-width: 34px; max-height: 34px; }
 @media (max-width: 767px) {
 
   /* NAV */
-  nav, .topnav { height: 52px; padding: 0 16px; }
+  nav, .topnav { height: 52px; padding: 0 0 0 16px; }
 
   .nav-logo, .tn-logo, .topbar-logo {
     padding: 0 14px 0 0;
@@ -1057,9 +1058,11 @@ img[alt="WatchTower"] { max-width: 34px; max-height: 34px; }
   .type-break-inner { font-size: clamp(36px, 8vw, 64px); padding: 16px 0; }
 
   /* FEATURES */
-  .feat-grid { grid-template-columns: 1fr; }
-  .feat-cell { padding: 36px 20px; border-right: none !important; }
-  .feat-title { font-size: 42px; }
+  .feat-grid { grid-template-columns: 1fr 1fr; }
+  .feat-cell { padding: 28px 18px; }
+  .feat-cell:nth-child(2n) { border-right: none; }
+  .feat-cell:nth-child(n+3) { border-top: var(--rule); }
+  .feat-title { font-size: 38px; }
 
   /* REPORT */
   .report-section { grid-template-columns: 1fr; }
@@ -1084,7 +1087,7 @@ img[alt="WatchTower"] { max-width: 34px; max-height: 34px; }
   .ticker-wrap { top: 50px; }
 
   /* ACCESS WIDGET */
-  #wt-access-widget { top: 122px; right: 8px; }
+  #wt-access-widget { top: 132px; right: 8px; }
   #wt-access-toggle { padding: 5px 10px; font-size: 12px; }
   .wt-access-panel { width: 220px; right: 0; }
 
@@ -1889,8 +1892,8 @@ body { top: 0 !important; }
       <span class="how-ghost">1</span>
       <div class="how-icon">
         <svg width="18" height="18" viewBox="0 0 18 18" fill="none">
-          <circle cx="9" cy="9" r="3" fill="#d42b20"/>
-          <circle cx="9" cy="9" r="6.5" stroke="#d42b20" stroke-width="0.6" stroke-dasharray="2 2"/>
+          <circle cx="9" cy="9" r="3" fill="#2563eb"/>
+          <circle cx="9" cy="9" r="6.5" stroke="#2563eb" stroke-width="0.6" stroke-dasharray="2 2"/>
           <circle cx="9" cy="9" r="8.5" stroke="rgba(242,239,230,0.678)" stroke-width="0.5"/>
         </svg>
       </div>
@@ -1901,7 +1904,7 @@ body { top: 0 !important; }
       <span class="how-ghost">2</span>
       <div class="how-icon">
         <svg width="18" height="18" viewBox="0 0 18 18" fill="none">
-          <path d="M3 9L7 13L15 5" stroke="#d42b20" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+          <path d="M3 9L7 13L15 5" stroke="#2563eb" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
         </svg>
       </div>
       <p class="how-title">Tap to<br>Report</p>
@@ -1912,8 +1915,8 @@ body { top: 0 !important; }
       <div class="how-icon">
         <svg width="18" height="18" viewBox="0 0 18 18" fill="none">
           <path d="M2 16L9 3L16 16Z" stroke="rgba(242,239,230,0.88)" stroke-width="0.75" fill="none"/>
-          <line x1="9" y1="7.5" x2="9" y2="12" stroke="#d42b20" stroke-width="1.5"/>
-          <circle cx="9" cy="13.5" r="0.9" fill="#d42b20"/>
+          <line x1="9" y1="7.5" x2="9" y2="12" stroke="#2563eb" stroke-width="1.5"/>
+          <circle cx="9" cy="13.5" r="0.9" fill="#2563eb"/>
         </svg>
       </div>
       <p class="how-title">Get<br>Verified</p>
@@ -1923,9 +1926,9 @@ body { top: 0 !important; }
       <span class="how-ghost">4</span>
       <div class="how-icon">
         <svg width="18" height="18" viewBox="0 0 18 18" fill="none">
-          <line x1="9" y1="2" x2="9" y2="16" stroke="#d42b20" stroke-width="1.5" stroke-linecap="round"/>
+          <line x1="9" y1="2" x2="9" y2="16" stroke="#2563eb" stroke-width="1.5" stroke-linecap="round"/>
           <path d="M2 16Q9 2 16 16" stroke="rgba(242,239,230,0.678)" stroke-width="0.75" fill="none"/>
-          <circle cx="9" cy="2" r="1.5" fill="#d42b20"/>
+          <circle cx="9" cy="2" r="1.5" fill="#2563eb"/>
         </svg>
       </div>
       <p class="how-title">Stay<br>Informed</p>
@@ -2015,7 +2018,7 @@ body { top: 0 !important; }
       </div>
       <button class="submit" onclick="submitReport(event)">Submit Report →</button>
       <p style="font-size: 13px;color:rgba(242,239,230,0.68);margin-top:12px;line-height:1.6;letter-spacing:0.06em">
-        📱 <strong style="color:rgba(242,239,230,0.88)">Get SMS alerts:</strong> <a href="sms:+1(855) 502-6699" style="color:#d42b20;text-decoration:none">Text WATCH to +1 (855) 502-6699 </a> — reports are anonymous by default
+        📱 <strong style="color:rgba(242,239,230,0.88)">Get SMS alerts:</strong> <a href="sms:+1(855) 502-6699" style="color:#2563eb;text-decoration:none">Text WATCH to +1 (855) 502-6699 </a> — reports are anonymous by default
       </p>
     </div>
     <div class="report-right reveal" style="transition-delay:.1s">
@@ -2385,15 +2388,15 @@ function closeMobileNav() {
 }
 .wt-ap-row:last-child { margin-bottom: 0; }
 
-.wt-ap-link { color: #d42b20 !important; font-size: 13px; text-decoration: none; letter-spacing: 0.06em; }
+.wt-ap-link { color: #2563eb !important; font-size: 13px; text-decoration: none; letter-spacing: 0.06em; }
 .wt-ap-link:hover { text-decoration: underline; }
 
 .wt-sw { position: relative; width: 32px; height: 16px; cursor: pointer; flex-shrink: 0; }
 .wt-sw input { opacity: 0; width: 0; height: 0; position: absolute; }
 .wt-sw-t { position: absolute; inset: 0; background: rgba(242,239,230,0.11); border: 1px solid rgba(242,239,230,0.2); transition: all 0.2s; }
 .wt-sw-d { position: absolute; top: 2px; left: 2px; width: 10px; height: 10px; background: rgba(242,239,230,0.6); transition: all 0.2s; }
-.wt-sw input:checked ~ .wt-sw-t { background: rgba(212,43,32,0.25); border-color: #d42b20; }
-.wt-sw input:checked ~ .wt-sw-d { transform: translateX(16px); background: #d42b20; }
+.wt-sw input:checked ~ .wt-sw-t { background: rgba(37,99,235,0.25); border-color: #2563eb; }
+.wt-sw input:checked ~ .wt-sw-d { transform: translateX(16px); background: #2563eb; }
 
 #wt-access-widget #google_translate_element { width: 100%; }
 #wt-access-widget .goog-te-gadget-simple {
@@ -2417,7 +2420,7 @@ body.large-text { font-size: 118% !important; }
 body.high-contrast { background: #000 !important; filter: contrast(1.3); }
 
 @media (max-width: 767px) {
-  #wt-access-widget { top: 82px; right: 8px; }
+  #wt-access-widget { top: 132px; right: 8px; }
   .wt-access-panel { width: 220px; }
   #wt-access-toggle { padding: 5px 10px; font-size: 12px; }
 }
