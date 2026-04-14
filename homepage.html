@@ -609,7 +609,7 @@ nav {
 
   .hero-wordmark-row {
     left: 0; right: 0;
-    bottom: 0;
+    bottom: 40px !important;
     padding: 0 20px 48px;
     background: linear-gradient(to top, rgba(8,8,8,0.92) 0%, rgba(8,8,8,0.6) 60%, transparent 100%);
   }
@@ -1044,9 +1044,11 @@ img[alt="WatchTower"] { max-width: 34px; max-height: 34px; }
   .sec-right { display: none; }
 
   /* HOW */
-  .how-grid { grid-template-columns: 1fr; }
-  .how-cell { border-right: none; padding: 32px 20px; }
-  .how-cell + .how-cell { border-top: var(--rule); }
+  .how-grid { grid-template-columns: 1fr 1fr; }
+  .how-cell { padding: 28px 18px; }
+  .how-cell:nth-child(2n) { border-right: none; }
+  .how-cell:nth-child(n+3) { border-top: var(--rule); }
+  .how-ghost { font-size: 72px; opacity: 1; }
 
   /* TYPE BREAK */
   .type-break { padding: 0 20px; }
@@ -1076,10 +1078,13 @@ img[alt="WatchTower"] { max-width: 34px; max-height: 34px; }
   #subscribe-email-input { min-width: 0 !important; width: 100% !important; }
   #subscribe-btn { width: 100%; justify-content: center; }
 
+  /* TICKER */
+  .ticker-wrap { top: 50px; }
+
   /* ACCESS WIDGET */
-  #wt-access-widget { top: 8px; right: 8px; }
+  #wt-access-widget { top: 122px; right: 8px; }
   #wt-access-toggle { padding: 5px 10px; font-size: 12px; }
-  .wt-access-panel { width: 220px; }
+  .wt-access-panel { width: 220px; right: 0; }
 
   /* FOOTER */
   footer {
@@ -1164,7 +1169,6 @@ img[alt="WatchTower"] { max-width: 34px; max-height: 34px; }
   .lang-grid { grid-template-columns: 1fr 1fr; }
 
   /* HIDE heavy decorative elements on mobile */
-  .how-ghost { display: none; }
   .feat-ghost { display: none; }
   .hero-glitch { display: none; }
 
@@ -1461,18 +1465,13 @@ body { top: 0 !important; }
 
 .feed-footer a:hover { color: #ede9e0; }
 
-/* mobile: feed as bottom strip */
+/* mobile: feed hidden */
 @media (max-width: 767px) {
   .hero-feed {
-    top: auto !important;
-    bottom: 0; left: 0; right: 0;
-    width: 100% !important;
-    height: 210px;
-    border-left: none;
-    border-top: var(--rule);
+    display: none !important;
   }
   .hero-wordmark-row {
-    bottom: 210px !important;
+    bottom: 40px !important;
     right: 0 !important;
   }
   .map-tab-bar {
@@ -1745,8 +1744,7 @@ body { top: 0 !important; }
     border-bottom: var(--rule);
   }
   .hero-feed {
-    width: 100%;
-    border-left: none;
+    display: none !important;
   }
   .hero-wordmark-row {
     padding: 0 16px 18px;
