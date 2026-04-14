@@ -611,6 +611,7 @@ nav {
     left: 0; right: 0;
     bottom: 40px !important;
     padding: 0 20px 48px;
+    gap: 0;
     background: linear-gradient(to top, rgba(8,8,8,0.92) 0%, rgba(8,8,8,0.6) 60%, transparent 100%);
   }
 
@@ -1001,7 +1002,7 @@ img[alt="WatchTower"] { max-width: 34px; max-height: 34px; }
     gap: 16px;
   }
 
-  .hero-wordmark { font-size: clamp(64px, 18vw, 110px); line-height: 0.84; }
+  .hero-wordmark { font-size: clamp(52px, 60vw, 100px) !important; line-height: 0.84; }
 
   .hero-right-text { padding-bottom: 0; }
 
@@ -1032,7 +1033,7 @@ img[alt="WatchTower"] { max-width: 34px; max-height: 34px; }
   .map-tab { font-size: 12px; padding: 8px 12px; }
 
   /* MANIFESTO */
-  .manifesto { grid-template-columns: 1fr; }
+  .manifesto { grid-template-columns: 1fr; margin-top: 0; }
   .man-num { display: none; }
   .man-text { padding: 24px 20px; font-size: clamp(16px, 4vw, 24px); }
   .man-aside { display: none; }
@@ -1736,7 +1737,7 @@ body { top: 0 !important; }
   .hero-shell {
     position: relative;
     grid-template-columns: 1fr;
-    grid-template-rows: minmax(460px, 72vh) 220px;
+    grid-template-rows: minmax(460px, 72vh);
   }
   .hero-map-main {
     min-height: 460px;

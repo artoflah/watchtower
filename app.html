@@ -740,6 +740,34 @@ input, select, textarea { font-size: 18px !important; }
   /* PROFILE MAIN */
   .profile-main { padding: 16px; overflow-x: hidden; }
   .profile-main input, .profile-main select { font-size: 16px !important; }
+
+  /* CHAT HEADER */
+  .chat-header { padding: 8px 12px; gap: 8px; flex-wrap: nowrap; }
+  .chat-ch-name { font-size: 14px; }
+  .chat-ch-meta { font-size: 10px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 160px; }
+  .chat-header-right { gap: 5px; flex-shrink: 0; }
+  .ai-badge { font-size: 10px; padding: 2px 6px; }
+  .chat-act-btn { font-size: 10px; padding: 4px 7px; }
+
+  /* AID CONTROLS */
+  .aid-controls-bar { padding: 8px 14px; }
+  .aid-showing { font-size: 11px; }
+
+  /* AID CARDS — tighter so 2-col grid fits on screen */
+  .aid-grid { grid-template-columns: 1fr 1fr; }
+  .aid-card { padding: 14px 12px; }
+  .aid-card-icon { font-size: 20px; margin-bottom: 5px; }
+  .aid-card-title { font-size: 15px; }
+  .aid-card-desc { font-size: 12px; line-height: 1.4; margin-bottom: 8px; }
+  .aid-card-user { font-size: 10px; max-width: 80px; }
+  .aid-contact-btn { font-size: 10px; padding: 3px 6px; }
+
+  /* ALERT TYPE BADGE — prevent 2-line wrap */
+  .alert-type-badge { font-size: 9px; letter-spacing: 0.08em; padding: 2px 5px; white-space: nowrap; }
+
+  /* RESOURCE CATEGORY COUNT */
+  .res-cat-count { font-size: 10px; letter-spacing: 0.08em; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .res-cat-header { padding: 10px 14px; gap: 8px; }
 }
 
 @supports (padding: max(0px)) {
