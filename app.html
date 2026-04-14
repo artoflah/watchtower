@@ -471,8 +471,9 @@ input, select, textarea { font-size: 18px !important; }
 
 /* LEAFLET DARK STYLE */
 .leaflet-tile { filter: invert(100%) hue-rotate(180deg) brightness(0.82) contrast(0.92) saturate(0.55); }
-.leaflet-popup { background: #0a0a0a !important; }
-.leaflet-popup.leaflet-zoom-animated { will-change: auto !important; background: #0a0a0a !important; }
+.leaflet-popup,
+.leaflet-popup.leaflet-zoom-animated,
+.leaflet-pane > .leaflet-popup { background: #0a0a0a !important; will-change: auto !important; }
 .leaflet-popup-content-wrapper { background: #0a0a0a !important; background-color: #0a0a0a !important; border: 1px solid rgba(242,239,230,0.34) !important; border-radius: 0 !important; box-shadow: none !important; color: #f2efe6 !important; font-family: 'DM Mono', monospace !important; font-size: 15px !important; opacity: 1 !important; }
 .leaflet-popup-tip { background: #0a0a0a !important; }
 .leaflet-popup-content { margin: 10px 14px !important; line-height: 1.6 !important; background: #0a0a0a !important; background-color: #0a0a0a !important; color: #f2efe6 !important; }
@@ -1450,7 +1451,7 @@ function renderMapPins(hood) {
       `<div class="wt-popup-label">${o.label}</div>` +
       `<div class="wt-popup-meta">${o.area}, ${boroName}<br>${o.ago} ago</div>` +
       `</div>`,
-      { maxWidth: 220, closeButton: false }
+      { maxWidth: window.innerWidth <= 767 ? 260 : 220, closeButton: false }
     );
     marker.addTo(leafletMap);
     leafletMarkers.push(marker);
@@ -1527,10 +1528,11 @@ function initLeafletMap() {
         node.style.setProperty('will-change', 'auto', 'important');
       });
       if (wrapper) {
-        wrapper.style.setProperty('border', '1px solid rgba(242,239,230,0.34)', 'important');
+        wrapper.style.setProperty('border', '1px solid rgba(242,239,230,0.55)', 'important');
         wrapper.style.setProperty('border-radius', '0', 'important');
         wrapper.style.setProperty('color', '#f2efe6', 'important');
         wrapper.style.setProperty('box-shadow', 'none', 'important');
+        wrapper.style.setProperty('outline', '1px solid rgba(242,239,230,0.55)', 'important');
       }
     };
     requestAnimationFrame(() => requestAnimationFrame(apply));
