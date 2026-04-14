@@ -733,7 +733,7 @@ input, select, textarea { font-size: 18px !important; }
   .setting-row input, .setting-row select { width: auto !important; min-width: 0; flex: 1; max-width: 100%; }
 
   /* ACCESS WIDGET */
-  #wt-access-widget { top: 8px; right: 8px; }
+  #wt-access-widget { top: 125px !important; right: 8px; }
   #wt-access-toggle { padding: 5px 10px; font-size: 12px; }
   .wt-access-panel { width: 220px; }
 
@@ -742,12 +742,13 @@ input, select, textarea { font-size: 18px !important; }
   .profile-main input, .profile-main select { font-size: 16px !important; }
 
   /* CHAT HEADER */
-  .chat-header { padding: 8px 12px; gap: 8px; flex-wrap: nowrap; }
-  .chat-ch-name { font-size: 14px; }
-  .chat-ch-meta { font-size: 10px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 160px; }
-  .chat-header-right { gap: 5px; flex-shrink: 0; }
-  .ai-badge { font-size: 10px; padding: 2px 6px; }
-  .chat-act-btn { font-size: 10px; padding: 4px 7px; }
+  .chat-header { padding: 8px 10px; gap: 6px; flex-wrap: nowrap; overflow: hidden; }
+  .chat-header-left { min-width: 0; flex: 1; overflow: hidden; }
+  .chat-ch-name { font-size: 13px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .chat-ch-meta { font-size: 10px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .chat-header-right { gap: 4px; flex-shrink: 0; }
+  .ai-badge { font-size: 9px; padding: 2px 5px; white-space: nowrap; }
+  .chat-act-btn { font-size: 9px; padding: 3px 6px; white-space: nowrap; }
 
   /* AID CONTROLS */
   .aid-controls-bar { padding: 8px 14px; }
@@ -1208,7 +1209,7 @@ body.high-contrast { background: #000 !important; filter: contrast(1.3); }
       <span class="bot-badge">5</span>
     </button>
     <button class="bot-tab" onclick="switchTab(5,this)">
-      <span class="bot-icon">🏥</span><span class="bot-label">Resources</span>
+      <span class="bot-icon">🏥</span><span class="bot-label">Res.</span>
     </button>
     <button class="bot-tab" onclick="switchTab(4,this)">
       <span class="bot-icon">👤</span><span class="bot-label">Profile</span>
@@ -1299,6 +1300,8 @@ function switchTab(n, btn) {
   document.querySelectorAll('.tn-tab').forEach((t,i) => t.classList.toggle('active', i===n));
   document.querySelectorAll('.bot-tab').forEach((t,i) => t.classList.toggle('active', i===n));
   if (n === 0) setTimeout(() => { if (!leafletMap) initLeafletMap(); else leafletMap.invalidateSize(true); }, 50);
+  // On mobile, opening Chat tab always shows channels list first
+  if (n === 1 && window.innerWidth <= 767) showChannels();
 }
 
 // ══════════════════════════════════════════
@@ -1655,6 +1658,8 @@ function appendMsg(m) {
 function loadChannel(el, key) {
   document.querySelectorAll('.channel-item').forEach(c => c.classList.remove('active'));
   if (el) { el.classList.add('active'); el.querySelector('.ch-unread')?.remove(); }
+  // On mobile, dismiss channels panel and open the chat view
+  if (window.innerWidth <= 767) hideChannels();
   currentChannelKey = key;
   chatHistory = [];
   const ch = CHANNELS[key];
