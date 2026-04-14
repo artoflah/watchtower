@@ -1178,7 +1178,7 @@ img[alt="WatchTower"] { max-width: 34px; max-height: 34px; }
 /* ── SMALL MOBILE (max 390px — iPhone SE, older phones) ── */
 @media (max-width: 390px) {
 
-  .hero-wordmark { font-size: 58px; }
+  .hero-wordmark { font-size: 110px !important; }
   .step-headline { font-size: 42px; }
   .report-left h2 { font-size: 48px; }
   .feat-title { font-size: 36px; }
@@ -1195,7 +1195,7 @@ img[alt="WatchTower"] { max-width: 34px; max-height: 34px; }
 
 /* ── SHORT SCREENS (iPhone SE height ~667px, older iPhones) ── */
 @media (max-height: 680px) and (max-width: 767px) {
-  .hero-wordmark { font-size: clamp(48px, 14vw, 72px); }
+  .hero-wordmark { font-size: 100px !important; }
   .hero-desc { font-size: 15px; margin-bottom: 14px; }
   .hero-wordmark-row { padding: 0 16px 32px; }
   .hero-ctas { gap: 8px; }
@@ -1327,8 +1327,8 @@ body { top: 0 !important; }
   /* prevent any text from running off screen */
   * { max-width: 100%; }
   
-  /* hero wordmark scale down more aggressively */
-  .hero-wordmark { font-size: clamp(52px, 14vw, 88px) !important; }
+  /* hero wordmark */
+  .hero-wordmark { font-size: 130px !important; }
   
   /* type break — don't let it overflow */
   .type-break { padding: 0 16px; overflow: hidden; }
@@ -1375,7 +1375,7 @@ body { top: 0 !important; }
 }
 
 @media (max-width: 390px) {
-  .hero-wordmark { font-size: 48px !important; }
+  .hero-wordmark { font-size: 110px !important; }
   .feat-title { font-size: 32px; }
   .report-left h2 { font-size: 44px; }
   .stat-n { font-size: 44px; }
