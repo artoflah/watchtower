@@ -713,7 +713,7 @@ input, select, textarea { font-size: 18px !important; }
 
 /* MOBILE */
 @media (max-width: 767px) {
-  * { max-width: 100%; }
+  *:not(#wt-access-widget):not(#wt-access-widget *) { max-width: 100%; }
   .shell { grid-template-rows: 52px 20px 1fr 56px; }
   .tn-status { display: none; }
   .v-map { grid-template-columns: 1fr; }
@@ -734,7 +734,7 @@ input, select, textarea { font-size: 18px !important; }
   .setting-row input, .setting-row select { width: auto !important; min-width: 0; flex: 1; max-width: 100%; }
 
   /* ACCESS WIDGET */
-  #wt-access-widget { top: 125px !important; right: 8px; max-width: none !important; }
+  #wt-access-widget { top: 125px !important; right: 8px; }
 
   /* PROFILE MAIN */
   .profile-main { padding: 16px; overflow-x: hidden; }
