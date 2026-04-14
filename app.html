@@ -777,7 +777,7 @@ input, select, textarea { font-size: 18px !important; }
   position: fixed;
   left: 12px;
   bottom: calc(70px + env(safe-area-inset-bottom, 0px));
-  z-index: 300;
+  z-index: 9999;
   background: #0a0a0a;
   border: 1px solid rgba(242,239,230,0.34);
   width: 220px;
@@ -786,7 +786,7 @@ input, select, textarea { font-size: 18px !important; }
   pointer-events: none;
   transition: opacity 0.2s ease, transform 0.2s ease;
 }
-#map-info-bar.visible { opacity: 1; transform: translateY(0); pointer-events: all; }
+#map-info-bar.visible { display: block; opacity: 1; transform: translateY(0); pointer-events: all; }
 .mib-inner { display: flex; align-items: flex-start; justify-content: space-between; padding: 12px 12px 12px 14px; gap: 8px; }
 .mib-left { flex: 1; min-width: 0; }
 .mib-top { display: flex; align-items: center; gap: 6px; margin-bottom: 4px; }
@@ -796,9 +796,6 @@ input, select, textarea { font-size: 18px !important; }
 .mib-meta { font-size: 10px; color: rgba(242,239,230,0.55); letter-spacing: 0.05em; line-height: 1.5; }
 .mib-close { background: none; border: none; color: rgba(242,239,230,0.5); font-size: 13px; cursor: pointer; flex-shrink: 0; padding: 0; line-height: 1; }
 
-@media (max-width: 767px) {
-  #map-info-bar { display: block; }
-}
 
 @supports (padding: max(0px)) {
   .bottombar { padding-bottom: max(0px, env(safe-area-inset-bottom)); }
@@ -1489,18 +1486,20 @@ function renderMapPins(hood) {
       fillOpacity: 1,
     });
     const boroName = BORO_NAME[o.boro] || o.boro;
-    if (window.innerWidth <= 767) {
-      marker.on('click', () => showMapBar(o, boroName, col));
-    } else {
-      marker.bindPopup(
-        `<div class="wt-popup">` +
-        `<div class="wt-popup-status wt-popup-status-${o.status}"><span class="wt-popup-dot wt-popup-dot-${o.status}"></span>${STATUS_LABEL[o.status]} · ${o.type}</div>` +
-        `<div class="wt-popup-label">${o.label}</div>` +
-        `<div class="wt-popup-meta">${o.area}, ${boroName}<br>${o.ago} ago</div>` +
-        `</div>`,
-        { maxWidth: 220, closeButton: false }
-      );
-    }
+    marker.bindPopup(
+      `<div class="wt-popup">` +
+      `<div class="wt-popup-status wt-popup-status-${o.status}"><span class="wt-popup-dot wt-popup-dot-${o.status}"></span>${STATUS_LABEL[o.status]} · ${o.type}</div>` +
+      `<div class="wt-popup-label">${o.label}</div>` +
+      `<div class="wt-popup-meta">${o.area}, ${boroName}<br>${o.ago} ago</div>` +
+      `</div>`,
+      { maxWidth: 220, closeButton: false }
+    );
+    marker.on('click', function() {
+      if (window.innerWidth <= 767) {
+        leafletMap.closePopup();
+        showMapBar(o, boroName, col);
+      }
+    });
     marker.addTo(leafletMap);
     leafletMarkers.push(marker);
   });
@@ -2058,16 +2057,19 @@ function selectLang(el) {
 function showMapBar(o, boroName, col) {
   const bar = document.getElementById('map-info-bar');
   if (!bar) return;
-  const STATUS_LABEL = { out: 'OUT', part: 'PARTIAL', on: 'ON' };
+  const labels = { out: 'OUT', part: 'PARTIAL', on: 'ON' };
   bar.querySelector('.mib-dot').style.background = col;
-  bar.querySelector('.mib-status').textContent = (STATUS_LABEL[o.status] || o.status) + ' · ' + o.type;
+  bar.querySelector('.mib-status').textContent = (labels[o.status] || o.status) + ' · ' + o.type;
   bar.querySelector('.mib-status').style.color = col;
   bar.querySelector('.mib-label').textContent = o.label;
   bar.querySelector('.mib-meta').textContent = o.area + ', ' + boroName + ' · ' + o.ago + ' ago';
-  bar.classList.add('visible');
+  bar.style.display = 'block';
+  requestAnimationFrame(() => bar.classList.add('visible'));
 }
 function hideMapBar() {
-  document.getElementById('map-info-bar')?.classList.remove('visible');
+  const bar = document.getElementById('map-info-bar');
+  if (!bar) return;
+  bar.classList.remove('visible');
 }
 
 function showChannels() {
