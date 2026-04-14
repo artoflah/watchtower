@@ -776,7 +776,7 @@ input, select, textarea { font-size: 18px !important; }
   display: none;
   position: fixed;
   left: 0; right: 0;
-  bottom: 58px;
+  bottom: calc(58px + env(safe-area-inset-bottom, 0px));
   z-index: 300;
   background: #0a0a0a;
   border-top: 1px solid rgba(242,239,230,0.34);
