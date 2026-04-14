@@ -228,7 +228,7 @@ nav, .topnav {
 .f-row:hover { background: var(--faint); }
 .f-zone { font-size: 16px; color: rgba(242,239,230,0.82); letter-spacing: 0.03em; line-height: 1.3; }
 .f-zone small { display: block; font-size: 17px; color: rgba(242,239,230,0.8); letter-spacing: 0.1em; margin-top: 1px; }
-.f-type { font-size: 17px; letter-spacing: 0.1em; text-transform: uppercase; color: rgba(242,239,230,0.8); text-align: right; }
+.f-type { font-size: 12px; letter-spacing: 0.1em; text-transform: uppercase; color: rgba(242,239,230,0.8); text-align: right; }
 .f-badge { font-size: 17px; letter-spacing: 0.1em; text-transform: uppercase; padding: 3px 6px; text-align: center; }
 
 /* ─── SHARED: NAV STATUS ─── */
@@ -1169,10 +1169,6 @@ body.high-contrast { background: #000 !important; filter: contrast(1.3); }
     <div class="wt-ap-section">
       <div class="wt-ap-label">Accessibility</div>
       <div class="wt-ap-row">
-        <span>Large Text</span>
-        <label class="wt-sw"><input type="checkbox" onchange="toggleLargeText(this)"><span class="wt-sw-t"></span><span class="wt-sw-d"></span></label>
-      </div>
-      <div class="wt-ap-row">
         <span>High Contrast</span>
         <label class="wt-sw"><input type="checkbox" onchange="toggleHighContrast(this)"><span class="wt-sw-t"></span><span class="wt-sw-d"></span></label>
       </div>
@@ -1181,7 +1177,7 @@ body.high-contrast { background: #000 !important; filter: contrast(1.3); }
       <div class="wt-ap-label">Quick Access</div>
       <div class="wt-ap-row" style="flex-direction:column;align-items:flex-start;gap:3px">
         <span>SMS Hotline</span>
-        <a href="sms:+19178669651" class="wt-ap-link">Text START to 917-WT-NOW1</a>
+        <a href="sms:+18555026699" class="wt-ap-link">Text WATCH to +1 (855) 502-6699</a>
       </div>
       <div class="wt-ap-row" style="flex-direction:column;align-items:flex-start;gap:3px;margin-top:8px">
         <span>Call-In</span>
@@ -1203,11 +1199,6 @@ document.addEventListener('click', function(e) {
   }
 });
 
-function toggleLargeText(cb) {
-  document.body.classList.toggle('large-text', cb.checked);
-  try { localStorage.setItem('wt_large_text', cb.checked); } catch(e) {}
-}
-
 function toggleHighContrast(cb) {
   document.body.classList.toggle('high-contrast', cb.checked);
   try { localStorage.setItem('wt_high_contrast', cb.checked); } catch(e) {}
@@ -1215,11 +1206,6 @@ function toggleHighContrast(cb) {
 
 window.addEventListener('load', function() {
   try {
-    if (localStorage.getItem('wt_large_text') === 'true') {
-      document.body.classList.add('large-text');
-      const cb = document.querySelector('[onchange*="toggleLargeText"]');
-      if (cb) cb.checked = true;
-    }
     if (localStorage.getItem('wt_high_contrast') === 'true') {
       document.body.classList.add('high-contrast');
       const cb = document.querySelector('[onchange*="toggleHighContrast"]');
@@ -1360,7 +1346,7 @@ function latToY(lat) {
   return ((NYC_BOUNDS.north - lat) / (NYC_BOUNDS.north - NYC_BOUNDS.south)) * 100;
 }
 
-const STATUS_COLOR = { out:'#2563eb', part:'#c8a020', on:'#2a9944' };
+const STATUS_COLOR = { out:'#ff4444', part:'#e8b800', on:'#22c55e' };
 const STATUS_LABEL = { out:'OUT', part:'PART', on:'ON' };
 const STATUS_CLASS = { out:'bOUT', part:'bPART', on:'bON' };
 
@@ -1380,10 +1366,10 @@ function renderMapPins(hood) {
     const marker = L.circleMarker([o.lat, o.lng], {
       radius: o.status === 'out' ? 11 : o.status === 'part' ? 9 : 7,
       fillColor: col,
-      color: '#111',
-      weight: 2,
-      opacity: 1,
-      fillOpacity: 1,
+      color: col,
+      weight: 1.5,
+      opacity: 0.45,
+      fillOpacity: 0.62,
     });
     marker.bindPopup(
       `<div class="wt-popup-title wt-popup-status-${o.status}">${emoji} ${STATUS_LABEL[o.status]} — ${o.label}</div>` +
@@ -1659,7 +1645,7 @@ async function sendMessage() {
     appendMsg({av:'WT', name:'WatchTower', cls:'wt verified is-alert', time:new Date().toLocaleTimeString('en-US',{hour:'numeric',minute:'2-digit'}), text:reply.replace(/\n/g,'<br>')});
   } catch(err) {
     if (typing) typing.style.display = 'none';
-    appendMsg({av:'WT', name:'WatchTower', cls:'wt verified is-alert', time:new Date().toLocaleTimeString('en-US',{hour:'numeric',minute:'2-digit'}), text:'Connection issue. SMS backup: text STATUS to 917-WT-NOW1'});
+    appendMsg({av:'WT', name:'WatchTower', cls:'wt verified is-alert', time:new Date().toLocaleTimeString('en-US',{hour:'numeric',minute:'2-digit'}), text:'Connection issue. SMS backup: text STATUS to +1 (855) 502-6699'});
   }
   if (input) input.disabled = false;
   if (btn) btn.disabled = false;

@@ -223,7 +223,7 @@ nav, .topnav {
 .f-row:hover { background: var(--faint); }
 .f-zone { font-size: 16px; color: rgba(242,239,230,0.82); letter-spacing: 0.03em; line-height: 1.3; }
 .f-zone small { display: block; font-size: 17px; color: rgba(242,239,230,0.8); letter-spacing: 0.1em; margin-top: 1px; }
-.f-type { font-size: 17px; letter-spacing: 0.1em; text-transform: uppercase; color: rgba(242,239,230,0.8); text-align: right; }
+.f-type { font-size: 12px; letter-spacing: 0.1em; text-transform: uppercase; color: rgba(242,239,230,0.8); text-align: right; }
 .f-badge { font-size: 17px; letter-spacing: 0.1em; text-transform: uppercase; padding: 3px 6px; text-align: center; }
 
 /* ─── SHARED: NAV STATUS ─── */
@@ -2085,28 +2085,73 @@ body { top: 0 !important; }
 <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js"></script>
 <script>
 const OUTAGES = [
-  { id:'bx01', lat:40.8061, lng:-73.9175, boro:'bronx', borough:'Bronx', label:'138th St & Willis Ave', area:'Mott Haven', type:'Power', status:'out', ago:'4 min' },
-  { id:'bx02', lat:40.8167, lng:-73.9284, boro:'bronx', borough:'Bronx', label:'Grand Concourse & 161st', area:'Concourse', type:'Water', status:'part', ago:'3 hr' },
-  { id:'bx03', lat:40.8448, lng:-73.8648, boro:'bronx', borough:'Bronx', label:'Pelham Pkwy & White Plains', area:'Pelham Bay', type:'Power', status:'on', ago:'8 hr' },
-  { id:'bx04', lat:40.8290, lng:-73.9209, boro:'bronx', borough:'Bronx', label:'Fordham Rd & Valentine Ave', area:'Fordham', type:'Water', status:'on', ago:'1 hr' },
-  { id:'bx05', lat:40.8501, lng:-73.9108, boro:'bronx', borough:'Bronx', label:'E 180th St & Bronx Park', area:'Bronx Park', type:'Power', status:'out', ago:'2 hr' },
-  { id:'bk01', lat:40.6944, lng:-73.9213, boro:'brooklyn', borough:'Brooklyn', label:'Knickerbocker Ave & Halsey', area:'Bushwick', type:'Water', status:'out', ago:'1 hr' },
-  { id:'bk02', lat:40.6912, lng:-73.9180, boro:'brooklyn', borough:'Brooklyn', label:'Myrtle Ave & Broadway', area:'Bushwick', type:'Power', status:'part', ago:'2 hr' },
-  { id:'bk03', lat:40.6782, lng:-73.9442, boro:'brooklyn', borough:'Brooklyn', label:'Malcolm X Blvd & Fulton', area:'Bed-Stuy', type:'Power', status:'on', ago:'2 hr' },
-  { id:'bk04', lat:40.6681, lng:-73.9496, boro:'brooklyn', borough:'Brooklyn', label:'Nostrand Ave & Eastern Pkwy', area:'Crown Heights', type:'Water', status:'on', ago:'12 min' },
-  { id:'bk05', lat:40.6501, lng:-73.9496, boro:'brooklyn', borough:'Brooklyn', label:'Flatbush Ave & Ave D', area:'East Flatbush', type:'Power', status:'part', ago:'31 min' },
-  { id:'bk06', lat:40.6745, lng:-74.0164, boro:'brooklyn', borough:'Brooklyn', label:'Van Brunt St & Commerce', area:'Red Hook', type:'Water', status:'on', ago:'6 hr' },
-  { id:'mn01', lat:40.8116, lng:-73.9465, boro:'manhattan', borough:'Manhattan', label:'W 125th St & Malcolm X Blvd', area:'Harlem', type:'Power', status:'on', ago:'2 hr' },
-  { id:'mn02', lat:40.8448, lng:-73.9393, boro:'manhattan', borough:'Manhattan', label:'W 181st St & Broadway', area:'Washington Heights', type:'Power', status:'out', ago:'3 hr' },
-  { id:'mn03', lat:40.8679, lng:-73.9219, boro:'manhattan', borough:'Manhattan', label:'Dyckman St & Broadway', area:'Inwood', type:'Power', status:'part', ago:'9 hr' },
-  { id:'mn04', lat:40.7831, lng:-73.9712, boro:'manhattan', borough:'Manhattan', label:'W 96th St & West End Ave', area:'Upper West Side', type:'Water', status:'on', ago:'5 hr' },
-  { id:'qn01', lat:40.6943, lng:-73.8010, boro:'queens', borough:'Queens', label:'Sutphin Blvd & Jamaica Ave', area:'Jamaica', type:'Water', status:'on', ago:'4 hr' },
-  { id:'qn02', lat:40.7728, lng:-73.9301, boro:'queens', borough:'Queens', label:'31st St & Ditmars Blvd', area:'Astoria', type:'Power', status:'part', ago:'2 hr' },
-  { id:'qn03', lat:40.7282, lng:-73.8796, boro:'queens', borough:'Queens', label:'Myrtle Ave & Fresh Pond Rd', area:'Ridgewood', type:'Water', status:'out', ago:'6 hr' },
-  { id:'qn04', lat:40.7580, lng:-73.8301, boro:'queens', borough:'Queens', label:'Jamaica Ave & 168th St', area:'Jamaica', type:'Power', status:'out', ago:'1 hr' },
-  { id:'si01', lat:40.6501, lng:-74.0966, boro:'statenisland', borough:'Staten Island', label:'Bay St & Victory Blvd', area:'St. George', type:'Power', status:'on', ago:'10 hr' },
-  { id:'si02', lat:40.6226, lng:-74.1052, boro:'statenisland', borough:'Staten Island', label:'Richmond Ave & Forest Ave', area:'Willowbrook', type:'Water', status:'part', ago:'7 hr' },
-  { id:'si03', lat:40.5795, lng:-74.1502, boro:'statenisland', borough:'Staten Island', label:'Hylan Blvd & New Dorp Lane', area:'New Dorp', type:'Power', status:'out', ago:'2 hr' }
+  // ── THE BRONX (13) ──
+  { id:'bx01', lat:40.8061, lng:-73.9175, boro:'bronx', borough:'Bronx', label:'138th St & Willis Ave',      area:'Mott Haven',       type:'Power', status:'out',  ago:'4 min' },
+  { id:'bx02', lat:40.8167, lng:-73.9284, boro:'bronx', borough:'Bronx', label:'Grand Concourse & 161st',    area:'Concourse',        type:'Water', status:'part', ago:'3 hr'  },
+  { id:'bx03', lat:40.8448, lng:-73.8648, boro:'bronx', borough:'Bronx', label:'Pelham Pkwy & White Plains', area:'Pelham Bay',       type:'Power', status:'on',   ago:'8 hr'  },
+  { id:'bx04', lat:40.8290, lng:-73.9209, boro:'bronx', borough:'Bronx', label:'Fordham Rd & Valentine Ave', area:'Fordham',          type:'Water', status:'on',   ago:'1 hr'  },
+  { id:'bx05', lat:40.8501, lng:-73.9108, boro:'bronx', borough:'Bronx', label:'E 180th St & Bronx Park',    area:'Bronx Park',       type:'Power', status:'out',  ago:'2 hr'  },
+  { id:'bx06', lat:40.8010, lng:-73.9270, boro:'bronx', borough:'Bronx', label:'3rd Ave & 138th St',         area:'Mott Haven',       type:'Power', status:'out',  ago:'5 hr'  },
+  { id:'bx07', lat:40.8620, lng:-73.8980, boro:'bronx', borough:'Bronx', label:'Boston Rd & E Tremont',      area:'West Farms',       type:'Water', status:'part', ago:'6 hr'  },
+  { id:'bx08', lat:40.8780, lng:-73.9051, boro:'bronx', borough:'Bronx', label:'Gun Hill Rd & White Plains', area:'Williamsbridge',   type:'Power', status:'on',   ago:'9 hr'  },
+  { id:'bx09', lat:40.8330, lng:-73.9450, boro:'bronx', borough:'Bronx', label:'W Tremont & University Ave', area:'University Hts',   type:'Water', status:'out',  ago:'1 hr'  },
+  { id:'bx10', lat:40.8680, lng:-73.9210, boro:'bronx', borough:'Bronx', label:'Kingsbridge Rd & Jerome',    area:'Kingsbridge',      type:'Power', status:'part', ago:'4 hr'  },
+  { id:'bx11', lat:40.8120, lng:-73.8950, boro:'bronx', borough:'Bronx', label:'Hunts Point Ave & Spofford', area:'Hunts Point',      type:'Water', status:'on',   ago:'7 hr'  },
+  { id:'bx12', lat:40.8450, lng:-73.9390, boro:'bronx', borough:'Bronx', label:'W 181st St & St Nicholas',   area:'Washington Hts',   type:'Power', status:'out',  ago:'3 hr'  },
+  { id:'bx13', lat:40.8235, lng:-73.9042, boro:'bronx', borough:'Bronx', label:'Bruckner Blvd & Story Ave',  area:'Soundview',        type:'Power', status:'part', ago:'2 hr'  },
+  // ── BROOKLYN (14) ──
+  { id:'bk01', lat:40.6944, lng:-73.9213, boro:'brooklyn', borough:'Brooklyn', label:'Knickerbocker Ave & Halsey',   area:'Bushwick',       type:'Water', status:'out',  ago:'1 hr'  },
+  { id:'bk02', lat:40.6912, lng:-73.9180, boro:'brooklyn', borough:'Brooklyn', label:'Myrtle Ave & Broadway',        area:'Bushwick',       type:'Power', status:'part', ago:'2 hr'  },
+  { id:'bk03', lat:40.6782, lng:-73.9442, boro:'brooklyn', borough:'Brooklyn', label:'Malcolm X Blvd & Fulton',      area:'Bed-Stuy',       type:'Power', status:'on',   ago:'2 hr'  },
+  { id:'bk04', lat:40.6681, lng:-73.9496, boro:'brooklyn', borough:'Brooklyn', label:'Nostrand Ave & Eastern Pkwy',  area:'Crown Heights',  type:'Water', status:'on',   ago:'12 min'},
+  { id:'bk05', lat:40.6501, lng:-73.9496, boro:'brooklyn', borough:'Brooklyn', label:'Flatbush Ave & Ave D',         area:'Flatbush',       type:'Power', status:'part', ago:'31 min'},
+  { id:'bk06', lat:40.6745, lng:-74.0164, boro:'brooklyn', borough:'Brooklyn', label:'Van Brunt St & Commerce',      area:'Red Hook',       type:'Water', status:'on',   ago:'6 hr'  },
+  { id:'bk07', lat:40.6360, lng:-73.9268, boro:'brooklyn', borough:'Brooklyn', label:'Church Ave & Coney Island Ave',area:'Flatbush',       type:'Power', status:'part', ago:'6 hr'  },
+  { id:'bk08', lat:40.6396, lng:-73.8988, boro:'brooklyn', borough:'Brooklyn', label:'Pitkin Ave & Euclid Ave',      area:'East New York',  type:'Power', status:'out',  ago:'7 hr'  },
+  { id:'bk09', lat:40.6582, lng:-74.0099, boro:'brooklyn', borough:'Brooklyn', label:'4th Ave & Atlantic Ave',       area:'Park Slope',     type:'Power', status:'on',   ago:'10 hr' },
+  { id:'bk10', lat:40.7020, lng:-73.9936, boro:'brooklyn', borough:'Brooklyn', label:'Bedford Ave & N 7th St',       area:'Williamsburg',   type:'Water', status:'part', ago:'3 hr'  },
+  { id:'bk11', lat:40.6892, lng:-73.9815, boro:'brooklyn', borough:'Brooklyn', label:'Atlantic Ave & Bond St',       area:'Boerum Hill',    type:'Power', status:'on',   ago:'5 hr'  },
+  { id:'bk12', lat:40.6450, lng:-73.9787, boro:'brooklyn', borough:'Brooklyn', label:'Ocean Ave & Caton Ave',        area:'Prospect Park',  type:'Water', status:'out',  ago:'2 hr'  },
+  { id:'bk13', lat:40.6220, lng:-74.0310, boro:'brooklyn', borough:'Brooklyn', label:'86th St & 4th Ave',            area:'Bay Ridge',      type:'Power', status:'on',   ago:'11 hr' },
+  { id:'bk14', lat:40.6490, lng:-73.9565, boro:'brooklyn', borough:'Brooklyn', label:'Rogers Ave & Linden Blvd',     area:'Crown Heights',  type:'Water', status:'part', ago:'4 hr'  },
+  // ── MANHATTAN (12) ──
+  { id:'mn01', lat:40.8116, lng:-73.9465, boro:'manhattan', borough:'Manhattan', label:'W 125th St & Malcolm X Blvd', area:'Harlem',          type:'Power', status:'on',   ago:'2 hr'  },
+  { id:'mn02', lat:40.8448, lng:-73.9393, boro:'manhattan', borough:'Manhattan', label:'W 181st St & Broadway',       area:'Washington Hts',  type:'Power', status:'out',  ago:'3 hr'  },
+  { id:'mn03', lat:40.8679, lng:-73.9219, boro:'manhattan', borough:'Manhattan', label:'Dyckman St & Broadway',       area:'Inwood',          type:'Power', status:'part', ago:'9 hr'  },
+  { id:'mn04', lat:40.7831, lng:-73.9712, boro:'manhattan', borough:'Manhattan', label:'W 96th St & West End Ave',    area:'Upper West Side',  type:'Water', status:'on',   ago:'5 hr'  },
+  { id:'mn05', lat:40.7282, lng:-73.9942, boro:'manhattan', borough:'Manhattan', label:'8th Ave & W 23rd St',         area:'Chelsea',         type:'Power', status:'on',   ago:'11 hr' },
+  { id:'mn06', lat:40.7614, lng:-73.9776, boro:'manhattan', borough:'Manhattan', label:'W 57th St & 9th Ave',         area:'Midtown West',    type:'Water', status:'part', ago:'1 hr'  },
+  { id:'mn07', lat:40.7282, lng:-73.9897, boro:'manhattan', borough:'Manhattan', label:'6th Ave & W 14th St',         area:'West Village',    type:'Power', status:'on',   ago:'8 hr'  },
+  { id:'mn08', lat:40.8010, lng:-73.9527, boro:'manhattan', borough:'Manhattan', label:'Amsterdam Ave & W 145th St',  area:'Harlem',          type:'Water', status:'out',  ago:'6 hr'  },
+  { id:'mn09', lat:40.7900, lng:-73.9720, boro:'manhattan', borough:'Manhattan', label:'Broadway & W 110th St',       area:'Morningside Hts', type:'Power', status:'part', ago:'4 hr'  },
+  { id:'mn10', lat:40.7580, lng:-73.9855, boro:'manhattan', borough:'Manhattan', label:'10th Ave & W 42nd St',        area:"Hell's Kitchen",  type:'Water', status:'on',   ago:'7 hr'  },
+  { id:'mn11', lat:40.8320, lng:-73.9530, boro:'manhattan', borough:'Manhattan', label:'St Nicholas Ave & W 170th',   area:'Washington Hts',  type:'Power', status:'out',  ago:'1 hr'  },
+  { id:'mn12', lat:40.7485, lng:-73.9865, boro:'manhattan', borough:'Manhattan', label:'9th Ave & W 36th St',         area:'Hudson Yards',    type:'Power', status:'part', ago:'5 hr'  },
+  // ── QUEENS (13) ──
+  { id:'qn01', lat:40.6943, lng:-73.8010, boro:'queens', borough:'Queens', label:'Sutphin Blvd & Jamaica Ave',   area:'Jamaica',         type:'Water', status:'on',   ago:'4 hr'  },
+  { id:'qn02', lat:40.7728, lng:-73.9301, boro:'queens', borough:'Queens', label:'31st St & Ditmars Blvd',       area:'Astoria',         type:'Power', status:'part', ago:'2 hr'  },
+  { id:'qn03', lat:40.7282, lng:-73.8796, boro:'queens', borough:'Queens', label:'Myrtle Ave & Fresh Pond Rd',   area:'Ridgewood',       type:'Water', status:'out',  ago:'6 hr'  },
+  { id:'qn04', lat:40.7489, lng:-73.8385, boro:'queens', borough:'Queens', label:'Hillside Ave & 164th St',      area:'Jamaica Hills',   type:'Power', status:'on',   ago:'8 hr'  },
+  { id:'qn05', lat:40.7580, lng:-73.8301, boro:'queens', borough:'Queens', label:'Jamaica Ave & 168th St',       area:'Jamaica',         type:'Power', status:'out',  ago:'1 hr'  },
+  { id:'qn06', lat:40.7465, lng:-73.8920, boro:'queens', borough:'Queens', label:'Queens Blvd & Woodhaven',      area:'Woodhaven',       type:'Water', status:'part', ago:'3 hr'  },
+  { id:'qn07', lat:40.7610, lng:-73.9130, boro:'queens', borough:'Queens', label:'Northern Blvd & 74th St',      area:'Jackson Heights', type:'Power', status:'on',   ago:'9 hr'  },
+  { id:'qn08', lat:40.7420, lng:-73.9210, boro:'queens', borough:'Queens', label:'Roosevelt Ave & 82nd St',      area:'Elmhurst',        type:'Water', status:'out',  ago:'2 hr'  },
+  { id:'qn09', lat:40.7200, lng:-73.8500, boro:'queens', borough:'Queens', label:'Linden Blvd & Guy Brewer Blvd',area:'S. Jamaica',     type:'Power', status:'part', ago:'5 hr'  },
+  { id:'qn10', lat:40.7830, lng:-73.8800, boro:'queens', borough:'Queens', label:'Union Tpke & 173rd St',        area:'Fresh Meadows',   type:'Water', status:'on',   ago:'10 hr' },
+  { id:'qn11', lat:40.7050, lng:-73.8280, boro:'queens', borough:'Queens', label:'Rockaway Blvd & 130th St',     area:'S. Ozone Park',   type:'Power', status:'out',  ago:'3 hr'  },
+  { id:'qn12', lat:40.7640, lng:-73.8230, boro:'queens', borough:'Queens', label:'Francis Lewis Blvd & 45th Ave',area:'Bayside',         type:'Water', status:'part', ago:'7 hr'  },
+  { id:'qn13', lat:40.7690, lng:-73.9000, boro:'queens', borough:'Queens', label:'Steinway St & 28th Ave',       area:'Astoria',         type:'Power', status:'on',   ago:'6 hr'  },
+  // ── STATEN ISLAND (10) ──
+  { id:'si01', lat:40.6501, lng:-74.0966, boro:'statenisland', borough:'Staten Island', label:'Bay St & Victory Blvd',        area:'St. George',     type:'Power', status:'on',   ago:'10 hr' },
+  { id:'si02', lat:40.6226, lng:-74.1052, boro:'statenisland', borough:'Staten Island', label:'Richmond Ave & Forest Ave',    area:'Willowbrook',    type:'Water', status:'part', ago:'7 hr'  },
+  { id:'si03', lat:40.5795, lng:-74.1502, boro:'statenisland', borough:'Staten Island', label:'Hylan Blvd & New Dorp Lane',   area:'New Dorp',       type:'Power', status:'out',  ago:'2 hr'  },
+  { id:'si04', lat:40.6020, lng:-74.0960, boro:'statenisland', borough:'Staten Island', label:'Forest Ave & Broadway',        area:'West Brighton',  type:'Water', status:'on',   ago:'5 hr'  },
+  { id:'si05', lat:40.6390, lng:-74.0740, boro:'statenisland', borough:'Staten Island', label:'Richmond Terrace & Bard Ave',  area:'Stapleton',      type:'Power', status:'part', ago:'4 hr'  },
+  { id:'si06', lat:40.5620, lng:-74.1680, boro:'statenisland', borough:'Staten Island', label:'Amboy Rd & Richmond Ave',      area:'Great Kills',    type:'Water', status:'out',  ago:'1 hr'  },
+  { id:'si07', lat:40.6100, lng:-74.1120, boro:'statenisland', borough:'Staten Island', label:'Victory Blvd & Manor Rd',      area:'Castleton',      type:'Power', status:'on',   ago:'8 hr'  },
+  { id:'si08', lat:40.6310, lng:-74.1210, boro:'statenisland', borough:'Staten Island', label:'Richmond Rd & Todt Hill Rd',   area:'Todt Hill',      type:'Water', status:'part', ago:'6 hr'  },
+  { id:'si09', lat:40.5880, lng:-74.1290, boro:'statenisland', borough:'Staten Island', label:'Richmond Ave & Arthur Kill Rd',area:'Richmond Town',  type:'Power', status:'out',  ago:'3 hr'  },
+  { id:'si10', lat:40.6680, lng:-74.0980, boro:'statenisland', borough:'Staten Island', label:'Castleton Ave & Davis Ave',    area:'Port Richmond',  type:'Water', status:'on',   ago:'9 hr'  },
 ];
 
 const BOROUGH_HOODS = {
@@ -2127,7 +2172,7 @@ const HOOD_VIEWS = {
   statenisland: { lat: 40.5795, lng: -74.1502, zoom: 11 }
 };
 
-const STATUS_COLOR = { out:'#ff5c5c', part:'#d4a820', on:'#2a9944' };
+const STATUS_COLOR = { out:'#ff4444', part:'#e8b800', on:'#22c55e' };
 const STATUS_LABEL = { out:'OUT', part:'PART', on:'ON' };
 const STATUS_CLASS = { out:'bOUT', part:'bPART', on:'bON' };
 
@@ -2142,15 +2187,16 @@ function renderMapPins(hood) {
   const filtered = hoods ? OUTAGES.filter(o => hoods.includes(o.boro)) : OUTAGES;
 
   filtered.forEach(o => {
-    const marker = L.circleMarker([o.lat, o.lng], {
-      radius: o.status === 'out' ? 10 : o.status === 'part' ? 8 : 6,
-      fillColor: STATUS_COLOR[o.status],
-      color: '#111',
-      weight: 2,
-      opacity: 1,
-      fillOpacity: 1,
-    });
+    const col = STATUS_COLOR[o.status];
     const emoji = o.type === 'Power' ? '⚡' : '💧';
+    const marker = L.circleMarker([o.lat, o.lng], {
+      radius: o.status === 'out' ? 11 : o.status === 'part' ? 9 : 7,
+      fillColor: col,
+      color: col,
+      weight: 1.5,
+      opacity: 0.45,
+      fillOpacity: 0.62,
+    });
     marker.bindPopup(
       `<div class="wt-popup-title wt-popup-status-${o.status}">${emoji} ${STATUS_LABEL[o.status]} — ${o.label}</div>` +
       `<div class="wt-popup-meta">${o.area} · ${o.borough} · ${o.type} · ${o.ago} ago</div>`,
@@ -2369,10 +2415,6 @@ body.high-contrast { background: #000 !important; filter: contrast(1.3); }
     <div class="wt-ap-section">
       <div class="wt-ap-label">Accessibility</div>
       <div class="wt-ap-row">
-        <span>Large Text</span>
-        <label class="wt-sw"><input type="checkbox" onchange="toggleLargeText(this)"><span class="wt-sw-t"></span><span class="wt-sw-d"></span></label>
-      </div>
-      <div class="wt-ap-row">
         <span>High Contrast</span>
         <label class="wt-sw"><input type="checkbox" onchange="toggleHighContrast(this)"><span class="wt-sw-t"></span><span class="wt-sw-d"></span></label>
       </div>
@@ -2381,7 +2423,7 @@ body.high-contrast { background: #000 !important; filter: contrast(1.3); }
       <div class="wt-ap-label">Quick Access</div>
       <div class="wt-ap-row" style="flex-direction:column;align-items:flex-start;gap:3px">
         <span>SMS Hotline</span>
-        <a href="sms:+19178669651" class="wt-ap-link">Text START to 917-WT-NOW1</a>
+        <a href="sms:+18555026699" class="wt-ap-link">Text WATCH to +1 (855) 502-6699</a>
       </div>
       <div class="wt-ap-row" style="flex-direction:column;align-items:flex-start;gap:3px;margin-top:8px">
         <span>Call-In</span>
@@ -2403,10 +2445,6 @@ document.addEventListener('click', function(e) {
   }
 });
 
-function toggleLargeText(cb) {
-  document.body.classList.toggle('large-text', cb.checked);
-  try { localStorage.setItem('wt_large_text', cb.checked); } catch(e) {}
-}
 
 function toggleHighContrast(cb) {
   document.body.classList.toggle('high-contrast', cb.checked);
@@ -2415,11 +2453,6 @@ function toggleHighContrast(cb) {
 
 window.addEventListener('load', function() {
   try {
-    if (localStorage.getItem('wt_large_text') === 'true') {
-      document.body.classList.add('large-text');
-      const cb = document.querySelector('[onchange*="toggleLargeText"]');
-      if (cb) cb.checked = true;
-    }
     if (localStorage.getItem('wt_high_contrast') === 'true') {
       document.body.classList.add('high-contrast');
       const cb = document.querySelector('[onchange*="toggleHighContrast"]');

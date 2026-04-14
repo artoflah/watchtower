@@ -924,7 +924,7 @@ body { top: 0 !important; }
 
         <p style="font-size: 13px;letter-spacing:0.1em;color:rgba(242,239,230,0.4);margin-top:14px;line-height:1.7;text-align:left">
           No account. No data sharing. Reports are anonymous by default.<br>
-          You can also reach WatchTower by SMS — text <span style="color:rgba(212,43,32,0.8)">START</span> to <span style="color:rgba(212,43,32,0.8)">917-WT-NOW1</span>
+          You can also reach WatchTower by SMS — text <span style="color:rgba(212,43,32,0.8)">WATCH</span> to <span style="color:rgba(212,43,32,0.8)">+1 (855) 502-6699</span>
         </p>
       </div>
     </div>
@@ -1190,10 +1190,6 @@ body.high-contrast { background: #000 !important; filter: contrast(1.3); }
     <div class="wt-ap-section">
       <div class="wt-ap-label">Accessibility</div>
       <div class="wt-ap-row">
-        <span>Large Text</span>
-        <label class="wt-sw"><input type="checkbox" onchange="toggleLargeText(this)"><span class="wt-sw-t"></span><span class="wt-sw-d"></span></label>
-      </div>
-      <div class="wt-ap-row">
         <span>High Contrast</span>
         <label class="wt-sw"><input type="checkbox" onchange="toggleHighContrast(this)"><span class="wt-sw-t"></span><span class="wt-sw-d"></span></label>
       </div>
@@ -1202,7 +1198,7 @@ body.high-contrast { background: #000 !important; filter: contrast(1.3); }
       <div class="wt-ap-label">Quick Access</div>
       <div class="wt-ap-row" style="flex-direction:column;align-items:flex-start;gap:3px">
         <span>SMS Hotline</span>
-        <a href="sms:+19178669651" class="wt-ap-link">Text START to 917-WT-NOW1</a>
+        <a href="sms:+18555026699" class="wt-ap-link">Text WATCH to +1 (855) 502-6699</a>
       </div>
       <div class="wt-ap-row" style="flex-direction:column;align-items:flex-start;gap:3px;margin-top:8px">
         <span>Call-In</span>
@@ -1224,11 +1220,6 @@ document.addEventListener('click', function(e) {
   }
 });
 
-function toggleLargeText(cb) {
-  document.body.classList.toggle('large-text', cb.checked);
-  try { localStorage.setItem('wt_large_text', cb.checked); } catch(e) {}
-}
-
 function toggleHighContrast(cb) {
   document.body.classList.toggle('high-contrast', cb.checked);
   try { localStorage.setItem('wt_high_contrast', cb.checked); } catch(e) {}
@@ -1236,11 +1227,6 @@ function toggleHighContrast(cb) {
 
 window.addEventListener('load', function() {
   try {
-    if (localStorage.getItem('wt_large_text') === 'true') {
-      document.body.classList.add('large-text');
-      const cb = document.querySelector('[onchange*="toggleLargeText"]');
-      if (cb) cb.checked = true;
-    }
     if (localStorage.getItem('wt_high_contrast') === 'true') {
       document.body.classList.add('high-contrast');
       const cb = document.querySelector('[onchange*="toggleHighContrast"]');
