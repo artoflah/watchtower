@@ -492,8 +492,9 @@ input, select, textarea { font-size: 18px !important; }
 .leaflet-control-zoom a { background: rgba(8,8,8,0.9) !important; border-color: rgba(103,178,255,0.18) !important; color: rgba(242,239,230,0.95) !important; }
 
 /* CHAT */
-.v-chat { display: grid; grid-template-columns: 250px 1fr; height: 100%; overflow: hidden; }
-.chat-channels { border-right: var(--rule); display: flex; flex-direction: column; overflow: hidden; background: rgba(8,8,8,0.6); }
+.v-chat { position: relative; height: 100%; overflow: hidden; }
+.chat-channels { position: absolute; inset: 0; display: flex; flex-direction: column; overflow: hidden; background: #080808; transition: transform 0.28s cubic-bezier(0.4,0,0.2,1); z-index: 2; }
+.v-chat.chat-open .chat-channels { transform: translateX(-100%); }
 .cc-head { padding: 14px 18px; border-bottom: var(--rule); flex-shrink: 0; display: flex; align-items: center; justify-content: space-between; }
 .cc-head-title { font-family: 'Bebas Neue', sans-serif; font-size: 22px; letter-spacing: 0.06em; color: var(--paper); }
 .cc-section-label { font-size: 12px; letter-spacing: 0.24em; text-transform: uppercase; color: rgba(242,239,230,0.52); padding: 10px 18px 5px; flex-shrink: 0; }
@@ -509,9 +510,10 @@ input, select, textarea { font-size: 18px !important; }
 .ch-meta { text-align: right; flex-shrink: 0; }
 .ch-time { font-size: 12px; color: rgba(242,239,230,0.68); }
 .ch-unread { width: 14px; height: 14px; background: var(--red); border-radius: 50%; font-size: 8px; display: flex; align-items: center; justify-content: center; color: var(--paper); margin-top: 3px; margin-left: auto; }
-.chat-main { display: flex; flex-direction: column; height: 100%; min-height: 0; overflow: hidden; }
+.chat-main { position: absolute; inset: 0; display: flex; flex-direction: column; height: 100%; min-height: 0; overflow: hidden; background: #080808; transform: translateX(100%); transition: transform 0.28s cubic-bezier(0.4,0,0.2,1); z-index: 1; }
+.v-chat.chat-open .chat-main { transform: translateX(0); }
 .chat-header { padding: 12px 20px; border-bottom: var(--rule); flex-shrink: 0; display: flex; align-items: center; justify-content: space-between; }
-.chat-back-btn { display: none; font-size: 13px; letter-spacing: 0.14em; text-transform: uppercase; color: rgba(242,239,230,0.74); background: none; border: none; border-right: var(--rule); padding: 0 14px; cursor: crosshair; font-family: 'DM Mono', monospace; transition: color 0.15s; }
+.chat-back-btn { display: flex; align-items: center; gap: 6px; font-size: 13px; letter-spacing: 0.14em; text-transform: uppercase; color: rgba(242,239,230,0.74); background: none; border: none; border-right: var(--rule); padding: 0 14px; cursor: crosshair; font-family: 'DM Mono', monospace; transition: color 0.15s; flex-shrink: 0; }
 .chat-header-left { display: flex; align-items: center; gap: 10px; }
 .chat-ch-dot { width: 8px; height: 8px; border-radius: 50%; background: var(--red2); }
 .chat-ch-name { font-family: 'Barlow Condensed', sans-serif; font-size: 18px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.06em; color: var(--paper); }
@@ -699,7 +701,7 @@ input, select, textarea { font-size: 18px !important; }
 @media (max-width: 1023px) {
   .v-map { grid-template-columns: 1fr; }
   .map-sidebar { display: none; }
-  .v-chat { grid-template-columns: 200px 1fr; }
+  /* .v-chat handled by slide navigation */
   .np-grid { grid-template-columns: 1fr 1fr; }
   .np-cell:nth-child(2n) { border-right: none; }
   .v-profile { grid-template-columns: 200px 1fr; }
@@ -715,12 +717,7 @@ input, select, textarea { font-size: 18px !important; }
   .tn-status { display: none; }
   .v-map { grid-template-columns: 1fr; }
   .map-sidebar { display: none; }
-  .v-chat { grid-template-columns: 1fr; }
-  .chat-channels { display: none; }
-  .chat-channels.mobile-open { display: flex; position: fixed; inset: 72px 0 56px 0; z-index: 200; background: #080808; border-right: none; overflow-y: auto; }
-  #chat-backdrop { display: none; position: fixed; inset: 0; z-index: 199; background: rgba(0,0,0,0.7); }
-  #chat-backdrop.visible { display: block; }
-  .chat-back-btn { display: flex; align-items: center; gap: 6px; }
+  /* .v-chat handled by slide navigation */
   .aid-grid { grid-template-columns: 1fr 1fr; }
   .aid-card:nth-child(2n) { border-right: none; }
   .np-grid { grid-template-columns: 1fr; } .np-cell { border-right: none !important; }
@@ -737,8 +734,6 @@ input, select, textarea { font-size: 18px !important; }
 
   /* ACCESS WIDGET */
   #wt-access-widget { top: 125px !important; right: 8px; }
-  #wt-access-toggle { padding: 5px 10px; font-size: 12px; }
-  .wt-access-panel { width: 220px; }
 
   /* PROFILE MAIN */
   .profile-main { padding: 16px; overflow-x: hidden; }
@@ -772,6 +767,12 @@ input, select, textarea { font-size: 18px !important; }
   /* RESOURCE CATEGORY COUNT */
   .res-cat-count { font-size: 10px; letter-spacing: 0.08em; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
   .res-cat-header { padding: 10px 14px; gap: 8px; }
+
+  /* LEAFLET POPUP — force solid black on mobile WebKit */
+  .leaflet-popup-content-wrapper,
+  .leaflet-popup-content-wrapper * { background: #0a0a0a !important; background-color: #0a0a0a !important; }
+  .leaflet-popup { opacity: 1 !important; }
+  .leaflet-popup-pane { opacity: 1 !important; }
 }
 
 @supports (padding: max(0px)) {
@@ -857,9 +858,18 @@ body.large-text { font-size: 118% !important; }
 body.high-contrast { background: #000 !important; filter: contrast(1.3); }
 
 @media (max-width: 767px) {
-  #wt-access-widget { top: 58px; right: 8px; }
-  .wt-access-panel { width: 220px; }
-  #wt-access-toggle { padding: 5px 10px; font-size: 12px; }
+  .wt-access-panel {
+    width: 210px;
+    right: 0;
+    left: auto;
+  }
+  .wt-ap-section { padding: 11px 13px; }
+  .wt-ap-label { font-size: 10px; margin-bottom: 8px; }
+  .wt-ap-row { font-size: 12px; gap: 8px; margin-bottom: 6px; }
+  .wt-ap-link { font-size: 11px; }
+  .wt-sw { width: 28px; height: 14px; }
+  .wt-sw-d { width: 8px; height: 8px; }
+  .wt-sw input:checked ~ .wt-sw-d { transform: translateX(14px); }
 }
 
 
@@ -1195,9 +1205,6 @@ body.high-contrast { background: #000 !important; filter: contrast(1.3); }
 
   </div><!-- /views -->
 
-  <!-- MOBILE CHAT BACKDROP -->
-  <div id="chat-backdrop" onclick="hideChannels()"></div>
-
   <!-- BOTTOM BAR -->
   <div class="bottombar">
     <button class="bot-tab active" onclick="switchTab(0,this)">
@@ -1306,8 +1313,7 @@ function switchTab(n, btn) {
   document.querySelectorAll('.tn-tab').forEach((t,i) => t.classList.toggle('active', i===n));
   document.querySelectorAll('.bot-tab').forEach((t,i) => t.classList.toggle('active', i===n));
   if (n === 0) setTimeout(() => { if (!leafletMap) initLeafletMap(); else leafletMap.invalidateSize(true); }, 50);
-  // On mobile, opening Chat tab always shows channels list first
-  if (n === 1 && window.innerWidth <= 767) showChannels();
+  if (n === 1) showChannels();
 }
 
 // ══════════════════════════════════════════
@@ -1664,8 +1670,7 @@ function appendMsg(m) {
 function loadChannel(el, key) {
   document.querySelectorAll('.channel-item').forEach(c => c.classList.remove('active'));
   if (el) { el.classList.add('active'); el.querySelector('.ch-unread')?.remove(); }
-  // On mobile, dismiss channels panel and open the chat view
-  if (window.innerWidth <= 767) hideChannels();
+  hideChannels();
   currentChannelKey = key;
   chatHistory = [];
   const ch = CHANNELS[key];
@@ -1978,14 +1983,11 @@ function selectLang(el) {
   el.classList.add('sel');
 }
 
-// mobile chat
 function showChannels() {
-  document.querySelector('.chat-channels')?.classList.add('mobile-open');
-  document.getElementById('chat-backdrop')?.classList.add('visible');
+  document.querySelector('.v-chat')?.classList.remove('chat-open');
 }
 function hideChannels() {
-  document.querySelector('.chat-channels')?.classList.remove('mobile-open');
-  document.getElementById('chat-backdrop')?.classList.remove('visible');
+  document.querySelector('.v-chat')?.classList.add('chat-open');
 }
 
 // ══════════════════════════════════════════
