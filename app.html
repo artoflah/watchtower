@@ -1511,6 +1511,31 @@ function initLeafletMap() {
     subdomains: 'abc'
   }).addTo(leafletMap);
 
+  // Force solid popup background on mobile (fixes iOS Safari compositing inside fixed shell)
+  leafletMap.on('popupopen', function(e) {
+    if (window.innerWidth > 767) return;
+    const apply = () => {
+      const el = e.popup.getElement();
+      if (!el) return;
+      const wrapper = el.querySelector('.leaflet-popup-content-wrapper');
+      const content = el.querySelector('.leaflet-popup-content');
+      [el, wrapper, content].forEach(node => {
+        if (!node) return;
+        node.style.setProperty('background', '#0a0a0a', 'important');
+        node.style.setProperty('background-color', '#0a0a0a', 'important');
+        node.style.setProperty('opacity', '1', 'important');
+        node.style.setProperty('will-change', 'auto', 'important');
+      });
+      if (wrapper) {
+        wrapper.style.setProperty('border', '1px solid rgba(242,239,230,0.34)', 'important');
+        wrapper.style.setProperty('border-radius', '0', 'important');
+        wrapper.style.setProperty('color', '#f2efe6', 'important');
+        wrapper.style.setProperty('box-shadow', 'none', 'important');
+      }
+    };
+    requestAnimationFrame(() => requestAnimationFrame(apply));
+  });
+
   renderFeed('all');
   // Wait a tick for tiles to load then render pins
   setTimeout(() => renderMapPins('all'), 300);
