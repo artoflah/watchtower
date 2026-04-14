@@ -431,7 +431,7 @@ input, select, textarea { font-size: 18px !important; }
 .bot-tab:hover { background: var(--faint); }
 .bot-tab.active { background: rgba(47,107,255,0.08); }
 .bot-icon { font-size: 20px; }
-.bot-label { font-size: 12px; letter-spacing: 0.12em; text-transform: uppercase; color: rgba(242,239,230,0.8); font-family: 'DM Mono', monospace; transition: color 0.15s; }
+.bot-label { font-size: 10px; letter-spacing: 0.08em; text-transform: uppercase; color: rgba(242,239,230,0.8); font-family: 'DM Mono', monospace; transition: color 0.15s; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 100%; }
 .bot-tab.active .bot-label { color: var(--red); }
 .bot-badge {
   position: absolute; top: 4px; right: calc(50% - 20px);
@@ -471,8 +471,8 @@ input, select, textarea { font-size: 18px !important; }
 
 /* LEAFLET DARK STYLE */
 .leaflet-tile { filter: invert(100%) hue-rotate(180deg) brightness(0.82) contrast(0.92) saturate(0.55); }
-.leaflet-popup-content-wrapper { background: rgba(8,8,8,0.95) !important; border: 1px solid rgba(242,239,230,0.34) !important; border-radius: 0 !important; box-shadow: none !important; color: #f2efe6 !important; font-family: 'DM Mono', monospace !important; font-size: 15px !important; }
-.leaflet-popup-tip { background: rgba(8,8,8,0.95) !important; }
+.leaflet-popup-content-wrapper { background: #0a0a0a !important; border: 1px solid rgba(242,239,230,0.34) !important; border-radius: 0 !important; box-shadow: none !important; color: #f2efe6 !important; font-family: 'DM Mono', monospace !important; font-size: 15px !important; opacity: 1 !important; }
+.leaflet-popup-tip { background: #0a0a0a !important; }
 .leaflet-popup-content { margin: 10px 14px !important; line-height: 1.6 !important; }
 .leaflet-popup-close-button { color: rgba(242,239,230,0.8) !important; }
 .wt-popup { min-width: 180px; }
@@ -580,7 +580,7 @@ input, select, textarea { font-size: 18px !important; }
 .aid-card-title { font-family: 'Barlow Condensed', sans-serif; font-size: 20px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; color: var(--paper); margin-bottom: 5px; line-height: 1; }
 .aid-card-desc { font-size: 14px; line-height: 1.6; color: rgba(242,239,230,0.84); margin-bottom: 10px; }
 .aid-card-meta { display: flex; align-items: center; justify-content: space-between; border-top: var(--rule); padding-top: 9px; }
-.aid-card-user { font-size: 12px; color: rgba(242,239,230,0.74); }
+.aid-card-user { font-size: 12px; color: rgba(242,239,230,0.74); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; max-width: 120px; }
 .aid-card-user strong { color: rgba(242,239,230,0.92); font-weight: 400; }
 .aid-contact-btn { font-size: 12px; letter-spacing: 0.1em; text-transform: uppercase; color: var(--paper); background: none; border: 1px solid rgba(242,239,230,0.34); padding: 4px 9px; cursor: crosshair; font-family: 'DM Mono', monospace; transition: all 0.15s; }
 .aid-contact-btn:hover { border-color: var(--red); color: var(--red2); }
