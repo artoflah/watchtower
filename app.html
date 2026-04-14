@@ -1487,14 +1487,21 @@ function renderMapPins(hood) {
     });
     const boroName = BORO_NAME[o.boro] || o.boro;
     marker._mobileData = { o, boroName, col };
-    marker.bindPopup(
-      `<div class="wt-popup">` +
-      `<div class="wt-popup-status wt-popup-status-${o.status}"><span class="wt-popup-dot wt-popup-dot-${o.status}"></span>${STATUS_LABEL[o.status]} · ${o.type}</div>` +
-      `<div class="wt-popup-label">${o.label}</div>` +
-      `<div class="wt-popup-meta">${o.area}, ${boroName}<br>${o.ago} ago</div>` +
-      `</div>`,
-      { maxWidth: 220, closeButton: false }
-    );
+    if (window.innerWidth <= 767) {
+      marker.on('click', function(e) {
+        leafletMap.closePopup();
+        showMapBar(o, boroName, col);
+      });
+    } else {
+      marker.bindPopup(
+        `<div class="wt-popup">` +
+        `<div class="wt-popup-status wt-popup-status-${o.status}"><span class="wt-popup-dot wt-popup-dot-${o.status}"></span>${STATUS_LABEL[o.status]} · ${o.type}</div>` +
+        `<div class="wt-popup-label">${o.label}</div>` +
+        `<div class="wt-popup-meta">${o.area}, ${boroName}<br>${o.ago} ago</div>` +
+        `</div>`,
+        { maxWidth: 220, closeButton: false }
+      );
+    }
     marker.addTo(leafletMap);
     leafletMarkers.push(marker);
   });
@@ -1582,12 +1589,6 @@ function initLeafletMap() {
 
   leafletMap.on('click', () => { hideMapBar(); });
 
-  leafletMap.on('popupopen', function(e) {
-    if (window.innerWidth > 767) return;
-    const data = e.popup._source?._mobileData;
-    leafletMap.closePopup();
-    if (data) showMapBar(data.o, data.boroName, data.col);
-  });
 
   renderFeed('all');
   // Wait a tick for tiles to load then render pins
