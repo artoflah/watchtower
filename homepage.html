@@ -1188,6 +1188,15 @@ img[alt="WatchTower"] { max-width: 34px; max-height: 34px; }
 
 }
 
+/* ── SHORT SCREENS (iPhone SE height ~667px, older iPhones) ── */
+@media (max-height: 680px) and (max-width: 767px) {
+  .hero-wordmark { font-size: clamp(48px, 14vw, 72px); }
+  .hero-desc { font-size: 15px; margin-bottom: 14px; }
+  .hero-wordmark-row { padding: 0 16px 32px; }
+  .hero-ctas { gap: 8px; }
+  .btn-fill, .btn-ghost-hero { padding: 10px 20px; font-size: 13px; }
+}
+
 /* ── SAFE AREA (iPhone notch / home bar) ── */
 @supports (padding: max(0px)) {
   .bottom-bar, .bottombar {
