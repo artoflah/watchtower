@@ -771,27 +771,30 @@ input, select, textarea { font-size: 18px !important; }
 
 }
 
-/* MAP INFO BAR — mobile only */
+/* MAP INFO CARD — mobile only, bottom-left corner */
 #map-info-bar {
   display: none;
   position: fixed;
-  left: 0; right: 0;
-  bottom: calc(58px + env(safe-area-inset-bottom, 0px));
+  left: 12px;
+  bottom: calc(70px + env(safe-area-inset-bottom, 0px));
   z-index: 300;
   background: #0a0a0a;
-  border-top: 1px solid rgba(242,239,230,0.34);
-  transform: translateY(100%);
-  transition: transform 0.22s cubic-bezier(0.4,0,0.2,1);
+  border: 1px solid rgba(242,239,230,0.34);
+  width: 220px;
+  opacity: 0;
+  transform: translateY(10px);
+  pointer-events: none;
+  transition: opacity 0.2s ease, transform 0.2s ease;
 }
-#map-info-bar.visible { transform: translateY(0); }
-.mib-inner { display: flex; align-items: center; justify-content: space-between; padding: 14px 18px; gap: 12px; }
+#map-info-bar.visible { opacity: 1; transform: translateY(0); pointer-events: all; }
+.mib-inner { display: flex; align-items: flex-start; justify-content: space-between; padding: 12px 12px 12px 14px; gap: 8px; }
 .mib-left { flex: 1; min-width: 0; }
-.mib-top { display: flex; align-items: center; gap: 7px; margin-bottom: 5px; }
-.mib-dot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; }
-.mib-status { font-size: 11px; letter-spacing: 0.2em; text-transform: uppercase; font-weight: 700; }
-.mib-label { font-family: 'Barlow Condensed', sans-serif; font-size: 20px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.04em; color: #f2efe6; line-height: 1.1; margin-bottom: 4px; }
-.mib-meta { font-size: 11px; color: rgba(242,239,230,0.55); letter-spacing: 0.06em; }
-.mib-close { background: none; border: 1px solid rgba(242,239,230,0.22); color: rgba(242,239,230,0.7); font-size: 14px; width: 30px; height: 30px; cursor: pointer; flex-shrink: 0; display: flex; align-items: center; justify-content: center; }
+.mib-top { display: flex; align-items: center; gap: 6px; margin-bottom: 4px; }
+.mib-dot { width: 7px; height: 7px; border-radius: 50%; flex-shrink: 0; }
+.mib-status { font-size: 10px; letter-spacing: 0.18em; text-transform: uppercase; font-weight: 700; }
+.mib-label { font-family: 'Barlow Condensed', sans-serif; font-size: 17px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.04em; color: #f2efe6; line-height: 1.15; margin-bottom: 4px; }
+.mib-meta { font-size: 10px; color: rgba(242,239,230,0.55); letter-spacing: 0.05em; line-height: 1.5; }
+.mib-close { background: none; border: none; color: rgba(242,239,230,0.5); font-size: 13px; cursor: pointer; flex-shrink: 0; padding: 0; line-height: 1; }
 
 @media (max-width: 767px) {
   #map-info-bar { display: block; }
