@@ -1347,6 +1347,7 @@ function latToY(lat) {
 }
 
 const STATUS_COLOR = { out:'#ff4444', part:'#e8b800', on:'#22c55e' };
+const BORO_NAME = { bronx:'Bronx', brooklyn:'Brooklyn', manhattan:'Manhattan', queens:'Queens', statenisland:'Staten Island' };
 const STATUS_LABEL = { out:'OUT', part:'PART', on:'ON' };
 const STATUS_CLASS = { out:'bOUT', part:'bPART', on:'bON' };
 
@@ -1363,14 +1364,14 @@ function renderMapPins(hood) {
   filtered.forEach(o => {
     const col = STATUS_COLOR[o.status];
     const emoji = o.type === 'Power' ? '⚡' : '💧';
-    const marker = L.circleMarker([o.lat, o.lng], {
-      radius: o.status === 'out' ? 7 : o.status === 'part' ? 5 : 4,
-      fillColor: col,
-      color: col,
-      weight: 1.5,
-      opacity: 0.45,
-      fillOpacity: 0.62,
+    const size = o.status === 'out' ? 14 : o.status === 'part' ? 10 : 8;
+    const icon = L.divIcon({
+      className: '',
+      html: `<div style="width:${size}px;height:${size}px;border-radius:50%;background:radial-gradient(circle at 38% 38%, ${col}ff 0%, ${col}cc 35%, ${col}44 70%, ${col}00 100%);"></div>`,
+      iconSize: [size, size],
+      iconAnchor: [size / 2, size / 2]
     });
+    const marker = L.marker([o.lat, o.lng], { icon });
     marker.bindPopup(
       `<div class="wt-popup-title wt-popup-status-${o.status}">${emoji} ${STATUS_LABEL[o.status]} — ${o.label}</div>` +
       `<div class="wt-popup-meta">${o.area} · ${o.borough || o.boro} · ${o.type} · ${o.ago} ago</div>`,
@@ -1396,14 +1397,14 @@ function renderFeed(hood) {
   const sorted = [...filtered].sort((a,b) => order[a.status] - order[b.status]);
 
   // Update header
-  if (title) title.textContent = hood === 'all' ? 'LIVE GRID' : filtered[0]?.borough?.toUpperCase() || 'LIVE GRID';
+  if (title) title.textContent = hood === 'all' ? 'LIVE GRID' : (BORO_NAME[hood] || 'LIVE GRID').toUpperCase();
   if (sub) sub.textContent = hood === 'all'
     ? `NYC · All Boroughs · ${filtered.length} reports`
-    : `${filtered[0]?.borough || ''} · ${filtered.length} reports · Updated 2 min ago`;
+    : `${BORO_NAME[hood] || ''} · ${filtered.length} reports · Updated 2 min ago`;
 
   rows.innerHTML = sorted.map(o => `
     <div class="f-row">
-      <div class="f-zone">${o.borough} — ${o.label}<small>${o.ago} ago</small></div>
+      <div class="f-zone">${BORO_NAME[o.boro]} — ${o.label}<small>${o.ago} ago</small></div>
       <span class="f-type">${o.type}</span>
       <span class="f-badge ${STATUS_CLASS[o.status]}">${STATUS_LABEL[o.status]}</span>
     </div>`).join('');
