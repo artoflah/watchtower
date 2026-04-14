@@ -2142,7 +2142,7 @@ const OUTAGES = [
   { id:'qn12', lat:40.7640, lng:-73.8230, boro:'queens', borough:'Queens', label:'Francis Lewis Blvd & 45th Ave',area:'Bayside',         type:'Water', status:'part', ago:'7 hr'  },
   { id:'qn13', lat:40.7690, lng:-73.9000, boro:'queens', borough:'Queens', label:'Steinway St & 28th Ave',       area:'Astoria',         type:'Power', status:'on',   ago:'6 hr'  },
   // ── STATEN ISLAND (10) ──
-  { id:'si01', lat:40.6501, lng:-74.0966, boro:'statenisland', borough:'Staten Island', label:'Bay St & Victory Blvd',        area:'St. George',     type:'Power', status:'on',   ago:'10 hr' },
+  { id:'si01', lat:40.6437, lng:-74.0740, boro:'statenisland', borough:'Staten Island', label:'Bay St & Victory Blvd',        area:'St. George',     type:'Power', status:'on',   ago:'10 hr' },
   { id:'si02', lat:40.6226, lng:-74.1052, boro:'statenisland', borough:'Staten Island', label:'Richmond Ave & Forest Ave',    area:'Willowbrook',    type:'Water', status:'part', ago:'7 hr'  },
   { id:'si03', lat:40.5795, lng:-74.1502, boro:'statenisland', borough:'Staten Island', label:'Hylan Blvd & New Dorp Lane',   area:'New Dorp',       type:'Power', status:'out',  ago:'2 hr'  },
   { id:'si04', lat:40.6020, lng:-74.0960, boro:'statenisland', borough:'Staten Island', label:'Forest Ave & Broadway',        area:'West Brighton',  type:'Water', status:'on',   ago:'5 hr'  },
@@ -2151,7 +2151,7 @@ const OUTAGES = [
   { id:'si07', lat:40.6100, lng:-74.1120, boro:'statenisland', borough:'Staten Island', label:'Victory Blvd & Manor Rd',      area:'Castleton',      type:'Power', status:'on',   ago:'8 hr'  },
   { id:'si08', lat:40.6310, lng:-74.1210, boro:'statenisland', borough:'Staten Island', label:'Richmond Rd & Todt Hill Rd',   area:'Todt Hill',      type:'Water', status:'part', ago:'6 hr'  },
   { id:'si09', lat:40.5880, lng:-74.1290, boro:'statenisland', borough:'Staten Island', label:'Richmond Ave & Arthur Kill Rd',area:'Richmond Town',  type:'Power', status:'out',  ago:'3 hr'  },
-  { id:'si10', lat:40.6680, lng:-74.0980, boro:'statenisland', borough:'Staten Island', label:'Castleton Ave & Davis Ave',    area:'Port Richmond',  type:'Water', status:'on',   ago:'9 hr'  },
+  { id:'si10', lat:40.6325, lng:-74.1350, boro:'statenisland', borough:'Staten Island', label:'Castleton Ave & Davis Ave',    area:'Port Richmond',  type:'Water', status:'on',   ago:'9 hr'  },
 ];
 
 const BOROUGH_HOODS = {
@@ -2190,7 +2190,7 @@ function renderMapPins(hood) {
     const col = STATUS_COLOR[o.status];
     const emoji = o.type === 'Power' ? '⚡' : '💧';
     const marker = L.circleMarker([o.lat, o.lng], {
-      radius: o.status === 'out' ? 11 : o.status === 'part' ? 9 : 7,
+      radius: o.status === 'out' ? 7 : o.status === 'part' ? 5 : 4,
       fillColor: col,
       color: col,
       weight: 1.5,
