@@ -771,6 +771,32 @@ input, select, textarea { font-size: 18px !important; }
 
 }
 
+/* MAP INFO BAR — mobile only */
+#map-info-bar {
+  display: none;
+  position: fixed;
+  left: 0; right: 0;
+  bottom: 58px;
+  z-index: 300;
+  background: #0a0a0a;
+  border-top: 1px solid rgba(242,239,230,0.34);
+  transform: translateY(100%);
+  transition: transform 0.22s cubic-bezier(0.4,0,0.2,1);
+}
+#map-info-bar.visible { transform: translateY(0); }
+.mib-inner { display: flex; align-items: center; justify-content: space-between; padding: 14px 18px; gap: 12px; }
+.mib-left { flex: 1; min-width: 0; }
+.mib-top { display: flex; align-items: center; gap: 7px; margin-bottom: 5px; }
+.mib-dot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; }
+.mib-status { font-size: 11px; letter-spacing: 0.2em; text-transform: uppercase; font-weight: 700; }
+.mib-label { font-family: 'Barlow Condensed', sans-serif; font-size: 20px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.04em; color: #f2efe6; line-height: 1.1; margin-bottom: 4px; }
+.mib-meta { font-size: 11px; color: rgba(242,239,230,0.55); letter-spacing: 0.06em; }
+.mib-close { background: none; border: 1px solid rgba(242,239,230,0.22); color: rgba(242,239,230,0.7); font-size: 14px; width: 30px; height: 30px; cursor: pointer; flex-shrink: 0; display: flex; align-items: center; justify-content: center; }
+
+@media (max-width: 767px) {
+  #map-info-bar { display: block; }
+}
+
 @supports (padding: max(0px)) {
   .bottombar { padding-bottom: max(0px, env(safe-area-inset-bottom)); }
 }
@@ -1201,6 +1227,21 @@ body.high-contrast { background: #000 !important; filter: contrast(1.3); }
 
   </div><!-- /views -->
 
+  <!-- MOBILE MAP INFO BAR -->
+  <div id="map-info-bar">
+    <div class="mib-inner">
+      <div class="mib-left">
+        <div class="mib-top">
+          <span class="mib-dot"></span>
+          <span class="mib-status"></span>
+        </div>
+        <div class="mib-label"></div>
+        <div class="mib-meta"></div>
+      </div>
+      <button class="mib-close" onclick="hideMapBar()">✕</button>
+    </div>
+  </div>
+
   <!-- BOTTOM BAR -->
   <div class="bottombar">
     <button class="bot-tab active" onclick="switchTab(0,this)">
@@ -1445,14 +1486,18 @@ function renderMapPins(hood) {
       fillOpacity: 1,
     });
     const boroName = BORO_NAME[o.boro] || o.boro;
-    marker.bindPopup(
-      `<div class="wt-popup">` +
-      `<div class="wt-popup-status wt-popup-status-${o.status}"><span class="wt-popup-dot wt-popup-dot-${o.status}"></span>${STATUS_LABEL[o.status]} · ${o.type}</div>` +
-      `<div class="wt-popup-label">${o.label}</div>` +
-      `<div class="wt-popup-meta">${o.area}, ${boroName}<br>${o.ago} ago</div>` +
-      `</div>`,
-      { maxWidth: window.innerWidth <= 767 ? 260 : 220, closeButton: false }
-    );
+    if (window.innerWidth <= 767) {
+      marker.on('click', () => showMapBar(o, boroName, col));
+    } else {
+      marker.bindPopup(
+        `<div class="wt-popup">` +
+        `<div class="wt-popup-status wt-popup-status-${o.status}"><span class="wt-popup-dot wt-popup-dot-${o.status}"></span>${STATUS_LABEL[o.status]} · ${o.type}</div>` +
+        `<div class="wt-popup-label">${o.label}</div>` +
+        `<div class="wt-popup-meta">${o.area}, ${boroName}<br>${o.ago} ago</div>` +
+        `</div>`,
+        { maxWidth: 220, closeButton: false }
+      );
+    }
     marker.addTo(leafletMap);
     leafletMarkers.push(marker);
   });
@@ -1537,6 +1582,8 @@ function initLeafletMap() {
     };
     requestAnimationFrame(() => requestAnimationFrame(apply));
   });
+
+  leafletMap.on('click', () => hideMapBar());
 
   renderFeed('all');
   // Wait a tick for tiles to load then render pins
@@ -2003,6 +2050,21 @@ function profileSection(sec, el) {
 function selectLang(el) {
   el.closest('.lang-grid').querySelectorAll('.lang-opt').forEach(o => o.classList.remove('sel'));
   el.classList.add('sel');
+}
+
+function showMapBar(o, boroName, col) {
+  const bar = document.getElementById('map-info-bar');
+  if (!bar) return;
+  const STATUS_LABEL = { out: 'OUT', part: 'PARTIAL', on: 'ON' };
+  bar.querySelector('.mib-dot').style.background = col;
+  bar.querySelector('.mib-status').textContent = (STATUS_LABEL[o.status] || o.status) + ' · ' + o.type;
+  bar.querySelector('.mib-status').style.color = col;
+  bar.querySelector('.mib-label').textContent = o.label;
+  bar.querySelector('.mib-meta').textContent = o.area + ', ' + boroName + ' · ' + o.ago + ' ago';
+  bar.classList.add('visible');
+}
+function hideMapBar() {
+  document.getElementById('map-info-bar')?.classList.remove('visible');
 }
 
 function showChannels() {
