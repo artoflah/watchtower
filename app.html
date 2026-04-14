@@ -475,9 +475,17 @@ input, select, textarea { font-size: 18px !important; }
 .leaflet-popup-tip { background: rgba(8,8,8,0.95) !important; }
 .leaflet-popup-content { margin: 10px 14px !important; line-height: 1.6 !important; }
 .leaflet-popup-close-button { color: rgba(242,239,230,0.8) !important; }
-.wt-popup-title { font-size: 14px; font-weight: bold; letter-spacing: 0.1em; text-transform: uppercase; margin-bottom: 4px; }
-.wt-popup-status-out { color: #2563eb; } .wt-popup-status-part { color: #c8a020; } .wt-popup-status-on { color: #2a9944; }
-.wt-popup-meta { color: rgba(242,239,230,0.8); font-size: 12px; margin-top: 3px; }
+.wt-popup { min-width: 180px; }
+.wt-popup-status { font-size: 10px; letter-spacing: 0.22em; text-transform: uppercase; font-weight: 700; margin-bottom: 5px; display: flex; align-items: center; gap: 6px; }
+.wt-popup-status-out  { color: #ff4444; }
+.wt-popup-status-part { color: #e8b800; }
+.wt-popup-status-on   { color: #22c55e; }
+.wt-popup-dot { width: 6px; height: 6px; border-radius: 50%; flex-shrink: 0; }
+.wt-popup-dot-out  { background: #ff4444; }
+.wt-popup-dot-part { background: #e8b800; }
+.wt-popup-dot-on   { background: #22c55e; }
+.wt-popup-label { font-size: 13px; font-weight: 600; letter-spacing: 0.04em; color: #f2efe6; margin-bottom: 6px; line-height: 1.3; }
+.wt-popup-meta { font-size: 11px; color: rgba(242,239,230,0.55); letter-spacing: 0.06em; line-height: 1.6; }
 .leaflet-popup-content-wrapper { box-shadow: 0 0 0 1px rgba(103,178,255,0.10) inset !important; }
 .leaflet-control-attribution { background: rgba(8,8,8,0.7) !important; color: rgba(242,239,230,0.52) !important; font-size: 11px !important; }
 .leaflet-control-zoom a { background: rgba(8,8,8,0.9) !important; border-color: rgba(103,178,255,0.18) !important; color: rgba(242,239,230,0.95) !important; }
@@ -1364,18 +1372,21 @@ function renderMapPins(hood) {
   filtered.forEach(o => {
     const col = STATUS_COLOR[o.status];
     const emoji = o.type === 'Power' ? '⚡' : '💧';
-    const size = o.status === 'out' ? 14 : o.status === 'part' ? 10 : 8;
-    const icon = L.divIcon({
-      className: '',
-      html: `<div style="width:${size}px;height:${size}px;border-radius:50%;background:radial-gradient(circle at 38% 38%, ${col}ff 0%, ${col}cc 35%, ${col}44 70%, ${col}00 100%);"></div>`,
-      iconSize: [size, size],
-      iconAnchor: [size / 2, size / 2]
+    const marker = L.circleMarker([o.lat, o.lng], {
+      radius: o.status === 'out' ? 7 : o.status === 'part' ? 5 : 4,
+      fillColor: col,
+      color: col,
+      weight: 0,
+      fillOpacity: 1,
     });
-    const marker = L.marker([o.lat, o.lng], { icon });
+    const boroName = BORO_NAME[o.boro] || o.boro;
     marker.bindPopup(
-      `<div class="wt-popup-title wt-popup-status-${o.status}">${emoji} ${STATUS_LABEL[o.status]} — ${o.label}</div>` +
-      `<div class="wt-popup-meta">${o.area} · ${o.borough || o.boro} · ${o.type} · ${o.ago} ago</div>`,
-      { maxWidth: 240, closeButton: true }
+      `<div class="wt-popup">` +
+      `<div class="wt-popup-status wt-popup-status-${o.status}"><span class="wt-popup-dot wt-popup-dot-${o.status}"></span>${STATUS_LABEL[o.status]} · ${o.type}</div>` +
+      `<div class="wt-popup-label">${o.label}</div>` +
+      `<div class="wt-popup-meta">${o.area}, ${boroName}<br>${o.ago} ago</div>` +
+      `</div>`,
+      { maxWidth: 220, closeButton: false }
     );
     marker.addTo(leafletMap);
     leafletMarkers.push(marker);
