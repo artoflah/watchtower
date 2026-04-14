@@ -586,15 +586,15 @@ nav {
     padding: 0 28px 32px;
   }
   .map-tab-bar {
-  position: absolute;
-  top: 80px; left: 0; right: 300px;
-  z-index: 6;
-  display: flex; overflow-x: auto;
-  background: rgba(8,8,8,0.82);
-  border-bottom: var(--rule);
-  border-top: var(--rule);
-  backdrop-filter: blur(6px);
-}
+    position: absolute;
+    top: 80px; left: 0; right: 260px;
+    z-index: 6;
+    display: flex; overflow-x: auto;
+    background: rgba(8,8,8,0.82);
+    border-bottom: var(--rule);
+    border-top: var(--rule);
+    backdrop-filter: blur(6px);
+  }
   .map-pins { padding-right: 260px; }
   .map-ts { right: 276px; }
   .hero-wordmark { font-size: clamp(72px, 13vw, 150px); }
@@ -630,15 +630,15 @@ nav {
   .hero-wordmark { font-size: clamp(58px, 16vw, 96px); margin-bottom: 12px; }
 
   .map-tab-bar {
-  position: absolute;
-  top: 80px; left: 0; right: 300px;
-  z-index: 6;
-  display: flex; overflow-x: auto;
-  background: rgba(8,8,8,0.82);
-  border-bottom: var(--rule);
-  border-top: var(--rule);
-  backdrop-filter: blur(6px);
-}
+    position: absolute;
+    top: 80px; left: 0; right: 0;
+    z-index: 6;
+    display: flex; overflow-x: auto;
+    background: rgba(8,8,8,0.82);
+    border-bottom: var(--rule);
+    border-top: var(--rule);
+    backdrop-filter: blur(6px);
+  }
   .map-pins { padding-right: 0; padding-bottom: 220px; }
   .map-ts { right: 12px; bottom: 232px; }
   .map-xhair { left: 50%; }
@@ -1025,15 +1025,15 @@ img[alt="WatchTower"] { max-width: 34px; max-height: 34px; }
   .hero-feed { max-height: 260px; }
 
   .map-tab-bar {
-  position: absolute;
-  top: 80px; left: 0; right: 300px;
-  z-index: 6;
-  display: flex; overflow-x: auto;
-  background: rgba(8,8,8,0.82);
-  border-bottom: var(--rule);
-  border-top: var(--rule);
-  backdrop-filter: blur(6px);
-}
+    position: absolute;
+    top: 80px; left: 0; right: 0;
+    z-index: 6;
+    display: flex; overflow-x: auto;
+    background: rgba(8,8,8,0.82);
+    border-bottom: var(--rule);
+    border-top: var(--rule);
+    backdrop-filter: blur(6px);
+  }
   .map-tab { font-size: 12px; padding: 8px 12px; }
 
   /* MANIFESTO */
@@ -1075,6 +1075,16 @@ img[alt="WatchTower"] { max-width: 34px; max-height: 34px; }
   .access-strip { grid-template-columns: 1fr; }
   .access-cell { padding: 24px 20px; border-right: none; border-bottom: var(--rule); }
   .access-cell:last-child { border-bottom: none; }
+
+  /* SUBSCRIBE FORM */
+  #email-subscribe-form { flex-direction: column; }
+  #subscribe-email-input { min-width: 0 !important; width: 100% !important; }
+  #subscribe-btn { width: 100%; justify-content: center; }
+
+  /* ACCESS WIDGET */
+  #wt-access-widget { top: 8px; right: 8px; }
+  #wt-access-toggle { padding: 5px 10px; font-size: 12px; }
+  .wt-access-panel { width: 220px; }
 
   /* FOOTER */
   footer {
