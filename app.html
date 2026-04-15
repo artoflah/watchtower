@@ -1352,7 +1352,8 @@ function googleTranslateElementInit() {
 function switchTab(n, btn) {
   document.querySelectorAll('.view').forEach((v,i) => v.classList.toggle('active', i===n));
   document.querySelectorAll('.tn-tab').forEach((t,i) => t.classList.toggle('active', i===n));
-  document.querySelectorAll('.bot-tab').forEach((t,i) => t.classList.toggle('active', i===n));
+  document.querySelectorAll('.bot-tab').forEach(t => t.classList.remove('active'));
+  if (btn) btn.classList.add('active');
   hideMapBar();
   if (n === 0) setTimeout(() => { if (!leafletMap) initLeafletMap(); else leafletMap.invalidateSize(true); }, 50);
   if (n === 1) showChannels();
