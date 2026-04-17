@@ -1273,12 +1273,12 @@ input, select, textarea { font-size: 18px !important; } /* prevent iOS zoom on f
 }
 
 
-/* wordmark click behavior */
-#hero-wordmark-only {
+/* wordmark hover behavior */
+.hero-wordmark-row {
   transition: opacity 0.35s ease;
   opacity: 1;
 }
-#hero-wordmark-only.map-engaged {
+.hero-wordmark-row.map-engaged {
   opacity: 0;
   pointer-events: none;
 }
@@ -2537,33 +2537,22 @@ async function submitReport(e) {
 
 <script>
 document.addEventListener('DOMContentLoaded', () => {
-  const mapMain = document.querySelector('.hero-map-main');
-  const wordmark = document.getElementById('hero-wordmark-only');
+  const mapSurface = document.getElementById('leaflet-map');
   const wordmarkRow = document.querySelector('.hero-wordmark-row');
-  const heroFeed = document.querySelector('.hero-feed');
 
-  if (!mapMain || !wordmark) return;
+  if (!mapSurface || !wordmarkRow) return;
 
-  mapMain.addEventListener('click', (e) => {
-    const clickedControls = e.target.closest('.hero-wordmark-row, .hero-feed');
-    if (clickedControls) return;
-    wordmark.classList.add('map-engaged');
-  });
+  const hideWordmark = () => wordmarkRow.classList.add('map-engaged');
+  const showWordmark = () => wordmarkRow.classList.remove('map-engaged');
 
-  [wordmarkRow, heroFeed].forEach((el) => {
-    if (!el) return;
-    el.addEventListener('click', (e) => {
-      e.stopPropagation();
-      wordmark.classList.remove('map-engaged');
-    });
-  });
+  // Desktop: fade the wordmark only while the cursor is actively over the map.
+  mapSurface.addEventListener('pointerenter', hideWordmark);
+  mapSurface.addEventListener('pointerleave', showWordmark);
 
-  document.addEventListener('click', (e) => {
-    const insideHeroMap = e.target.closest('.hero-map-main');
-    if (!insideHeroMap) {
-      wordmark.classList.remove('map-engaged');
-    }
-  });
+  // Mobile/tablet: fade while user is touching/dragging the map.
+  mapSurface.addEventListener('touchstart', hideWordmark, { passive: true });
+  mapSurface.addEventListener('touchend', showWordmark, { passive: true });
+  mapSurface.addEventListener('touchcancel', showWordmark, { passive: true });
 });
 </script>
 
